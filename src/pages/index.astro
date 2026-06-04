@@ -98,6 +98,73 @@ const rosterColumns = 13;
           </article>
         </section>
       </section>
+
+      <section class="mobile-layout" aria-label="Mobile streamer signup">
+        <header class="mobile-top-bar">
+          <div class="mobile-nav-plate" aria-hidden="true">
+            <span class="mobile-back-icon"></span>
+            <span class="mobile-book-icon"></span>
+          </div>
+          <div class="mobile-title-tab">
+            <h1>QGF Streamer Invite</h1>
+            <span class="mobile-title-caret"></span>
+          </div>
+        </header>
+
+        <section class="mobile-roster" aria-label="Streamer roster placeholders">
+          {
+            streamers.map((streamer, index) => (
+              <button
+                type="button"
+                class={`mobile-tile mobile-tile-${streamer.status}`}
+                style={`--tile-index: ${index}`}
+                data-mobile-streamer-card
+                data-streamer-id={streamer.id}
+                data-streamer-name={streamer.name}
+                aria-pressed="false"
+              >
+                <span class="mobile-portrait" aria-hidden="true">
+                  {
+                    streamer.image ? (
+                      <img src={streamer.image} alt="" loading="lazy" />
+                    ) : (
+                      <>
+                        <span class="mobile-portrait-shape mobile-portrait-shape-a" />
+                        <span class="mobile-portrait-shape mobile-portrait-shape-b" />
+                        <span class="mobile-portrait-head" />
+                        <span class="mobile-portrait-body" />
+                      </>
+                    )
+                  }
+                </span>
+                <span class="mobile-tile-shine" aria-hidden="true"></span>
+                <span class="mobile-tile-name">{streamer.name}</span>
+              </button>
+            ))
+          }
+        </section>
+
+        <section class="mobile-cta" data-mobile-cta hidden aria-live="polite">
+          <div class="mobile-cta-panel">
+            <div class="mobile-cta-portrait" aria-hidden="true">
+              <span class="mobile-big-avatar-head"></span>
+              <span class="mobile-big-avatar-body"></span>
+              <span class="mobile-big-avatar-arm"></span>
+            </div>
+            <div class="mobile-cta-card">
+              <div class="mobile-watermark">QGF</div>
+              <h2 data-mobile-selected-name>Streamer</h2>
+              <div class="mobile-player-info">
+                <span>Streamer</span>
+                <strong>0%</strong>
+              </div>
+              <button type="button" class="mobile-twitch-button" aria-disabled="true">
+                Confirm with Twitch
+              </button>
+            </div>
+          </div>
+        </section>
+      </section>
     </main>
     <script>
       const setStageScale = () => {
@@ -107,6 +174,35 @@ const rosterColumns = 13;
 
       setStageScale();
       window.addEventListener("resize", setStageScale, { passive: true });
+
+      const mobileCards = document.querySelectorAll("[data-mobile-streamer-card]");
+      const mobileCta = document.querySelector("[data-mobile-cta]");
+      const mobileSelectedName = document.querySelector("[data-mobile-selected-name]");
+
+      mobileCards.forEach((card) => {
+        card.addEventListener("click", () => {
+          mobileCards.forEach((candidate) => {
+            candidate.classList.remove("mobile-tile-selected");
+            candidate.setAttribute("aria-pressed", "false");
+          });
+
+          card.classList.add("mobile-tile-selected");
+          card.setAttribute("aria-pressed", "true");
+
+          if (mobileSelectedName instanceof HTMLElement) {
+            mobileSelectedName.textContent = card.getAttribute("data-streamer-name") || "Streamer";
+          }
+
+          if (mobileCta instanceof HTMLElement) {
+            const wasHidden = mobileCta.hidden;
+            mobileCta.hidden = false;
+
+            if (wasHidden && window.matchMedia("(max-width: 900px)").matches) {
+              mobileCta.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          }
+        });
+      });
     </script>
   </body>
 </html>
@@ -146,6 +242,10 @@ const rosterColumns = 13;
       radial-gradient(circle at 12% 72%, rgba(255, 43, 80, 0.6), transparent 23%),
       radial-gradient(circle at 82% 82%, rgba(70, 241, 246, 0.5), transparent 28%),
       linear-gradient(135deg, #2819bc 0%, #12bad0 47%, #fff24b 100%);
+  }
+
+  .mobile-layout {
+    display: none;
   }
 
   .stage {
@@ -713,6 +813,470 @@ const rosterColumns = 13;
     background:
       radial-gradient(circle at 50% 38%, #0d0d0d 0 13px, transparent 14px),
       #16181b;
+  }
+
+  @media (max-width: 900px) {
+    :global(html),
+    :global(body) {
+      min-height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: #080d10;
+    }
+
+    .viewport {
+      width: 100%;
+      min-height: 100svh;
+      height: auto;
+      overflow: visible;
+      background:
+        linear-gradient(180deg, #1762d2 0 15%, #19b9c6 34%, #2415a6 34% 35%, #111719 35% 36%, #2ce3e7 64%, #fff06c 100%);
+    }
+
+    .stage {
+      display: none;
+    }
+
+    .mobile-layout {
+      display: block;
+      width: 100%;
+      min-height: 100svh;
+      padding: 86px 8px 28px;
+    }
+
+    .mobile-top-bar {
+      position: fixed;
+      z-index: 20;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 74px;
+      background: linear-gradient(180deg, #e60010 0 45px, #101619 45px 100%);
+      box-shadow: 0 5px 0 rgba(0, 0, 0, 0.72);
+    }
+
+    .mobile-nav-plate {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 138px;
+      height: 70px;
+      background: linear-gradient(111deg, #d9000d 0 48%, #ad0009 49% 83%, transparent 84%);
+      filter: drop-shadow(7px 6px 0 rgba(0, 0, 0, 0.72));
+    }
+
+    .mobile-back-icon {
+      position: absolute;
+      left: 15px;
+      top: 17px;
+      width: 30px;
+      height: 21px;
+      border: 5px solid #f2a0a0;
+      border-right: 0;
+      border-radius: 18px 0 0 18px;
+    }
+
+    .mobile-back-icon::before {
+      content: "";
+      position: absolute;
+      left: -9px;
+      top: -11px;
+      width: 0;
+      height: 0;
+      border-top: 15px solid transparent;
+      border-bottom: 15px solid transparent;
+      border-right: 20px solid #f2a0a0;
+    }
+
+    .mobile-book-icon {
+      position: absolute;
+      left: 81px;
+      top: 15px;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      background: #f3a4a4;
+      box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    .mobile-title-tab {
+      position: absolute;
+      left: 88px;
+      right: 11px;
+      top: 8px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 36px 0 24px;
+      background: #ffdb05;
+      color: #040404;
+      clip-path: polygon(5% 0, 97% 0, 100% 50%, 97% 100%, 5% 100%, 0 50%);
+      border: 3px solid #151516;
+      box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.78);
+    }
+
+    .mobile-title-tab h1 {
+      margin: 0;
+      max-width: 100%;
+      overflow: hidden;
+      font-family: Impact, "Arial Black", sans-serif;
+      font-size: clamp(16px, 5vw, 24px);
+      line-height: 1;
+      letter-spacing: 0;
+      text-align: center;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .mobile-title-caret {
+      position: absolute;
+      right: 13px;
+      top: 13px;
+      width: 0;
+      height: 0;
+      border-left: 9px solid transparent;
+      border-right: 9px solid transparent;
+      border-top: 16px solid #8c7412;
+    }
+
+    .mobile-roster {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+      width: 100%;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 6px;
+      background: #101518;
+      border: 4px solid #101518;
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.55);
+    }
+
+    .mobile-tile {
+      position: relative;
+      isolation: isolate;
+      min-width: 0;
+      aspect-ratio: 1.12;
+      overflow: hidden;
+      padding: 0;
+      border: 2px solid #151719;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.55), transparent 22%),
+        linear-gradient(145deg, hsl(calc(var(--tile-index) * 37), 78%, 63%), hsl(calc(var(--tile-index) * 37 + 70), 78%, 52%));
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+        inset 0 -24px 28px rgba(0, 0, 0, 0.36);
+      cursor: pointer;
+      appearance: none;
+    }
+
+    .mobile-tile-confirmed {
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.55), transparent 22%),
+        linear-gradient(145deg, #18c6a7, #5940e8);
+    }
+
+    .mobile-tile-invited {
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.55), transparent 22%),
+        linear-gradient(145deg, #ffcb1f, #ed327a);
+    }
+
+    .mobile-tile-featured,
+    .mobile-tile-selected {
+      border-color: #08090a;
+      box-shadow:
+        inset 0 0 0 3px #f62624,
+        inset 0 0 0 6px #08090a,
+        0 0 0 2px #fff,
+        inset 0 -24px 28px rgba(0, 0, 0, 0.36);
+    }
+
+    .mobile-portrait {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .mobile-portrait img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .mobile-portrait-shape-a,
+    .mobile-portrait-shape-b {
+      position: absolute;
+      display: block;
+      border-radius: 50%;
+      opacity: 0.38;
+    }
+
+    .mobile-portrait-shape-a {
+      width: 78%;
+      height: 78%;
+      left: -22%;
+      top: -20%;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .mobile-portrait-shape-b {
+      width: 96%;
+      height: 96%;
+      right: -36%;
+      bottom: -40%;
+      background: rgba(0, 0, 0, 0.22);
+    }
+
+    .mobile-portrait-head {
+      position: absolute;
+      left: 50%;
+      top: 12%;
+      width: 34%;
+      height: 31%;
+      border-radius: 48% 48% 42% 42%;
+      background:
+        radial-gradient(circle at 33% 38%, #171717 0 8%, transparent 9%),
+        radial-gradient(circle at 68% 38%, #171717 0 8%, transparent 9%),
+        linear-gradient(#ffe8c2, #f1b477);
+      transform: translateX(-50%) rotate(calc((var(--tile-index) - 34) * 0.22deg));
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.32);
+    }
+
+    .mobile-portrait-body {
+      position: absolute;
+      left: 46%;
+      top: 43%;
+      width: 56%;
+      height: 52%;
+      border-radius: 45% 45% 0 0;
+      background: linear-gradient(135deg, #ffffff, #2b3037 28%, #08090a 100%);
+      transform: translateX(-50%) skewX(-10deg);
+      box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.12);
+    }
+
+    .mobile-tile-shine {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      background: linear-gradient(115deg, rgba(255, 255, 255, 0.34) 0 18%, transparent 19% 100%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    .mobile-tile-name {
+      position: absolute;
+      z-index: 2;
+      left: 3px;
+      right: 3px;
+      bottom: 3px;
+      color: #fff;
+      font-family: "Arial Black", Impact, sans-serif;
+      font-size: clamp(10px, 3.2vw, 18px);
+      line-height: 0.9;
+      text-align: center;
+      text-transform: uppercase;
+      text-wrap: balance;
+      text-shadow:
+        -2px -2px 0 #111,
+        2px -2px 0 #111,
+        -2px 2px 0 #111,
+        2px 2px 0 #111,
+        0 4px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    .mobile-cta[hidden] {
+      display: none;
+    }
+
+    .mobile-cta {
+      max-width: 820px;
+      margin: 16px auto 0;
+      scroll-margin-top: 86px;
+    }
+
+    .mobile-cta-panel {
+      position: relative;
+      min-height: 286px;
+      overflow: hidden;
+      border: 7px solid #101416;
+      background:
+        linear-gradient(131deg, #ff1968 0 26%, transparent 26%),
+        linear-gradient(100deg, rgba(255, 255, 255, 0.92) 0 45%, transparent 45%),
+        #ff2a2f;
+      clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%, 0 27%);
+    }
+
+    .mobile-cta-portrait {
+      position: absolute;
+      left: 3%;
+      top: 12px;
+      width: 50%;
+      height: 260px;
+      overflow: hidden;
+    }
+
+    .mobile-big-avatar-head {
+      position: absolute;
+      left: 30%;
+      top: 14%;
+      width: 88px;
+      height: 78px;
+      border-radius: 48% 47% 42% 43%;
+      background:
+        radial-gradient(circle at 36% 45%, #063251 0 6px, transparent 7px),
+        radial-gradient(circle at 66% 45%, #063251 0 6px, transparent 7px),
+        linear-gradient(#ffeac8, #edac73);
+      box-shadow:
+        -30px -10px 0 -12px #bc2030,
+        0 8px 0 rgba(0, 0, 0, 0.24);
+      transform: rotate(-12deg);
+    }
+
+    .mobile-big-avatar-body {
+      position: absolute;
+      left: 15%;
+      top: 43%;
+      width: 150px;
+      height: 132px;
+      border-radius: 45% 52% 0 0;
+      background: linear-gradient(145deg, #1d51b8 0 42%, #f7f4f5 43% 51%, #c82735 52% 100%);
+      transform: rotate(-16deg) skewX(-8deg);
+      box-shadow: inset -18px -8px 0 rgba(0, 0, 0, 0.16);
+    }
+
+    .mobile-big-avatar-arm {
+      position: absolute;
+      left: 47%;
+      top: 52%;
+      width: 104px;
+      height: 44px;
+      border-radius: 28px;
+      background: linear-gradient(90deg, #f7f7f7, #aeb8c5);
+      transform: rotate(-18deg);
+      box-shadow: 0 0 0 5px rgba(10, 12, 16, 0.18);
+    }
+
+    .mobile-cta-card {
+      position: relative;
+      z-index: 1;
+      width: min(58%, 430px);
+      min-height: 244px;
+      margin: 22px 14px 14px auto;
+      padding: 74px 12px 14px;
+      background:
+        linear-gradient(140deg, transparent 0 30%, rgba(255, 255, 255, 0.16) 31% 42%, transparent 43%),
+        linear-gradient(#ff3031, #f21814);
+    }
+
+    .mobile-watermark {
+      position: absolute;
+      right: 17px;
+      top: 18px;
+      color: rgba(104, 0, 0, 0.22);
+      font-family: Impact, sans-serif;
+      font-size: 48px;
+      line-height: 1;
+    }
+
+    .mobile-cta-card h2 {
+      margin: 0;
+      color: #fff;
+      font-family: "Arial Black", Impact, sans-serif;
+      font-size: clamp(27px, 8vw, 48px);
+      line-height: 0.95;
+      text-align: right;
+      text-transform: uppercase;
+      text-wrap: balance;
+      text-shadow:
+        -3px -3px 0 #060606,
+        3px -3px 0 #060606,
+        -3px 3px 0 #060606,
+        3px 3px 0 #060606,
+        0 7px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .mobile-player-info {
+      display: grid;
+      grid-template-columns: 1fr 72px;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .mobile-player-info span,
+    .mobile-player-info strong {
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 3px solid #171719;
+      background: rgba(255, 226, 226, 0.88);
+      color: #151515;
+      font-family: "Arial Black", Impact, sans-serif;
+      font-size: clamp(18px, 5vw, 30px);
+      line-height: 1;
+    }
+
+    .mobile-player-info strong {
+      color: #fff;
+      background: rgba(255, 232, 232, 0.5);
+      text-shadow:
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+        2px 2px 0 #000;
+    }
+
+    .mobile-twitch-button {
+      width: 100%;
+      min-height: 47px;
+      margin-top: 12px;
+      border: 4px solid #171719;
+      background: #9146ff;
+      color: #fff;
+      font-family: "Arial Black", Impact, sans-serif;
+      font-size: clamp(18px, 5vw, 27px);
+      line-height: 1;
+      text-transform: uppercase;
+      text-shadow:
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+        2px 2px 0 #000;
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.45);
+      cursor: default;
+    }
+
+    @media (min-width: 560px) {
+      .mobile-roster {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 430px) {
+      .mobile-layout {
+        padding-right: 5px;
+        padding-left: 5px;
+      }
+
+      .mobile-roster {
+        gap: 3px;
+        padding: 4px;
+        border-width: 3px;
+      }
+
+      .mobile-cta-panel {
+        min-height: 268px;
+      }
+
+      .mobile-cta-card {
+        width: 62%;
+        margin-right: 8px;
+        padding-top: 68px;
+      }
+    }
   }
 
 </style>
