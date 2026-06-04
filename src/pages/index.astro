@@ -378,7 +378,15 @@ const rosterColumns = 13;
               float clouds2 = fbm(wuv * vec2(7.0 * aspect, 7.0) + vec2(8.0, 2.0) + vec2(-0.18 * t, 0.12 * t));
               float clouds3 = fbm(wuv * vec2(13.0 * aspect, 13.0) + vec2(4.0, 9.0) + vec2(0.10 * t, 0.16 * t));
 
-              vec3 col = palette(uv);
+              vec2 colorUv = uv;
+              colorUv += (warpA - 0.5) * 0.10;
+              colorUv += (warpB - 0.5) * 0.045;
+              colorUv.x += 0.060 * sin(t * 0.58 + uv.y * 4.2)
+                         + 0.030 * sin(t * 0.34 + uv.x * 5.5 + uv.y * 2.0);
+              colorUv.y += 0.050 * cos(t * 0.46 + uv.x * 3.6)
+                         + 0.024 * sin(t * 0.40 + uv.y * 5.2);
+
+              vec3 col = mix(palette(uv), palette(colorUv), 0.62);
 
               float warmMist = smoothstep(0.42, 0.92, clouds1)
                              * softBlob(uv, vec2(0.24, 0.70), vec2(0.54, 0.40), 1.4);
@@ -570,6 +578,23 @@ const rosterColumns = 13;
 </html>
 
 <style>
+  @property --selected-border-color {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #f62624;
+  }
+
+  @keyframes selected-border-pulse {
+    0%,
+    100% {
+      --selected-border-color: #f62624;
+    }
+
+    38% {
+      --selected-border-color: #fff;
+    }
+  }
+
   :global(*) {
     box-sizing: border-box;
   }
@@ -747,9 +772,31 @@ const rosterColumns = 13;
     pointer-events: none;
   }
 
+  .roster::before,
+  .roster::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    bottom: -2px;
+    height: 82px;
+    background: #101518;
+    box-shadow: inset 0 2px 0 #151719;
+    pointer-events: none;
+  }
+
+  .roster::before {
+    left: -2px;
+    width: 292px;
+  }
+
+  .roster::after {
+    right: -2px;
+    width: 148px;
+  }
+
   .tile {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     isolation: isolate;
     overflow: hidden;
     min-width: 0;
@@ -771,9 +818,11 @@ const rosterColumns = 13;
   }
 
   .tile-featured {
+    --selected-border-color: #f62624;
     border-color: #111;
+    animation: selected-border-pulse 1.25s ease-in-out infinite;
     box-shadow:
-      inset 0 0 0 4px #f62624,
+      inset 0 0 0 4px var(--selected-border-color),
       inset 0 0 0 7px #08090a,
       inset 0 -24px 28px rgba(0, 0, 0, 0.34);
   }
@@ -1380,9 +1429,11 @@ const rosterColumns = 13;
 
     .mobile-tile-featured,
     .mobile-tile-selected {
+      --selected-border-color: #f62624;
       border-color: #08090a;
+      animation: selected-border-pulse 1.25s ease-in-out infinite;
       box-shadow:
-        inset 0 0 0 3px #f62624,
+        inset 0 0 0 3px var(--selected-border-color),
         inset 0 0 0 6px #08090a,
         0 0 0 2px #fff,
         inset 0 -24px 28px rgba(0, 0, 0, 0.36);
