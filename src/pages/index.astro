@@ -938,7 +938,7 @@ const rosterColumns = 13;
     z-index: 5;
     inset: 0 0 auto;
     height: 84px;
-    background: linear-gradient(179deg, #f6e51e 0 8px, #e60010 9px 43px, #101619 44px);
+    background: linear-gradient(180deg, #e60010 0 43px, #101619 44px);
   }
 
   .nav-plate {
@@ -987,41 +987,65 @@ const rosterColumns = 13;
 
   .title-tab {
     position: absolute;
-    left: 342px;
-    top: 8px;
-    width: 630px;
-    height: 66px;
+    z-index: 1;
+    left: 318px;
+    top: 4px;
+    width: 670px;
+    height: 72px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #ffdb05;
+    padding: 0 82px 0 94px;
+    isolation: isolate;
+    background: #111315;
     color: #040404;
-    clip-path: polygon(3% 0, 98% 0, 100% 50%, 98% 100%, 3% 100%, 0 50%);
-    border: 5px solid #151516;
-    box-shadow: 9px 8px 0 rgba(0, 0, 0, 0.78);
+    clip-path: polygon(4.4% 0, 97.6% 0, 100% 50%, 97.6% 100%, 4.4% 100%, 0 50%);
+    filter: drop-shadow(6px 7px 0 rgba(0, 0, 0, 0.78));
+  }
+
+  .title-tab::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 5px 9px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent 28%),
+      linear-gradient(105deg, #fff017 0 36%, #ffdb05 52%, #ffd100 100%);
+    clip-path: polygon(4.4% 0, 97.6% 0, 100% 50%, 97.6% 100%, 4.4% 100%, 0 50%);
   }
 
   .title-tab h1 {
-    margin: 0 34px 0 0;
-    font-size: 42px;
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    font-family: "Segoe UI", Arial, Helvetica, system-ui, sans-serif !important;
+    font-size: 43px;
+    font-weight: 900;
+    font-stretch: normal;
+    font-variant: normal;
+    font-variant-caps: normal;
     line-height: 1;
     letter-spacing: 0;
-    text-transform: uppercase;
+    text-align: center;
+    text-transform: none !important;
+    white-space: nowrap;
   }
 
   .title-caret {
     position: absolute;
-    right: 25px;
-    top: 22px;
+    z-index: 1;
+    right: 43px;
+    top: 24px;
     width: 0;
     height: 0;
-    border-left: 15px solid transparent;
-    border-right: 15px solid transparent;
-    border-top: 25px solid #8c7412;
+    border-left: 17px solid transparent;
+    border-right: 17px solid transparent;
+    border-top: 27px solid #9a7b08;
   }
 
   .top-red {
     position: absolute;
+    z-index: 0;
     left: 976px;
     right: 0;
     top: 8px;
@@ -1640,44 +1664,63 @@ const rosterColumns = 13;
 
     .mobile-title-tab {
       position: absolute;
-      left: 88px;
-      right: 11px;
-      top: 8px;
-      height: 42px;
+      z-index: 1;
+      left: 86px;
+      right: 8px;
+      top: 5px;
+      height: 49px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0 36px 0 24px;
-      background: #ffdb05;
+      padding: 0 58px 0 34px;
+      isolation: isolate;
+      background: #111315;
       color: #040404;
-      clip-path: polygon(5% 0, 97% 0, 100% 50%, 97% 100%, 5% 100%, 0 50%);
-      border: 3px solid #151516;
-      box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.78);
+      clip-path: polygon(7% 0, 97% 0, 100% 50%, 97% 100%, 7% 100%, 0 50%);
+      filter: drop-shadow(4px 5px 0 rgba(0, 0, 0, 0.78));
+    }
+
+    .mobile-title-tab::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 3px 5px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent 30%),
+        linear-gradient(105deg, #fff017 0 36%, #ffdb05 55%, #ffd100 100%);
+      clip-path: polygon(7% 0, 97% 0, 100% 50%, 97% 100%, 7% 100%, 0 50%);
     }
 
     .mobile-title-tab h1 {
+      position: relative;
+      z-index: 1;
       margin: 0;
       max-width: 100%;
       overflow: hidden;
-      font-family: Impact, "Arial Black", sans-serif;
-      font-size: clamp(16px, 5vw, 24px);
+      font-family: "Segoe UI", Arial, Helvetica, system-ui, sans-serif !important;
+      font-size: clamp(15px, 4.3vw, 22px);
+      font-weight: 900;
+      font-stretch: normal;
+      font-variant: normal;
+      font-variant-caps: normal;
       line-height: 1;
       letter-spacing: 0;
       text-align: center;
       text-overflow: ellipsis;
-      text-transform: uppercase;
+      text-transform: none !important;
       white-space: nowrap;
     }
 
     .mobile-title-caret {
       position: absolute;
-      right: 13px;
-      top: 13px;
+      z-index: 2;
+      right: 29px;
+      top: 16px;
       width: 0;
       height: 0;
       border-left: 9px solid transparent;
       border-right: 9px solid transparent;
-      border-top: 16px solid #8c7412;
+      border-top: 16px solid #9a7b08;
     }
 
     .mobile-roster {
