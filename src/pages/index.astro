@@ -255,25 +255,50 @@ const rosterColumns = 13;
       const hasSelection = () =>
         document.documentElement.classList.contains("has-streamer-selected");
 
+      const setSelectedStreamerName = (streamerName) => {
+        if (selectedName instanceof HTMLElement) {
+          selectedName.textContent = streamerName;
+        }
+
+        if (mobileSelectedName instanceof HTMLElement) {
+          mobileSelectedName.textContent = streamerName;
+        }
+      };
+
       const setCursorOverStreamerCard = (isOver) => {
         document.documentElement.classList.toggle("custom-cursor-over-streamer-card", isOver);
       };
 
+      const clearHoverPreview = () => {
+        document.documentElement.classList.remove("has-streamer-hover-preview");
+
+        if (!hasSelection()) {
+          setSelectedStreamerName("");
+        }
+      };
+
+      const previewStreamer = (card) => {
+        if (hasSelection()) {
+          return;
+        }
+
+        const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
+        document.documentElement.classList.add("has-streamer-hover-preview");
+        setSelectedStreamerName(streamerName);
+      };
+
       const clearSelection = () => {
-        document.documentElement.classList.remove("has-streamer-selected");
+        document.documentElement.classList.remove(
+          "has-streamer-selected",
+          "has-streamer-hover-preview",
+        );
 
         streamerCards.forEach((candidate) => {
           candidate.classList.remove("tile-selected", "mobile-tile-selected");
           candidate.setAttribute("aria-pressed", "false");
         });
 
-        if (selectedName instanceof HTMLElement) {
-          selectedName.textContent = "";
-        }
-
-        if (mobileSelectedName instanceof HTMLElement) {
-          mobileSelectedName.textContent = "";
-        }
+        setSelectedStreamerName("");
 
         if (mobileCta instanceof HTMLElement) {
           mobileCta.hidden = true;
@@ -285,6 +310,7 @@ const rosterColumns = 13;
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
 
         document.documentElement.classList.add("has-streamer-selected");
+        document.documentElement.classList.remove("has-streamer-hover-preview");
 
         streamerCards.forEach((candidate) => {
           const isSelected = streamerId
@@ -301,13 +327,7 @@ const rosterColumns = 13;
           candidate.setAttribute("aria-pressed", String(isSelected));
         });
 
-        if (selectedName instanceof HTMLElement) {
-          selectedName.textContent = streamerName;
-        }
-
-        if (mobileSelectedName instanceof HTMLElement) {
-          mobileSelectedName.textContent = streamerName;
-        }
+        setSelectedStreamerName(streamerName);
 
         if (mobileCta instanceof HTMLElement && card.classList.contains("mobile-tile")) {
           const wasHidden = mobileCta.hidden;
@@ -331,10 +351,12 @@ const rosterColumns = 13;
       streamerCards.forEach((card) => {
         card.addEventListener("mouseenter", () => {
           setCursorOverStreamerCard(true);
+          previewStreamer(card);
         });
 
         card.addEventListener("mouseleave", () => {
           setCursorOverStreamerCard(false);
+          clearHoverPreview();
         });
 
         card.addEventListener("click", () => {
@@ -1648,7 +1670,9 @@ const rosterColumns = 13;
   }
 
   :global(html.has-streamer-selected) .player-panel-primary .panel-portrait,
-  :global(html.has-streamer-selected) .player-panel-primary .player-red-card {
+  :global(html.has-streamer-selected) .player-panel-primary .player-red-card,
+  :global(html.has-streamer-hover-preview) .player-panel-primary .panel-portrait,
+  :global(html.has-streamer-hover-preview) .player-panel-primary .player-red-card {
     opacity: 1;
   }
 
