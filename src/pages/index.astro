@@ -76,6 +76,22 @@ const rosterColumns = 13;
           }
         </section>
 
+        <section class="ready-overlay" aria-hidden="true">
+          <div class="ready-panel">
+            <span class="ready-rail ready-rail-top"></span>
+            <div class="ready-banner">
+              <span class="ready-red-wedge"></span>
+              <span class="ready-yellow-wedge"></span>
+              <p class="ready-copy">
+                <span data-ready-word="READY">READY</span>
+                <small data-ready-word="to">to</small>
+                <span data-ready-word="STREAM!">STREAM!</span>
+              </p>
+            </div>
+            <span class="ready-rail ready-rail-bottom"></span>
+          </div>
+        </section>
+
         <section class="bottom-dock" aria-label="Signup panel">
           <canvas
             class="dock-shader"
@@ -243,19 +259,21 @@ const rosterColumns = 13;
       setStageScale();
       window.addEventListener("resize", setStageScale, { passive: true });
 
-      const streamerCards = document.querySelectorAll(
+      const streamerCards = document.querySelectorAll<HTMLElement>(
         "[data-streamer-card], [data-mobile-streamer-card]",
       );
-      const backArrows = document.querySelectorAll("[data-back-arrow]");
+      const backArrows = document.querySelectorAll<HTMLElement>("[data-back-arrow]");
       const mobileCta = document.querySelector("[data-mobile-cta]");
       const selectedName = document.querySelector("[data-selected-name]");
       const mobileSelectedName = document.querySelector("[data-mobile-selected-name]");
       const festivalUrl = "https://www.queenslandgamesfestival.com/";
+      const readyOverlayExitMs = 280;
+      let readyOverlayExitTimer: number | undefined;
 
       const hasSelection = () =>
         document.documentElement.classList.contains("has-streamer-selected");
 
-      const setSelectedStreamerName = (streamerName) => {
+      const setSelectedStreamerName = (streamerName: string) => {
         if (selectedName instanceof HTMLElement) {
           selectedName.textContent = streamerName;
         }
@@ -265,7 +283,7 @@ const rosterColumns = 13;
         }
       };
 
-      const setCursorOverStreamerCard = (isOver) => {
+      const setCursorOverStreamerCard = (isOver: boolean) => {
         document.documentElement.classList.toggle("custom-cursor-over-streamer-card", isOver);
       };
 
@@ -277,7 +295,7 @@ const rosterColumns = 13;
         }
       };
 
-      const previewStreamer = (card) => {
+      const previewStreamer = (card: HTMLElement) => {
         if (hasSelection()) {
           return;
         }
@@ -287,11 +305,48 @@ const rosterColumns = 13;
         setSelectedStreamerName(streamerName);
       };
 
+      const resetReadyOverlayToEntrance = () => {
+        document.documentElement.classList.add("ready-overlay-reset");
+        document.documentElement.classList.remove("ready-overlay-exiting");
+        document.querySelector(".ready-panel")?.getBoundingClientRect();
+        window.requestAnimationFrame(() => {
+          document.documentElement.classList.remove("ready-overlay-reset");
+        });
+      };
+
+      const cancelReadyOverlayExit = () => {
+        if (readyOverlayExitTimer) {
+          window.clearTimeout(readyOverlayExitTimer);
+          readyOverlayExitTimer = undefined;
+        }
+
+        if (document.documentElement.classList.contains("ready-overlay-exiting")) {
+          resetReadyOverlayToEntrance();
+        }
+      };
+
+      const showReadyOverlay = () => {
+        cancelReadyOverlayExit();
+        document.documentElement.classList.add("has-streamer-selected");
+      };
+
+      const hideReadyOverlay = () => {
+        document.documentElement.classList.remove("has-streamer-selected");
+        document.documentElement.classList.add("ready-overlay-exiting");
+
+        if (readyOverlayExitTimer) {
+          window.clearTimeout(readyOverlayExitTimer);
+        }
+
+        readyOverlayExitTimer = window.setTimeout(() => {
+          resetReadyOverlayToEntrance();
+          readyOverlayExitTimer = undefined;
+        }, readyOverlayExitMs);
+      };
+
       const clearSelection = () => {
-        document.documentElement.classList.remove(
-          "has-streamer-selected",
-          "has-streamer-hover-preview",
-        );
+        hideReadyOverlay();
+        document.documentElement.classList.remove("has-streamer-hover-preview");
 
         streamerCards.forEach((candidate) => {
           candidate.classList.remove("tile-selected", "mobile-tile-selected");
@@ -305,11 +360,11 @@ const rosterColumns = 13;
         }
       };
 
-      const selectStreamer = (card) => {
+      const selectStreamer = (card: HTMLElement) => {
         const streamerId = card.getAttribute("data-streamer-id");
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
 
-        document.documentElement.classList.add("has-streamer-selected");
+        showReadyOverlay();
         document.documentElement.classList.remove("has-streamer-hover-preview");
 
         streamerCards.forEach((candidate) => {
@@ -339,7 +394,7 @@ const rosterColumns = 13;
         }
       };
 
-      const activateStreamer = (card) => {
+      const activateStreamer = (card: HTMLElement) => {
         if (hasSelection()) {
           clearSelection();
           return;
@@ -728,7 +783,7 @@ const rosterColumns = 13;
           }
         `;
 
-        const compileShader = (type, source) => {
+        const compileShader = (type: number, source: string) => {
           const shader = gl.createShader(type);
 
           if (!shader) {
@@ -791,7 +846,7 @@ const rosterColumns = 13;
         const mobileMedia = window.matchMedia("(max-width: 900px)");
         let animationFrame = 0;
         let startTime = performance.now();
-        let currentHost = null;
+        let currentHost: HTMLElement | null = null;
 
         const getActiveHost = () => mobileMedia.matches ? mobileRoster : desktopRoster;
 
@@ -821,7 +876,7 @@ const rosterColumns = 13;
           gl.uniform3f(resolutionLocation, width, height, pixelRatio);
         };
 
-        const render = (now) => {
+        const render = (now: number) => {
           syncHost();
           resizeCanvas();
           gl.useProgram(program);
@@ -990,7 +1045,7 @@ const rosterColumns = 13;
           }
         `;
 
-        const compileShader = (type, source) => {
+        const compileShader = (type: number, source: string): WebGLShader | null => {
           const shader = gl.createShader(type);
 
           if (!shader) {
@@ -1068,7 +1123,7 @@ const rosterColumns = 13;
           gl.uniform3f(resolutionLocation, width, height, pixelRatio);
         };
 
-        const render = (now) => {
+        const render = (now: number) => {
           resizeCanvas();
           gl.useProgram(program);
           gl.uniform1f(timeLocation, (now - startTime) / 1000);
@@ -1264,7 +1319,7 @@ const rosterColumns = 13;
 
   .top-bar {
     position: absolute;
-    z-index: 5;
+    z-index: auto;
     inset: 0 0 auto;
     height: 84px;
     background: linear-gradient(180deg, #e60010 0 43px, #101619 44px);
@@ -1272,6 +1327,7 @@ const rosterColumns = 13;
 
   .nav-plate {
     position: absolute;
+    z-index: 8;
     left: 0;
     top: 0;
     width: 315px;
@@ -1324,7 +1380,7 @@ const rosterColumns = 13;
 
   .title-tab {
     position: absolute;
-    z-index: 1;
+    z-index: 8;
     left: 318px;
     top: 4px;
     width: 670px;
@@ -1462,7 +1518,7 @@ const rosterColumns = 13;
   }
 
   .tile-selected {
-    z-index: 7;
+    z-index: 5;
     border-color: #fff;
     box-shadow:
       inset 0 0 0 4px #f62624,
@@ -1608,13 +1664,413 @@ const rosterColumns = 13;
     transform: translateY(0) scale(1) rotate(-7deg);
   }
 
+  .ready-overlay {
+    position: absolute;
+    z-index: 6;
+    inset: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .ready-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.76);
+    opacity: 0;
+    transition: opacity 160ms ease;
+  }
+
+  :global(html.has-streamer-selected) .ready-overlay {
+    visibility: visible;
+  }
+
+  :global(html.ready-overlay-exiting) .ready-overlay {
+    visibility: visible;
+  }
+
+  :global(html.has-streamer-selected) .ready-overlay::before {
+    opacity: 1;
+  }
+
+  .ready-panel {
+    position: absolute;
+    z-index: 1;
+    --ready-panel-slide: -112%;
+    --ready-panel-depth: translateX(-180px) perspective(1050px) rotateY(-13deg) rotateZ(-1.8deg) scaleX(1.35);
+    --ready-rail-delay: 120ms;
+    --ready-gradient-delay: 220ms;
+    --ready-black-delay: 320ms;
+    --ready-text-delay: 430ms;
+    left: -120px;
+    width: 2160px;
+    top: 188px;
+    height: 280px;
+    filter: drop-shadow(0 17px 0 rgba(0, 0, 0, 0.54));
+    transform: translateX(var(--ready-panel-slide)) var(--ready-panel-depth);
+    transform-origin: 88% 50%;
+    transform-style: preserve-3d;
+    transition: transform 260ms cubic-bezier(0.18, 0.86, 0.24, 1);
+    will-change: transform;
+  }
+
+  .ready-panel::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    top: 194px;
+    height: 44px;
+    background: linear-gradient(90deg, #ff1f00 0, #ff7a00 34%, #ffb900 68%, #ffdd05 100%);
+    box-shadow:
+      0 7px 0 rgba(0, 0, 0, 0.72),
+      0 -3px 0 rgba(255, 255, 255, 0.18);
+    opacity: 0;
+    transform: scaleX(0.02);
+    transform-origin: left center;
+    transition:
+      opacity 90ms ease,
+      transform 220ms cubic-bezier(0.2, 0.86, 0.24, 1);
+  }
+
+  :global(html.has-streamer-selected) .ready-panel {
+    --ready-panel-slide: 0;
+    transition-delay: 80ms;
+  }
+
+  :global(html.ready-overlay-exiting) .ready-panel {
+    --ready-panel-slide: 112%;
+    transition-delay: 0ms;
+  }
+
+  :global(html.ready-overlay-reset) .ready-panel {
+    transition: none;
+  }
+
+  :global(html.has-streamer-selected) .ready-panel::before,
+  :global(html.ready-overlay-exiting) .ready-panel::before {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  :global(html.has-streamer-selected) .ready-panel::before {
+    transition-delay: var(--ready-gradient-delay);
+  }
+
+  :global(html.ready-overlay-exiting) .ready-panel::before {
+    transition-delay: 0ms;
+  }
+
+  .ready-rail {
+    position: absolute;
+    z-index: 0;
+    left: 0;
+    right: 0;
+    display: block;
+    background: linear-gradient(180deg, #ffffff, #dce3ee);
+    opacity: 0;
+    transform: scaleX(0.02);
+    transform-origin: left center;
+    transition:
+      opacity 90ms ease,
+      transform 220ms cubic-bezier(0.2, 0.86, 0.24, 1);
+  }
+
+  :global(html.has-streamer-selected) .ready-rail,
+  :global(html.ready-overlay-exiting) .ready-rail {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  :global(html.has-streamer-selected) .ready-rail {
+    transition-delay: var(--ready-rail-delay);
+  }
+
+  :global(html.ready-overlay-exiting) .ready-rail {
+    transition-delay: 0ms;
+  }
+
+  .ready-rail-top {
+    top: 0;
+    height: 34px;
+  }
+
+  .ready-rail-bottom {
+    top: 226px;
+    height: 54px;
+    background: linear-gradient(180deg, #f7f9ff, #cfd7e4);
+  }
+
+  .ready-banner {
+    position: absolute;
+    z-index: 2;
+    left: 134px;
+    right: 146px;
+    top: 34px;
+    height: 176px;
+    overflow: visible;
+    background: transparent;
+    transform: translateY(5px) skewY(-1.1deg);
+    transform-origin: right center;
+  }
+
+  .ready-banner::before,
+  .ready-banner::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .ready-banner::before {
+    z-index: 0;
+    inset: 0;
+    background: #090a0b;
+    box-shadow:
+      inset 0 0 0 5px rgba(255, 255, 255, 0.14),
+      inset 0 -12px 0 rgba(0, 0, 0, 0.38),
+      0 14px 0 rgba(0, 0, 0, 0.62),
+      0 0 18px rgba(0, 0, 0, 0.42);
+    opacity: 0;
+    transform: scaleX(0.02);
+    transform-origin: left center;
+    transition:
+      opacity 110ms ease,
+      transform 220ms cubic-bezier(0.2, 0.86, 0.24, 1);
+  }
+
+  .ready-banner::after {
+    z-index: 1;
+    inset: 0;
+    background:
+      linear-gradient(105deg, transparent 0 22%, rgba(255, 255, 255, 0.09) 23% 31%, transparent 32% 100%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.11), transparent 32%);
+    opacity: 0;
+    transform: scaleX(0.02);
+    transform-origin: left center;
+    transition:
+      opacity 110ms ease,
+      transform 220ms cubic-bezier(0.2, 0.86, 0.24, 1);
+  }
+
+  :global(html.has-streamer-selected) .ready-banner::before,
+  :global(html.has-streamer-selected) .ready-banner::after,
+  :global(html.ready-overlay-exiting) .ready-banner::before,
+  :global(html.ready-overlay-exiting) .ready-banner::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  :global(html.has-streamer-selected) .ready-banner::before,
+  :global(html.has-streamer-selected) .ready-banner::after {
+    transition-delay: var(--ready-black-delay);
+  }
+
+  :global(html.ready-overlay-exiting) .ready-banner::before,
+  :global(html.ready-overlay-exiting) .ready-banner::after {
+    transition-delay: 0ms;
+  }
+
+  .ready-red-wedge,
+  .ready-yellow-wedge {
+    position: absolute;
+    z-index: 2;
+    top: -24px;
+    bottom: -24px;
+    display: block;
+    opacity: 0;
+    transition:
+      opacity 100ms ease,
+      transform 220ms cubic-bezier(0.2, 0.86, 0.24, 1);
+  }
+
+  .ready-red-wedge {
+    left: -134px;
+    width: 260px;
+    background: linear-gradient(105deg, #ef0012, #ff2920);
+    transform: translateX(-54px) scaleX(0.42);
+    transform-origin: right center;
+    box-shadow:
+      10px 0 0 rgba(0, 0, 0, 0.34),
+      0 12px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  .ready-yellow-wedge {
+    right: -146px;
+    width: 330px;
+    background: linear-gradient(96deg, #ffae00 0, #ffda04 48%, #fff04a 100%);
+    transform: translateX(54px) scaleX(0.42);
+    transform-origin: left center;
+    box-shadow:
+      -10px 0 0 rgba(0, 0, 0, 0.28),
+      0 12px 0 rgba(0, 0, 0, 0.44);
+  }
+
+  :global(html.has-streamer-selected) .ready-red-wedge,
+  :global(html.has-streamer-selected) .ready-yellow-wedge,
+  :global(html.ready-overlay-exiting) .ready-red-wedge,
+  :global(html.ready-overlay-exiting) .ready-yellow-wedge {
+    opacity: 1;
+    transform: translateX(0) scaleX(1);
+  }
+
+  :global(html.has-streamer-selected) .ready-red-wedge,
+  :global(html.has-streamer-selected) .ready-yellow-wedge {
+    transition-delay: var(--ready-gradient-delay);
+  }
+
+  :global(html.ready-overlay-exiting) .ready-red-wedge,
+  :global(html.ready-overlay-exiting) .ready-yellow-wedge {
+    transition-delay: 0ms;
+  }
+
+  .ready-copy {
+    position: absolute;
+    z-index: 3;
+    inset: 0 174px 0 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    margin: 0;
+    padding-top: 0;
+    color: #ffd817;
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: 132px;
+    font-style: italic;
+    line-height: 0.82;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: nowrap;
+    text-shadow:
+      -5px -5px 0 #050505,
+      5px -5px 0 #050505,
+      -5px 5px 0 #050505,
+      5px 5px 0 #050505,
+      0 11px 0 rgba(0, 0, 0, 0.42),
+      12px 16px 0 rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: translateY(18px) skewX(-8deg) scaleX(1.14);
+    transform-origin: center;
+    transition:
+      opacity 120ms ease,
+      transform 190ms cubic-bezier(0.2, 0.86, 0.24, 1);
+  }
+
+  :global(html.has-streamer-selected) .ready-copy,
+  :global(html.ready-overlay-exiting) .ready-copy {
+    opacity: 1;
+    transform: translateY(0) skewX(-8deg) scaleX(1.14);
+  }
+
+  :global(html.has-streamer-selected) .ready-copy {
+    transition-delay: var(--ready-text-delay);
+  }
+
+  :global(html.ready-overlay-exiting) .ready-copy {
+    transition-delay: 0ms;
+  }
+
+  .ready-copy span,
+  .ready-copy small {
+    --ready-word-fill: #ffd817;
+    --ready-shimmer-delay: 650ms;
+    position: relative;
+    display: inline-block;
+    overflow: visible;
+    color: var(--ready-word-fill);
+    -webkit-text-fill-color: var(--ready-word-fill);
+  }
+
+  .ready-copy span::after,
+  .ready-copy small::after {
+    content: attr(data-ready-word);
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: block;
+    pointer-events: none;
+    color: transparent;
+    background:
+      linear-gradient(
+        105deg,
+        transparent 0 31%,
+        rgba(255, 244, 112, 0) 40%,
+        rgba(255, 244, 112, 0.9) 46%,
+        #fff 50%,
+        rgba(255, 244, 112, 0.9) 54%,
+        rgba(255, 244, 112, 0) 60%,
+        transparent 100%
+      );
+    background-size: 360% 100%;
+    background-position: 150% 0;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0;
+    text-shadow: none;
+    mix-blend-mode: screen;
+  }
+
+  :global(html.has-streamer-selected) .ready-copy span::after,
+  :global(html.has-streamer-selected) .ready-copy small::after {
+    opacity: 1;
+    animation: ready-text-shimmer 1.35s cubic-bezier(0.2, 0.76, 0.26, 1)
+      var(--ready-shimmer-delay) infinite;
+  }
+
+  :global(html.has-streamer-selected) .ready-copy small {
+    --ready-shimmer-delay: 730ms;
+  }
+
+  :global(html.has-streamer-selected) .ready-copy span:last-child {
+    --ready-shimmer-delay: 810ms;
+  }
+
+  .ready-copy span:last-child {
+    --ready-word-fill: #ff9f00;
+  }
+
+  .ready-copy small {
+    --ready-word-fill: #fff;
+    font-size: 58px;
+    font-style: italic;
+    letter-spacing: 0;
+    text-shadow:
+      -4px -4px 0 #050505,
+      4px -4px 0 #050505,
+      -4px 4px 0 #050505,
+      4px 4px 0 #050505,
+      0 8px 0 rgba(0, 0, 0, 0.42),
+      8px 12px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  @keyframes ready-text-shimmer {
+    0%,
+    22% {
+      background-position: 150% 0;
+    }
+
+    78%,
+    100% {
+      background-position: -150% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.has-streamer-selected) .ready-copy span::after,
+    :global(html.has-streamer-selected) .ready-copy small::after {
+      animation-duration: 2.8s;
+    }
+  }
+
   .bottom-dock {
     position: absolute;
+    z-index: auto;
     left: 0;
     right: 0;
     bottom: 0;
     height: 404px;
-    isolation: isolate;
     overflow: hidden;
     display: grid;
     grid-template-columns: 922px 1fr;
@@ -1649,11 +2105,12 @@ const rosterColumns = 13;
   }
 
   .bottom-dock > .player-panel {
-    z-index: 2;
+    z-index: 8;
   }
 
   .player-panel {
     position: relative;
+    z-index: 8;
     height: 389px;
     overflow: hidden;
     border: 9px solid #101416;
@@ -2158,7 +2615,7 @@ const rosterColumns = 13;
 
     .mobile-tile-selected {
       --selected-border-color: #f62624;
-      z-index: 6;
+      z-index: 5;
       border-color: #08090a;
       animation: selected-border-pulse 1.25s ease-in-out infinite;
       box-shadow:
