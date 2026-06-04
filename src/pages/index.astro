@@ -203,11 +203,398 @@ const rosterColumns = 13;
           }
         });
       });
+
+      const createRosterShader = () => {
+        const desktopRoster = document.querySelector(".roster");
+        const mobileRoster = document.querySelector(".mobile-roster");
+
+        if (!(desktopRoster instanceof HTMLElement) || !(mobileRoster instanceof HTMLElement)) {
+          return;
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.className = "roster-shader";
+        canvas.setAttribute("aria-hidden", "true");
+
+        const gl = canvas.getContext("webgl", {
+          alpha: false,
+          antialias: false,
+          depth: false,
+          stencil: false,
+        });
+
+        if (!gl) {
+          return;
+        }
+
+        const vertexSource = `
+          attribute vec2 aPosition;
+
+          void main() {
+            gl_Position = vec4(aPosition, 0.0, 1.0);
+          }
+        `;
+
+        const fragmentSource = `
+          precision highp float;
+
+          uniform vec3 iResolution;
+          uniform float iTime;
+
+          #define SPEED 2.0
+
+          float hash11(float n)
+          {
+              return fract(sin(n) * 43758.5453123);
+          }
+
+          float hash21(vec2 p)
+          {
+              p = fract(p * vec2(123.34, 456.21));
+              p += dot(p, p + 45.32);
+              return fract(p.x * p.y);
+          }
+
+          vec2 hash22(vec2 p)
+          {
+              float n = hash21(p);
+              return vec2(n, hash21(p + n + 19.19));
+          }
+
+          float noise(vec2 p)
+          {
+              vec2 i = floor(p);
+              vec2 f = fract(p);
+
+              vec2 u = f * f * (3.0 - 2.0 * f);
+
+              float a = hash21(i);
+              float b = hash21(i + vec2(1.0, 0.0));
+              float c = hash21(i + vec2(0.0, 1.0));
+              float d = hash21(i + vec2(1.0, 1.0));
+
+              return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+          }
+
+          float fbm(vec2 p)
+          {
+              float v = 0.0;
+              float a = 0.5;
+
+              mat2 m = mat2(
+                   1.6,  1.2,
+                  -1.2,  1.6
+              );
+
+              for (int i = 0; i < 6; i++)
+              {
+                  v += a * noise(p);
+                  p = m * p + 7.13;
+                  a *= 0.5;
+              }
+
+              return v;
+          }
+
+          float softBlob(vec2 uv, vec2 center, vec2 scale, float softness)
+          {
+              vec2 p = (uv - center) / scale;
+              float d = dot(p, p);
+              return exp(-d * softness);
+          }
+
+          float twinkleSpeckles(vec2 uv, float density, float threshold, float sizeMin, float sizeMax, float t)
+          {
+              vec2 g = uv * density;
+              vec2 id = floor(g);
+              vec2 f = fract(g) - 0.5;
+
+              vec2 rnd = hash22(id) - 0.5;
+              float seed = hash21(id + 31.7);
+
+              float d = length(f - rnd * 0.75);
+              float radius = mix(sizeMin, sizeMax, hash21(id + 9.2));
+
+              float dotShape = 1.0 - smoothstep(radius, radius * 1.8, d);
+
+              float phase = hash21(id + 100.0) * 6.28318;
+              float speed = mix(0.6, 2.4, hash21(id + 200.0));
+              float pulse = 0.5 + 0.5 * sin(t * speed + phase);
+
+              float visible = step(threshold, seed);
+              return dotShape * pulse * visible;
+          }
+
+          vec3 palette(vec2 uv)
+          {
+              vec3 coral    = vec3(1.00, 0.36, 0.47);
+              vec3 peach    = vec3(1.00, 0.71, 0.55);
+              vec3 pink     = vec3(1.00, 0.28, 0.73);
+              vec3 rose     = vec3(0.97, 0.42, 0.86);
+              vec3 lavender = vec3(0.72, 0.54, 1.00);
+              vec3 violet   = vec3(0.42, 0.18, 0.98);
+              vec3 deepVio  = vec3(0.28, 0.10, 0.78);
+
+              float leftToRight = smoothstep(-0.15, 1.15, uv.x);
+
+              vec3 col = mix(coral, violet, leftToRight);
+              col = mix(col, pink, 0.38);
+              col = mix(col, lavender, smoothstep(0.25, 0.95, uv.x) * 0.34);
+              col = mix(col, deepVio, smoothstep(0.62, 1.08, uv.x + (1.0 - uv.y) * 0.42) * 0.36);
+              col = mix(col, peach, softBlob(uv, vec2(0.23, 0.68), vec2(0.32, 0.28), 1.8) * 0.58);
+              col = mix(col, rose,  softBlob(uv, vec2(0.55, 0.58), vec2(0.48, 0.32), 2.0) * 0.36);
+
+              return col;
+          }
+
+          void mainImage(out vec4 fragColor, in vec2 fragCoord)
+          {
+              vec2 uv = fragCoord.xy / iResolution.xy;
+              float aspect = iResolution.x / iResolution.y;
+              vec2 q = vec2((uv.x - 0.5) * aspect, uv.y - 0.5);
+
+              float t = iTime * 0.18 * SPEED;
+
+              vec2 baseDrift = vec2(t * 0.11, -t * 0.035);
+
+              vec2 warpA = vec2(
+                  fbm(uv * 2.2 + baseDrift + vec2(0.0, 0.0)),
+                  fbm(uv * 2.2 + baseDrift + vec2(8.4, 3.1))
+              );
+
+              vec2 warpB = vec2(
+                  fbm(uv * 5.6 + warpA * 2.4 + vec2(1.3 * t, -0.7 * t)),
+                  fbm(uv * 5.6 + warpA * 2.4 + vec2(-0.9 * t, 0.8 * t))
+              );
+
+              vec2 wuv = uv;
+              wuv += (warpA - 0.5) * 0.18;
+              wuv += (warpB - 0.5) * 0.08;
+
+              wuv.x += 0.012 * sin(wuv.y * 8.0 + t * 1.2);
+              wuv.y += 0.010 * sin(wuv.x * 7.0 - t * 1.0);
+
+              float clouds1 = fbm(wuv * vec2(3.0 * aspect, 3.0) + vec2(1.3, 0.5) + vec2(0.25 * t, -0.10 * t));
+              float clouds2 = fbm(wuv * vec2(7.0 * aspect, 7.0) + vec2(8.0, 2.0) + vec2(-0.18 * t, 0.12 * t));
+              float clouds3 = fbm(wuv * vec2(13.0 * aspect, 13.0) + vec2(4.0, 9.0) + vec2(0.10 * t, 0.16 * t));
+
+              vec2 colorUv = uv;
+              colorUv += (warpA - 0.5) * 0.10;
+              colorUv += (warpB - 0.5) * 0.045;
+              colorUv.x += 0.060 * sin(t * 0.58 + uv.y * 4.2)
+                         + 0.030 * sin(t * 0.34 + uv.x * 5.5 + uv.y * 2.0);
+              colorUv.y += 0.050 * cos(t * 0.46 + uv.x * 3.6)
+                         + 0.024 * sin(t * 0.40 + uv.y * 5.2);
+
+              vec3 col = mix(palette(uv), palette(colorUv), 0.62);
+
+              float warmMist = smoothstep(0.42, 0.92, clouds1)
+                             * softBlob(uv, vec2(0.24, 0.70), vec2(0.54, 0.40), 1.4);
+
+              float pinkMist = smoothstep(0.28, 0.82, clouds2)
+                             * softBlob(uv, vec2(0.42, 0.45), vec2(0.75, 0.55), 1.2);
+
+              float violetMist = smoothstep(0.34, 0.90, clouds1 + clouds2 * 0.35)
+                               * smoothstep(0.25, 1.05, uv.x + (1.0 - uv.y) * 0.55);
+
+              vec3 cream   = vec3(1.00, 0.88, 0.72);
+              vec3 hotPink = vec3(1.00, 0.20, 0.78);
+              vec3 magenta = vec3(0.88, 0.22, 0.96);
+              vec3 blueVio = vec3(0.38, 0.22, 1.00);
+
+              col = mix(col, cream,   warmMist * 0.42);
+              col = mix(col, hotPink, pinkMist * 0.22);
+              col = mix(col, magenta, smoothstep(0.45, 0.85, clouds2) * 0.23);
+              col = mix(col, blueVio, violetMist * 0.34);
+
+              float mottled = clouds2 * 0.55 + clouds3 * 0.45;
+              col += (mottled - 0.5) * 0.16;
+
+              float paleSplash =
+                  smoothstep(0.60, 0.93, fbm(wuv * vec2(9.0 * aspect, 9.0) + 10.0 + vec2(-0.20 * t, 0.18 * t))) *
+                  smoothstep(0.20, 0.95, fbm(wuv * vec2(2.0 * aspect, 2.0) - 5.0 + vec2(0.08 * t, -0.10 * t)));
+
+              col = mix(col, vec3(1.0, 0.82, 0.95), paleSplash * 0.23);
+
+              float glowPulse1 = 0.5 + 0.5 * sin(t * 0.9);
+              float glowPulse2 = 0.5 + 0.5 * sin(t * 1.2 + 1.7);
+              float glowPulse3 = 0.5 + 0.5 * sin(t * 0.7 + 3.1);
+
+              float glow1 = softBlob(uv, vec2(0.23, 0.82), vec2(0.24, 0.22), 2.2) * (0.75 + 0.25 * glowPulse1);
+              float glow2 = softBlob(uv, vec2(0.35, 0.57), vec2(0.36, 0.24), 2.6) * (0.75 + 0.25 * glowPulse2);
+              float glow3 = softBlob(uv, vec2(0.68, 0.58), vec2(0.38, 0.32), 2.0) * (0.75 + 0.25 * glowPulse3);
+              float glow4 = softBlob(uv, vec2(0.86, 0.70), vec2(0.28, 0.25), 2.4) * (0.80 + 0.20 * glowPulse1);
+
+              col = mix(col, vec3(1.00, 0.82, 0.68), glow1 * 0.26);
+              col = mix(col, vec3(1.00, 0.70, 0.78), glow2 * 0.20);
+              col = mix(col, vec3(0.95, 0.62, 1.00), glow3 * 0.25);
+              col = mix(col, vec3(0.80, 0.55, 1.00), glow4 * 0.18);
+
+              float s1 = twinkleSpeckles(uv + (warpA - 0.5) * 0.02, 115.0, 0.935, 0.035, 0.095, t * 2.0);
+              float s2 = twinkleSpeckles(uv + (warpB - 0.5) * 0.01, 210.0, 0.970, 0.020, 0.060, t * 2.7);
+              float s3 = twinkleSpeckles(uv,                          420.0, 0.992, 0.010, 0.032, t * 3.2);
+
+              float speck = s1 * 0.55 + s2 * 0.45 + s3 * 0.35;
+              col = mix(col, vec3(1.0), clamp(speck, 0.0, 1.0) * 0.55);
+
+              float grain = hash21(fragCoord.xy + floor(iTime * 24.0));
+              col += (grain - 0.5) * 0.028;
+
+              float edge = length(q * vec2(0.33, 0.72));
+              col *= 1.04 - smoothstep(0.28, 0.78, edge) * 0.09;
+
+              col = clamp(col, 0.0, 1.0);
+              col = pow(col, vec3(0.92));
+              col = mix(vec3(dot(col, vec3(0.299, 0.587, 0.114))), col, 1.14);
+
+              fragColor = vec4(col, 1.0);
+          }
+
+          void main() {
+            mainImage(gl_FragColor, gl_FragCoord.xy);
+          }
+        `;
+
+        const compileShader = (type, source) => {
+          const shader = gl.createShader(type);
+
+          if (!shader) {
+            return null;
+          }
+
+          gl.shaderSource(shader, source);
+          gl.compileShader(shader);
+
+          if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            console.warn("Roster shader compile failed:", gl.getShaderInfoLog(shader));
+            gl.deleteShader(shader);
+            return null;
+          }
+
+          return shader;
+        };
+
+        const vertexShader = compileShader(gl.VERTEX_SHADER, vertexSource);
+        const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentSource);
+
+        if (!vertexShader || !fragmentShader) {
+          return;
+        }
+
+        const program = gl.createProgram();
+
+        if (!program) {
+          return;
+        }
+
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+        gl.deleteShader(vertexShader);
+        gl.deleteShader(fragmentShader);
+
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+          console.warn("Roster shader link failed:", gl.getProgramInfoLog(program));
+          gl.deleteProgram(program);
+          return;
+        }
+
+        const positionLocation = gl.getAttribLocation(program, "aPosition");
+        const resolutionLocation = gl.getUniformLocation(program, "iResolution");
+        const timeLocation = gl.getUniformLocation(program, "iTime");
+        const positionBuffer = gl.createBuffer();
+
+        if (!positionBuffer || positionLocation < 0 || !resolutionLocation || !timeLocation) {
+          gl.deleteProgram(program);
+          return;
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+        gl.useProgram(program);
+        gl.enableVertexAttribArray(positionLocation);
+        gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+        const mobileMedia = window.matchMedia("(max-width: 900px)");
+        let animationFrame = 0;
+        let startTime = performance.now();
+        let currentHost = null;
+
+        const getActiveHost = () => mobileMedia.matches ? mobileRoster : desktopRoster;
+
+        const syncHost = () => {
+          const activeHost = getActiveHost();
+
+          if (currentHost !== activeHost) {
+            currentHost?.classList.remove("shader-active");
+            activeHost.prepend(canvas);
+            activeHost.classList.add("shader-active", "shader-ready");
+            currentHost = activeHost;
+          }
+        };
+
+        const resizeCanvas = () => {
+          const rect = canvas.getBoundingClientRect();
+          const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+          const width = Math.max(1, Math.round(rect.width * pixelRatio));
+          const height = Math.max(1, Math.round(rect.height * pixelRatio));
+
+          if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width;
+            canvas.height = height;
+          }
+
+          gl.viewport(0, 0, width, height);
+          gl.uniform3f(resolutionLocation, width, height, pixelRatio);
+        };
+
+        const render = (now) => {
+          syncHost();
+          resizeCanvas();
+          gl.useProgram(program);
+          gl.uniform1f(timeLocation, (now - startTime) / 1000);
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+          animationFrame = window.requestAnimationFrame(render);
+        };
+
+        const restartRenderLoop = () => {
+          window.cancelAnimationFrame(animationFrame);
+          startTime = performance.now();
+          animationFrame = window.requestAnimationFrame(render);
+        };
+
+        desktopRoster.classList.add("shader-ready");
+        mobileRoster.classList.add("shader-ready");
+        syncHost();
+        restartRenderLoop();
+
+        window.addEventListener("resize", restartRenderLoop, { passive: true });
+        mobileMedia.addEventListener("change", restartRenderLoop);
+      };
+
+      createRosterShader();
     </script>
   </body>
 </html>
 
 <style>
+  @property --selected-border-color {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #f62624;
+  }
+
+  @keyframes selected-border-pulse {
+    0%,
+    100% {
+      --selected-border-color: #f62624;
+    }
+
+    38% {
+      --selected-border-color: #fff;
+    }
+  }
+
   :global(*) {
     box-sizing: border-box;
   }
@@ -375,8 +762,41 @@ const rosterColumns = 13;
     border-bottom: 6px solid #101518;
   }
 
+  :global(.roster-shader) {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: none;
+  }
+
+  .roster::before,
+  .roster::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    bottom: -2px;
+    height: 82px;
+    background: #101518;
+    box-shadow: inset 0 2px 0 #151719;
+    pointer-events: none;
+  }
+
+  .roster::before {
+    left: -2px;
+    width: 292px;
+  }
+
+  .roster::after {
+    right: -2px;
+    width: 148px;
+  }
+
   .tile {
     position: relative;
+    z-index: 2;
     isolation: isolate;
     overflow: hidden;
     min-width: 0;
@@ -389,14 +809,20 @@ const rosterColumns = 13;
       inset 0 -24px 28px rgba(0, 0, 0, 0.34);
   }
 
-  .tile:nth-child(79) {
+  .roster.shader-ready .tile {
+    background: transparent;
+  }
+
+  .tile:nth-of-type(79) {
     grid-column-start: 3;
   }
 
   .tile-featured {
+    --selected-border-color: #f62624;
     border-color: #111;
+    animation: selected-border-pulse 1.25s ease-in-out infinite;
     box-shadow:
-      inset 0 0 0 4px #f62624,
+      inset 0 0 0 4px var(--selected-border-color),
       inset 0 0 0 7px #08090a,
       inset 0 -24px 28px rgba(0, 0, 0, 0.34);
   }
@@ -411,6 +837,11 @@ const rosterColumns = 13;
     background:
       linear-gradient(135deg, rgba(255, 255, 255, 0.55), transparent 20%),
       linear-gradient(145deg, #ffcb1f, #ed327a);
+  }
+
+  .roster.shader-ready .tile-confirmed,
+  .roster.shader-ready .tile-invited {
+    background: transparent;
   }
 
   .portrait {
@@ -942,13 +1373,15 @@ const rosterColumns = 13;
     }
 
     .mobile-roster {
+      position: relative;
+      overflow: hidden;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 4px;
+      gap: 0;
       width: 100%;
       max-width: 820px;
       margin: 0 auto;
-      padding: 6px;
+      padding: 8px;
       background: #101518;
       border: 4px solid #101518;
       box-shadow: 0 8px 0 rgba(0, 0, 0, 0.55);
@@ -956,6 +1389,7 @@ const rosterColumns = 13;
 
     .mobile-tile {
       position: relative;
+      z-index: 1;
       isolation: isolate;
       min-width: 0;
       aspect-ratio: 1.12;
@@ -972,6 +1406,10 @@ const rosterColumns = 13;
       appearance: none;
     }
 
+    .mobile-roster.shader-ready .mobile-tile {
+      background: transparent;
+    }
+
     .mobile-tile-confirmed {
       background:
         linear-gradient(135deg, rgba(255, 255, 255, 0.55), transparent 22%),
@@ -984,11 +1422,18 @@ const rosterColumns = 13;
         linear-gradient(145deg, #ffcb1f, #ed327a);
     }
 
+    .mobile-roster.shader-ready .mobile-tile-confirmed,
+    .mobile-roster.shader-ready .mobile-tile-invited {
+      background: transparent;
+    }
+
     .mobile-tile-featured,
     .mobile-tile-selected {
+      --selected-border-color: #f62624;
       border-color: #08090a;
+      animation: selected-border-pulse 1.25s ease-in-out infinite;
       box-shadow:
-        inset 0 0 0 3px #f62624,
+        inset 0 0 0 3px var(--selected-border-color),
         inset 0 0 0 6px #08090a,
         0 0 0 2px #fff,
         inset 0 -24px 28px rgba(0, 0, 0, 0.36);
@@ -1086,6 +1531,12 @@ const rosterColumns = 13;
         -2px 2px 0 #111,
         2px 2px 0 #111,
         0 4px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    .mobile-roster :global(.roster-shader) {
+      inset: 8px;
+      width: calc(100% - 16px);
+      height: calc(100% - 16px);
     }
 
     .mobile-cta[hidden] {
@@ -1262,9 +1713,15 @@ const rosterColumns = 13;
       }
 
       .mobile-roster {
-        gap: 3px;
+        gap: 0;
         padding: 4px;
         border-width: 3px;
+      }
+
+      .mobile-roster :global(.roster-shader) {
+        inset: 4px;
+        width: calc(100% - 8px);
+        height: calc(100% - 8px);
       }
 
       .mobile-cta-panel {
