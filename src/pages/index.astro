@@ -41,6 +41,12 @@ const rosterColumns = 13;
               <article
                 class={`tile tile-${streamer.status}`}
                 style={`--tile-index: ${index}`}
+                data-streamer-card
+                data-streamer-id={streamer.id}
+                data-streamer-name={streamer.name}
+                role="button"
+                tabindex="0"
+                aria-pressed="false"
                 aria-label={`${streamer.name} streamer slot`}
               >
                 <div class="portrait" aria-hidden="true">
@@ -67,7 +73,7 @@ const rosterColumns = 13;
             </div>
             <div class="player-red-card">
               <div class="watermark">QGF</div>
-              <h2>{featuredStreamer.name}</h2>
+              <h2 data-selected-name>{featuredStreamer.name}</h2>
               <div class="player-info">
                 <span>Streamer</span>
                 <strong>0%</strong>
@@ -166,6 +172,30 @@ const rosterColumns = 13;
         </section>
       </section>
     </main>
+
+    <div class="custom-cursor" data-custom-cursor aria-hidden="true" hidden>
+      <div class="custom-cursor-art">
+        <img
+          class="custom-cursor-hand custom-cursor-hand-marker"
+          src="/cursors/MarkerHand.png"
+          alt=""
+          draggable="false"
+        />
+        <img
+          class="custom-cursor-hand custom-cursor-hand-empty"
+          src="/cursors/EmptyHand.png"
+          alt=""
+          draggable="false"
+        />
+        <img
+          class="custom-cursor-p1"
+          src="/cursors/P1.png"
+          alt=""
+          draggable="false"
+        />
+      </div>
+    </div>
+
     <script>
       const setStageScale = () => {
         const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
@@ -175,33 +205,136 @@ const rosterColumns = 13;
       setStageScale();
       window.addEventListener("resize", setStageScale, { passive: true });
 
-      const mobileCards = document.querySelectorAll("[data-mobile-streamer-card]");
+      const streamerCards = document.querySelectorAll(
+        "[data-streamer-card], [data-mobile-streamer-card]",
+      );
       const mobileCta = document.querySelector("[data-mobile-cta]");
+      const selectedName = document.querySelector("[data-selected-name]");
       const mobileSelectedName = document.querySelector("[data-mobile-selected-name]");
 
-      mobileCards.forEach((card) => {
-        card.addEventListener("click", () => {
-          mobileCards.forEach((candidate) => {
-            candidate.classList.remove("mobile-tile-selected");
-            candidate.setAttribute("aria-pressed", "false");
-          });
+      const selectStreamer = (card) => {
+        const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
 
-          card.classList.add("mobile-tile-selected");
-          card.setAttribute("aria-pressed", "true");
+        document.documentElement.classList.add("has-streamer-selected");
 
-          if (mobileSelectedName instanceof HTMLElement) {
-            mobileSelectedName.textContent = card.getAttribute("data-streamer-name") || "Streamer";
-          }
-
-          if (mobileCta instanceof HTMLElement) {
-            const wasHidden = mobileCta.hidden;
-            mobileCta.hidden = false;
-
-            if (wasHidden && window.matchMedia("(max-width: 900px)").matches) {
-              mobileCta.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
-          }
+        streamerCards.forEach((candidate) => {
+          const isSelected = candidate === card;
+          candidate.classList.toggle(
+            "tile-selected",
+            isSelected && candidate.classList.contains("tile"),
+          );
+          candidate.classList.toggle(
+            "mobile-tile-selected",
+            isSelected && candidate.classList.contains("mobile-tile"),
+          );
+          candidate.setAttribute("aria-pressed", String(isSelected));
         });
+
+        if (selectedName instanceof HTMLElement) {
+          selectedName.textContent = streamerName;
+        }
+
+        if (mobileSelectedName instanceof HTMLElement) {
+          mobileSelectedName.textContent = streamerName;
+        }
+
+        if (mobileCta instanceof HTMLElement && card.classList.contains("mobile-tile")) {
+          const wasHidden = mobileCta.hidden;
+          mobileCta.hidden = false;
+
+          if (wasHidden && window.matchMedia("(max-width: 900px)").matches) {
+            mobileCta.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }
+      };
+
+      streamerCards.forEach((card) => {
+        card.addEventListener("click", () => {
+          selectStreamer(card);
+        });
+
+        card.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") {
+            return;
+          }
+
+          event.preventDefault();
+          selectStreamer(card);
+        });
+      });
+
+      const customCursor = document.querySelector("[data-custom-cursor]");
+      const customCursorQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+      let cursorFrame = 0;
+      let cursorX = -200;
+      let cursorY = -200;
+
+      const syncCustomCursor = () => {
+        const isEnabled = customCursorQuery.matches && customCursor instanceof HTMLElement;
+        document.documentElement.classList.toggle("custom-cursor-enabled", isEnabled);
+
+        if (customCursor instanceof HTMLElement) {
+          customCursor.hidden = !isEnabled;
+          customCursor.classList.toggle("custom-cursor-visible", false);
+        }
+      };
+
+      const positionCustomCursor = () => {
+        if (customCursor instanceof HTMLElement) {
+          customCursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+        }
+
+        cursorFrame = 0;
+      };
+
+      syncCustomCursor();
+      customCursorQuery.addEventListener("change", syncCustomCursor);
+
+      window.addEventListener(
+        "pointermove",
+        (event) => {
+          if (
+            event.pointerType !== "mouse" ||
+            !customCursorQuery.matches ||
+            !(customCursor instanceof HTMLElement)
+          ) {
+            return;
+          }
+
+          cursorX = event.clientX;
+          cursorY = event.clientY;
+          customCursor.classList.add("custom-cursor-visible");
+
+          if (!cursorFrame) {
+            cursorFrame = window.requestAnimationFrame(positionCustomCursor);
+          }
+        },
+        { passive: true },
+      );
+
+      window.addEventListener("pointerout", (event) => {
+        if (!event.relatedTarget && customCursor instanceof HTMLElement) {
+          customCursor.classList.remove("custom-cursor-visible");
+        }
+      });
+
+      window.addEventListener("blur", () => {
+        if (customCursor instanceof HTMLElement) {
+          customCursor.classList.remove("custom-cursor-visible");
+          customCursor.classList.remove("custom-cursor-pressed");
+        }
+      });
+
+      window.addEventListener("pointerdown", (event) => {
+        if (event.pointerType === "mouse" && customCursor instanceof HTMLElement) {
+          customCursor.classList.add("custom-cursor-pressed");
+        }
+      });
+
+      window.addEventListener("pointerup", (event) => {
+        if (event.pointerType === "mouse" && customCursor instanceof HTMLElement) {
+          customCursor.classList.remove("custom-cursor-pressed");
+        }
       });
 
       const createRosterShader = () => {
@@ -620,6 +753,83 @@ const rosterColumns = 13;
     min-height: 100vh;
   }
 
+  :global(html.custom-cursor-enabled),
+  :global(html.custom-cursor-enabled *) {
+    cursor: none !important;
+  }
+
+  .custom-cursor {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 108px;
+    height: 108px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(-200px, -200px, 0);
+    transition: opacity 80ms ease;
+    will-change: transform;
+  }
+
+  .custom-cursor[hidden] {
+    display: none;
+  }
+
+  .custom-cursor-visible {
+    opacity: 1;
+  }
+
+  .custom-cursor-art {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform: translate(-28%, -15%);
+    transform-origin: 28% 15%;
+    transition: transform 80ms ease;
+  }
+
+  .custom-cursor-pressed .custom-cursor-art {
+    transform: translate(-28%, -15%) scale(0.92);
+  }
+
+  .custom-cursor-hand,
+  .custom-cursor-p1 {
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .custom-cursor-hand {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 120ms ease;
+  }
+
+  .custom-cursor-hand-empty {
+    opacity: 0;
+  }
+
+  :global(html.has-streamer-selected) .custom-cursor-hand-marker {
+    opacity: 0;
+  }
+
+  :global(html.has-streamer-selected) .custom-cursor-hand-empty {
+    opacity: 1;
+  }
+
+  .custom-cursor-p1 {
+    position: absolute;
+    right: -10%;
+    bottom: -10%;
+    width: 42%;
+    height: 42%;
+    object-fit: contain;
+  }
+
   .viewport {
     position: relative;
     width: 100vw;
@@ -807,6 +1017,7 @@ const rosterColumns = 13;
     box-shadow:
       inset 0 0 0 1px rgba(255, 255, 255, 0.18),
       inset 0 -24px 28px rgba(0, 0, 0, 0.34);
+    cursor: pointer;
   }
 
   .roster.shader-ready .tile {
@@ -825,6 +1036,21 @@ const rosterColumns = 13;
       inset 0 0 0 4px var(--selected-border-color),
       inset 0 0 0 7px #08090a,
       inset 0 -24px 28px rgba(0, 0, 0, 0.34);
+  }
+
+  .tile-selected {
+    border-color: #fff;
+    box-shadow:
+      inset 0 0 0 4px #f62624,
+      inset 0 0 0 7px #08090a,
+      0 0 0 4px #fff,
+      inset 0 -24px 28px rgba(0, 0, 0, 0.34);
+  }
+
+  .tile:focus-visible,
+  .mobile-tile:focus-visible {
+    outline: 4px solid #fff;
+    outline-offset: -8px;
   }
 
   .tile-confirmed {
