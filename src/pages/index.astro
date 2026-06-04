@@ -1227,14 +1227,19 @@ const rosterColumns = 13;
   }
 
   .viewport {
+    --edge-blue-light: #6bb9e8;
+    --edge-blue-mid: #159cf0;
+    --edge-blue-deep: #078fe8;
     position: relative;
     width: 100vw;
     height: 100vh;
     overflow: hidden;
     background:
-      radial-gradient(circle at 12% 72%, rgba(255, 43, 80, 0.6), transparent 23%),
-      radial-gradient(circle at 82% 82%, rgba(70, 241, 246, 0.5), transparent 28%),
-      linear-gradient(135deg, #2819bc 0%, #12bad0 47%, #fff24b 100%);
+      linear-gradient(150deg, transparent 0 18%, rgba(107, 185, 232, 0.96) 18% 42%, transparent 42%) left center / 50% 100% no-repeat,
+      linear-gradient(207deg, transparent 0 31%, rgba(7, 143, 232, 0.94) 31% 56%, transparent 56%) left center / 50% 100% no-repeat,
+      linear-gradient(30deg, transparent 0 21%, rgba(21, 156, 240, 0.96) 21% 45%, transparent 45%) right center / 50% 100% no-repeat,
+      linear-gradient(334deg, transparent 0 38%, rgba(107, 185, 232, 0.94) 38% 65%, transparent 65%) right center / 50% 100% no-repeat,
+      linear-gradient(180deg, var(--edge-blue-light) 0%, var(--edge-blue-mid) 30%, var(--edge-blue-light) 55%, var(--edge-blue-deep) 78%, var(--edge-blue-light) 100%);
   }
 
   .mobile-layout {
@@ -1956,7 +1961,9 @@ const rosterColumns = 13;
       height: auto;
       overflow: visible;
       background:
-        linear-gradient(180deg, #1762d2 0 15%, #19b9c6 34%, #2415a6 34% 35%, #111719 35% 36%, #2ce3e7 64%, #fff06c 100%);
+        linear-gradient(150deg, transparent 0 20%, rgba(107, 185, 232, 0.9) 20% 42%, transparent 42%),
+        linear-gradient(24deg, transparent 0 35%, rgba(21, 156, 240, 0.9) 35% 58%, transparent 58%),
+        linear-gradient(180deg, var(--edge-blue-light) 0%, var(--edge-blue-mid) 30%, var(--edge-blue-light) 58%, var(--edge-blue-deep) 78%, var(--edge-blue-light) 100%);
     }
 
     .stage {
