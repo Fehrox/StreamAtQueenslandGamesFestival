@@ -35,7 +35,6 @@ const rosterColumns = 13;
             <h1>QGF Streamer Invite</h1>
             <span class="title-caret"></span>
           </div>
-          <div class="top-red"></div>
         </header>
 
         <section
@@ -1322,7 +1321,29 @@ const rosterColumns = 13;
     z-index: auto;
     inset: 0 0 auto;
     height: 84px;
-    background: linear-gradient(180deg, #e60010 0 43px, #101619 44px);
+    overflow: hidden;
+    background: #101619;
+  }
+
+  .top-bar::before,
+  .top-bar::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 43px;
+    pointer-events: none;
+  }
+
+  .top-bar::before {
+    background: linear-gradient(90deg, #fff 0%, #ffd100 100%);
+  }
+
+  .top-bar::after {
+    background: #e60010;
+    clip-path: polygon(0 100%, 100% 0, 100% 100%);
   }
 
   .nav-plate {
@@ -1434,16 +1455,6 @@ const rosterColumns = 13;
     border-left: 17px solid transparent;
     border-right: 17px solid transparent;
     border-top: 27px solid #9a7b08;
-  }
-
-  .top-red {
-    position: absolute;
-    z-index: 0;
-    left: 976px;
-    right: 0;
-    top: 8px;
-    height: 36px;
-    background: #e5000d;
   }
 
   .roster {
