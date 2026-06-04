@@ -70,6 +70,11 @@ const rosterColumns = 13;
         </section>
 
         <section class="bottom-dock" aria-label="Signup panel">
+          <canvas
+            class="dock-shader"
+            data-dock-shader
+            aria-hidden="true"
+          ></canvas>
           <article class="player-panel player-panel-primary">
             <div class="panel-slash"></div>
             <div class="panel-portrait" aria-hidden="true">
@@ -772,7 +777,248 @@ const rosterColumns = 13;
         mobileMedia.addEventListener("change", restartRenderLoop);
       };
 
+      const createDockShader = () => {
+        const canvas = document.querySelector("[data-dock-shader]");
+
+        if (!(canvas instanceof HTMLCanvasElement)) {
+          return;
+        }
+
+        const gl = canvas.getContext("webgl", {
+          alpha: false,
+          antialias: false,
+          depth: false,
+          stencil: false,
+        });
+
+        if (!gl) {
+          return;
+        }
+
+        const vertexSource = `
+          attribute vec2 aPosition;
+
+          void main() {
+            gl_Position = vec4(aPosition, 0.0, 1.0);
+          }
+        `;
+
+        const fragmentSource = `
+          precision highp float;
+
+          uniform vec3 iResolution;
+          uniform float iTime;
+
+          #define S(a,b,t) smoothstep(a,b,t)
+
+          mat2 Rot(float a)
+          {
+              float s = sin(a);
+              float c = cos(a);
+              return mat2(c, -s, s, c);
+          }
+
+          vec2 hash(vec2 p)
+          {
+              p = vec2(dot(p, vec2(2127.1, 81.17)),
+                       dot(p, vec2(1269.5, 283.37)));
+              return fract(sin(p) * 43758.5453);
+          }
+
+          float noise(in vec2 p)
+          {
+              vec2 i = floor(p);
+              vec2 f = fract(p);
+
+              vec2 u = f * f * (3.0 - 2.0 * f);
+
+              float n = mix(
+                  mix(dot(-1.0 + 2.0 * hash(i + vec2(0.0, 0.0)), f - vec2(0.0, 0.0)),
+                      dot(-1.0 + 2.0 * hash(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0)), u.x),
+                  mix(dot(-1.0 + 2.0 * hash(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0)),
+                      dot(-1.0 + 2.0 * hash(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x),
+                  u.y
+              );
+
+              return 0.5 + 0.5 * n;
+          }
+
+          vec3 topGradient(float t)
+          {
+              vec3 A = vec3(67.0,  49.0, 171.0) / 255.0;
+              vec3 B = vec3(18.0, 135.0, 255.0) / 255.0;
+              vec3 C = vec3(125.0, 226.0, 251.0) / 255.0;
+              vec3 D = vec3(244.0, 244.0, 223.0) / 255.0;
+
+              t = clamp(t, 0.0, 1.0);
+
+              if (t < 0.33) return mix(A, B, S(0.00, 0.33, t));
+              if (t < 0.66) return mix(B, C, S(0.33, 0.66, t));
+              return mix(C, D, S(0.66, 1.00, t));
+          }
+
+          vec3 sideGradient(float t)
+          {
+              vec3 A = vec3(26.0,  62.0,  75.0) / 255.0;
+              vec3 B = vec3(62.0, 202.0, 240.0) / 255.0;
+              vec3 C = vec3(42.0, 142.0, 227.0) / 255.0;
+              vec3 D = vec3(92.0,  80.0, 206.0) / 255.0;
+              vec3 E = vec3(131.0, 99.0, 175.0) / 255.0;
+
+              t = clamp(t, 0.0, 1.0);
+
+              if (t < 0.25) return mix(A, B, S(0.00, 0.25, t));
+              if (t < 0.50) return mix(B, C, S(0.25, 0.50, t));
+              if (t < 0.75) return mix(C, D, S(0.50, 0.75, t));
+              return mix(D, E, S(0.75, 1.00, t));
+          }
+
+          void mainImage(out vec4 fragColor, in vec2 fragCoord)
+          {
+              vec2 uv = fragCoord / iResolution.xy;
+              float ratio = iResolution.x / iResolution.y;
+              float t = iTime;
+
+              vec2 tuv = uv;
+              tuv -= 0.5;
+
+              float degree = noise(vec2(t * 0.10, tuv.x * tuv.y));
+
+              tuv.y *= 1.0 / ratio;
+              tuv *= Rot(radians((degree - 0.5) * 720.0 + 180.0));
+              tuv.y *= ratio;
+
+              float frequency = 5.0;
+              float amplitude = 30.0;
+              float speed = t * 2.0;
+
+              tuv.x += sin(tuv.y * frequency + speed) / amplitude;
+              tuv.y += sin(tuv.x * frequency * 1.5 + speed) / (amplitude * 0.5);
+
+              vec2 guv = tuv;
+              guv.x += 0.08 * sin(t * 0.50 + guv.y * 4.0);
+              guv.y += 0.06 * cos(t * 0.40 + guv.x * 5.0);
+
+              float gx = clamp((guv * Rot(radians(-5.0))).x + 0.5, 0.0, 1.0);
+              float gy = clamp(guv.y + 0.5, 0.0, 1.0);
+
+              vec3 layer1 = topGradient(gx);
+              vec3 layer2 = sideGradient(1.0 - gy);
+
+              float mixMask = 1.0 - S(-0.3, 0.5, tuv.y);
+              vec3 finalComp = mix(layer1, layer2, mixMask);
+
+              float glow = 0.08 * (1.0 - S(-0.2, 0.6, abs(tuv.y - 0.05)));
+              finalComp += glow * vec3(0.08, 0.12, 0.18);
+
+              float grain = fract(sin(dot(fragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+              finalComp += (grain - 0.5) * 0.015;
+
+              fragColor = vec4(clamp(finalComp, 0.0, 1.0), 1.0);
+          }
+
+          void main() {
+            mainImage(gl_FragColor, gl_FragCoord.xy);
+          }
+        `;
+
+        const compileShader = (type, source) => {
+          const shader = gl.createShader(type);
+
+          if (!shader) {
+            return null;
+          }
+
+          gl.shaderSource(shader, source);
+          gl.compileShader(shader);
+
+          if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            console.warn("Dock shader compile failed:", gl.getShaderInfoLog(shader));
+            gl.deleteShader(shader);
+            return null;
+          }
+
+          return shader;
+        };
+
+        const vertexShader = compileShader(gl.VERTEX_SHADER, vertexSource);
+        const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentSource);
+
+        if (!vertexShader || !fragmentShader) {
+          return;
+        }
+
+        const program = gl.createProgram();
+
+        if (!program) {
+          return;
+        }
+
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+        gl.deleteShader(vertexShader);
+        gl.deleteShader(fragmentShader);
+
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+          console.warn("Dock shader link failed:", gl.getProgramInfoLog(program));
+          gl.deleteProgram(program);
+          return;
+        }
+
+        const positionLocation = gl.getAttribLocation(program, "aPosition");
+        const resolutionLocation = gl.getUniformLocation(program, "iResolution");
+        const timeLocation = gl.getUniformLocation(program, "iTime");
+        const positionBuffer = gl.createBuffer();
+
+        if (!positionBuffer || positionLocation < 0 || !resolutionLocation || !timeLocation) {
+          gl.deleteProgram(program);
+          return;
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+        gl.useProgram(program);
+        gl.enableVertexAttribArray(positionLocation);
+        gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+        let animationFrame = 0;
+        const startTime = performance.now();
+
+        const resizeCanvas = () => {
+          const rect = canvas.getBoundingClientRect();
+          const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+          const width = Math.max(1, Math.round(rect.width * pixelRatio));
+          const height = Math.max(1, Math.round(rect.height * pixelRatio));
+
+          if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width;
+            canvas.height = height;
+          }
+
+          gl.viewport(0, 0, width, height);
+          gl.uniform3f(resolutionLocation, width, height, pixelRatio);
+        };
+
+        const render = (now) => {
+          resizeCanvas();
+          gl.useProgram(program);
+          gl.uniform1f(timeLocation, (now - startTime) / 1000);
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+          animationFrame = window.requestAnimationFrame(render);
+        };
+
+        canvas.parentElement?.classList.add("shader-ready");
+        animationFrame = window.requestAnimationFrame(render);
+
+        window.addEventListener("resize", () => {
+          window.cancelAnimationFrame(animationFrame);
+          animationFrame = window.requestAnimationFrame(render);
+        }, { passive: true });
+      };
+
       createRosterShader();
+      createDockShader();
     </script>
   </body>
 </html>
@@ -1277,13 +1523,42 @@ const rosterColumns = 13;
     right: 0;
     bottom: 0;
     height: 404px;
+    isolation: isolate;
+    overflow: hidden;
     display: grid;
     grid-template-columns: 922px 1fr;
     gap: 12px;
     padding: 16px 14px 0 17px;
     background:
-      linear-gradient(180deg, rgba(2, 24, 31, 0.95) 0 9px, transparent 9px),
-      linear-gradient(111deg, #311ab2 0 12%, #22dcea 44%, #f3f7c4 65%, #fff 100%);
+      linear-gradient(180deg, rgba(131, 99, 175, 0.72) 0%, rgba(92, 80, 206, 0.72) 26%, rgba(42, 142, 227, 0.72) 52%, rgba(62, 202, 240, 0.72) 75%, rgba(26, 62, 75, 0.72) 100%),
+      linear-gradient(111deg, #4331ab 0 14%, #1287ff 40%, #7de2fb 66%, #f4f4df 100%);
+    background-blend-mode: multiply, normal;
+  }
+
+  .bottom-dock::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 9px;
+    background: rgba(2, 24, 31, 0.95);
+    pointer-events: none;
+  }
+
+  :global(.dock-shader) {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: none;
+  }
+
+  .bottom-dock > .player-panel {
+    z-index: 2;
   }
 
   .player-panel {
