@@ -86,6 +86,7 @@ const confirmationQuestions = [
                 data-desktop-streamer-card
                 data-streamer-id={streamer.id}
                 data-streamer-name={streamer.name}
+                data-streamer-key={streamer.twitchHandle}
                 data-streamer-image={streamer.image ?? ""}
                 data-streamer-fallback-image={streamer.fallbackImage ?? ""}
                 aria-pressed={streamer.status === "featured" ? "true" : "false"}
@@ -249,6 +250,7 @@ const confirmationQuestions = [
                 data-mobile-streamer-card
                 data-streamer-id={streamer.id}
                 data-streamer-name={streamer.name}
+                data-streamer-key={streamer.twitchHandle}
                 data-streamer-image={streamer.image ?? ""}
                 data-streamer-fallback-image={streamer.fallbackImage ?? ""}
                 aria-pressed="false"
@@ -649,6 +651,41 @@ const confirmationQuestions = [
         const fallbackCard = candidates.find(
           (candidate) => candidate.getAttribute("data-streamer-id") === streamerId,
         );
+
+        const card = preferredCard || fallbackCard;
+
+        if (card) {
+          selectStreamer(card);
+        }
+      };
+
+      const normalizeCreatorKey = (value: string) =>
+        value.trim().replace(/^@+/, "").toLowerCase();
+
+      const getInitialCreatorKey = () => {
+        const key = new URLSearchParams(window.location.search).get("c");
+
+        return key ? normalizeCreatorKey(key) : "";
+      };
+
+      const selectStreamerByCreatorKey = (creatorKey: string) => {
+        const normalizedCreatorKey = normalizeCreatorKey(creatorKey);
+
+        if (!normalizedCreatorKey) {
+          return;
+        }
+
+        const prefersMobileCard = window.matchMedia("(max-width: 900px)").matches;
+        const candidates = Array.from(streamerCards);
+        const matchesCreatorKey = (candidate: HTMLElement) =>
+          normalizeCreatorKey(candidate.getAttribute("data-streamer-key") || "") ===
+          normalizedCreatorKey;
+        const preferredCard = candidates.find(
+          (candidate) =>
+            matchesCreatorKey(candidate) &&
+            candidate.classList.contains(prefersMobileCard ? "mobile-tile" : "tile"),
+        );
+        const fallbackCard = candidates.find(matchesCreatorKey);
         const card = preferredCard || fallbackCard;
 
         if (card) {
@@ -1659,6 +1696,31 @@ const confirmationQuestions = [
 
       createRosterShader();
       createDockShader();
+
+      const selectInitialCreatorFromUrl = () => {
+        if (hasSelection()) {
+          return;
+        }
+
+        selectStreamerByCreatorKey(getInitialCreatorKey());
+      };
+
+      const scheduleInitialCreatorSelection = () => {
+        const runAfterInitialPaint = () => {
+          window.requestAnimationFrame(() => {
+            window.requestAnimationFrame(selectInitialCreatorFromUrl);
+          });
+        };
+
+        if (document.readyState === "complete") {
+          runAfterInitialPaint();
+          return;
+        }
+
+        window.addEventListener("load", runAfterInitialPaint, { once: true });
+      };
+
+      scheduleInitialCreatorSelection();
     </script>
   </body>
 </html>
