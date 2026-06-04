@@ -345,11 +345,6 @@ const rosterColumns = 13;
         });
 
         backArrow.addEventListener("click", () => {
-          if (hasSelection()) {
-            clearSelection();
-            return;
-          }
-
           window.location.href = festivalUrl;
         });
       });
@@ -1245,7 +1240,7 @@ const rosterColumns = 13;
     width: 315px;
     height: 72px;
     background: linear-gradient(114deg, #d9000d 0 43%, #b9000b 44% 88%, transparent 89%);
-    filter: drop-shadow(10px 8px 0 rgba(0, 0, 0, 0.72));
+    filter: drop-shadow(5px 4px 0 rgba(0, 0, 0, 0.72));
   }
 
   .back-action {
@@ -1959,7 +1954,7 @@ const rosterColumns = 13;
       width: 138px;
       height: 70px;
       background: linear-gradient(111deg, #d9000d 0 48%, #ad0009 49% 83%, transparent 84%);
-      filter: drop-shadow(7px 6px 0 rgba(0, 0, 0, 0.72));
+      filter: drop-shadow(4px 3px 0 rgba(0, 0, 0, 0.72));
     }
 
     .mobile-back-action {
