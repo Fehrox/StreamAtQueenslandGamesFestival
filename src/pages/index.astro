@@ -85,7 +85,7 @@ const rosterColumns = 13;
               <p class="ready-copy">
                 <span>READY</span>
                 <small>to</small>
-                <span>FIGHT!</span>
+                <span>STREAM!</span>
               </p>
             </div>
             <span class="ready-rail ready-rail-bottom"></span>
@@ -262,16 +262,18 @@ const rosterColumns = 13;
       const streamerCards = document.querySelectorAll<HTMLElement>(
         "[data-streamer-card], [data-mobile-streamer-card]",
       );
-      const backArrows = document.querySelectorAll("[data-back-arrow]");
+      const backArrows = document.querySelectorAll<HTMLElement>("[data-back-arrow]");
       const mobileCta = document.querySelector("[data-mobile-cta]");
       const selectedName = document.querySelector("[data-selected-name]");
       const mobileSelectedName = document.querySelector("[data-mobile-selected-name]");
       const festivalUrl = "https://www.queenslandgamesfestival.com/";
+      const readyOverlayExitMs = 280;
+      let readyOverlayExitTimer: number | undefined;
 
       const hasSelection = () =>
         document.documentElement.classList.contains("has-streamer-selected");
 
-      const setSelectedStreamerName = (streamerName) => {
+      const setSelectedStreamerName = (streamerName: string) => {
         if (selectedName instanceof HTMLElement) {
           selectedName.textContent = streamerName;
         }
@@ -281,7 +283,7 @@ const rosterColumns = 13;
         }
       };
 
-      const setCursorOverStreamerCard = (isOver) => {
+      const setCursorOverStreamerCard = (isOver: boolean) => {
         document.documentElement.classList.toggle("custom-cursor-over-streamer-card", isOver);
       };
 
@@ -293,7 +295,7 @@ const rosterColumns = 13;
         }
       };
 
-      const previewStreamer = (card) => {
+      const previewStreamer = (card: HTMLElement) => {
         if (hasSelection()) {
           return;
         }
@@ -303,11 +305,48 @@ const rosterColumns = 13;
         setSelectedStreamerName(streamerName);
       };
 
+      const resetReadyOverlayToEntrance = () => {
+        document.documentElement.classList.add("ready-overlay-reset");
+        document.documentElement.classList.remove("ready-overlay-exiting");
+        document.querySelector(".ready-panel")?.getBoundingClientRect();
+        window.requestAnimationFrame(() => {
+          document.documentElement.classList.remove("ready-overlay-reset");
+        });
+      };
+
+      const cancelReadyOverlayExit = () => {
+        if (readyOverlayExitTimer) {
+          window.clearTimeout(readyOverlayExitTimer);
+          readyOverlayExitTimer = undefined;
+        }
+
+        if (document.documentElement.classList.contains("ready-overlay-exiting")) {
+          resetReadyOverlayToEntrance();
+        }
+      };
+
+      const showReadyOverlay = () => {
+        cancelReadyOverlayExit();
+        document.documentElement.classList.add("has-streamer-selected");
+      };
+
+      const hideReadyOverlay = () => {
+        document.documentElement.classList.remove("has-streamer-selected");
+        document.documentElement.classList.add("ready-overlay-exiting");
+
+        if (readyOverlayExitTimer) {
+          window.clearTimeout(readyOverlayExitTimer);
+        }
+
+        readyOverlayExitTimer = window.setTimeout(() => {
+          resetReadyOverlayToEntrance();
+          readyOverlayExitTimer = undefined;
+        }, readyOverlayExitMs);
+      };
+
       const clearSelection = () => {
-        document.documentElement.classList.remove(
-          "has-streamer-selected",
-          "has-streamer-hover-preview",
-        );
+        hideReadyOverlay();
+        document.documentElement.classList.remove("has-streamer-hover-preview");
 
         streamerCards.forEach((candidate) => {
           candidate.classList.remove("tile-selected", "mobile-tile-selected");
@@ -325,7 +364,7 @@ const rosterColumns = 13;
         const streamerId = card.getAttribute("data-streamer-id");
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
 
-        document.documentElement.classList.add("has-streamer-selected");
+        showReadyOverlay();
         document.documentElement.classList.remove("has-streamer-hover-preview");
 
         streamerCards.forEach((candidate) => {
@@ -355,7 +394,7 @@ const rosterColumns = 13;
         }
       };
 
-      const activateStreamer = (card) => {
+      const activateStreamer = (card: HTMLElement) => {
         if (hasSelection()) {
           clearSelection();
           return;
@@ -1006,7 +1045,7 @@ const rosterColumns = 13;
           }
         `;
 
-        const compileShader = (type, source) => {
+        const compileShader = (type: number, source: string): WebGLShader | null => {
           const shader = gl.createShader(type);
 
           if (!shader) {
@@ -1084,7 +1123,7 @@ const rosterColumns = 13;
           gl.uniform3f(resolutionLocation, width, height, pixelRatio);
         };
 
-        const render = (now) => {
+        const render = (now: number) => {
           resizeCanvas();
           gl.useProgram(program);
           gl.uniform1f(timeLocation, (now - startTime) / 1000);
@@ -1479,7 +1518,7 @@ const rosterColumns = 13;
   }
 
   .tile-selected {
-    z-index: 7;
+    z-index: 5;
     border-color: #fff;
     box-shadow:
       inset 0 0 0 4px #f62624,
@@ -1630,11 +1669,7 @@ const rosterColumns = 13;
     z-index: 6;
     inset: 0;
     visibility: hidden;
-    opacity: 0;
     pointer-events: none;
-    transition:
-      opacity 140ms ease,
-      visibility 0s linear 140ms;
   }
 
   .ready-overlay::before {
@@ -1642,66 +1677,102 @@ const rosterColumns = 13;
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.76);
+    opacity: 0;
+    transition: opacity 160ms ease;
   }
 
   :global(html.has-streamer-selected) .ready-overlay {
     visibility: visible;
+  }
+
+  :global(html.ready-overlay-exiting) .ready-overlay {
+    visibility: visible;
+  }
+
+  :global(html.has-streamer-selected) .ready-overlay::before {
     opacity: 1;
-    transition-delay: 0s;
   }
 
   .ready-panel {
     position: absolute;
     z-index: 1;
-    left: -98px;
-    top: 224px;
-    width: 2180px;
-    height: 304px;
+    --ready-panel-slide: -112%;
+    --ready-panel-depth: translateX(-180px) perspective(1050px) rotateY(-13deg) rotateZ(-1.8deg) scaleX(1.35);
+    left: -120px;
+    width: 2160px;
+    top: 188px;
+    height: 280px;
     filter: drop-shadow(0 17px 0 rgba(0, 0, 0, 0.54));
-    transform: translateY(-22px) perspective(1300px) rotateY(14deg) rotateZ(-6.2deg);
-    transform-origin: 62% 50%;
+    transform: translateX(var(--ready-panel-slide)) var(--ready-panel-depth);
+    transform-origin: 88% 50%;
     transform-style: preserve-3d;
-    transition: transform 230ms cubic-bezier(0.18, 0.88, 0.32, 1.08);
+    transition: transform 260ms cubic-bezier(0.18, 0.86, 0.24, 1);
+    will-change: transform;
+  }
+
+  .ready-panel::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    top: 194px;
+    height: 44px;
+    background: linear-gradient(90deg, #ff1f00 0, #ff7a00 34%, #ffb900 68%, #ffdd05 100%);
+    box-shadow:
+      0 7px 0 rgba(0, 0, 0, 0.72),
+      0 -3px 0 rgba(255, 255, 255, 0.18);
   }
 
   :global(html.has-streamer-selected) .ready-panel {
-    transform: perspective(1300px) rotateY(14deg) rotateZ(-6.2deg);
+    --ready-panel-slide: 0;
+  }
+
+  :global(html.ready-overlay-exiting) .ready-panel {
+    --ready-panel-slide: 112%;
+  }
+
+  :global(html.ready-overlay-reset) .ready-panel {
+    transition: none;
   }
 
   .ready-rail {
     position: absolute;
+    z-index: 0;
     left: 0;
-    right: -18px;
+    right: 0;
     display: block;
     background: linear-gradient(180deg, #ffffff, #dce3ee);
-    clip-path: polygon(13% 19%, 100% 0, 99% 100%, 6% 83%, 0 58%);
-    transform: skewX(-12deg);
   }
 
   .ready-rail-top {
-    top: 19px;
-    height: 37px;
+    top: 0;
+    height: 34px;
   }
 
   .ready-rail-bottom {
-    bottom: 28px;
-    height: 56px;
+    top: 226px;
+    height: 54px;
     background: linear-gradient(180deg, #f7f9ff, #cfd7e4);
   }
 
   .ready-banner {
     position: absolute;
-    z-index: 1;
-    left: 0;
-    right: 0;
-    top: 58px;
-    height: 178px;
-    overflow: hidden;
+    z-index: 2;
+    left: 134px;
+    right: 146px;
+    top: 34px;
+    height: 176px;
+    overflow: visible;
     background: #090a0b;
-    clip-path: polygon(12% 13%, 100% 0, 100% 100%, 6% 86%, 0 62%);
+    filter:
+      drop-shadow(0 14px 0 rgba(0, 0, 0, 0.62))
+      drop-shadow(0 0 18px rgba(0, 0, 0, 0.42));
     box-shadow:
       inset 0 0 0 5px rgba(255, 255, 255, 0.14),
       inset 0 -12px 0 rgba(0, 0, 0, 0.38);
+    transform: translateY(5px) skewY(-1.1deg);
+    transform-origin: right center;
   }
 
   .ready-banner::before,
@@ -1712,12 +1783,7 @@ const rosterColumns = 13;
   }
 
   .ready-banner::before {
-    z-index: 0;
-    left: 185px;
-    right: 0;
-    bottom: 0;
-    height: 38px;
-    background: linear-gradient(90deg, #ff2b00, #ffb300 56%, #ffdd05);
+    display: none;
   }
 
   .ready-banner::after {
@@ -1738,44 +1804,50 @@ const rosterColumns = 13;
   }
 
   .ready-red-wedge {
-    left: 0;
-    width: 360px;
+    left: -134px;
+    width: 260px;
     background: linear-gradient(105deg, #ef0012, #ff2920);
-    clip-path: polygon(0 0, 78% 0, 51% 100%, 0 100%);
+    box-shadow:
+      10px 0 0 rgba(0, 0, 0, 0.34),
+      0 12px 0 rgba(0, 0, 0, 0.5);
   }
 
   .ready-yellow-wedge {
-    right: -45px;
-    width: 610px;
+    right: -146px;
+    width: 330px;
     background: linear-gradient(96deg, #ffae00 0, #ffda04 48%, #fff04a 100%);
-    clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%);
+    box-shadow:
+      -10px 0 0 rgba(0, 0, 0, 0.28),
+      0 12px 0 rgba(0, 0, 0, 0.44);
   }
 
   .ready-copy {
     position: absolute;
     z-index: 2;
-    inset: 0 235px 0 245px;
+    inset: 0 174px 0 68px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 23px;
+    gap: 26px;
     margin: 0;
-    padding-top: 1px;
+    padding-top: 0;
     color: #ffd817;
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 126px;
+    font-size: 132px;
     font-style: italic;
     line-height: 0.82;
     letter-spacing: 0;
-    text-transform: uppercase;
+    text-transform: none;
     white-space: nowrap;
     text-shadow:
       -5px -5px 0 #050505,
       5px -5px 0 #050505,
       -5px 5px 0 #050505,
       5px 5px 0 #050505,
-      0 11px 0 rgba(0, 0, 0, 0.42);
-    transform: skewX(-9deg);
+      0 11px 0 rgba(0, 0, 0, 0.42),
+      12px 16px 0 rgba(0, 0, 0, 0.5);
+    transform: skewX(-8deg) scaleX(1.14);
+    transform-origin: center;
   }
 
   .ready-copy span:last-child {
@@ -1792,11 +1864,13 @@ const rosterColumns = 13;
       4px -4px 0 #050505,
       -4px 4px 0 #050505,
       4px 4px 0 #050505,
-      0 8px 0 rgba(0, 0, 0, 0.42);
+      0 8px 0 rgba(0, 0, 0, 0.42),
+      8px 12px 0 rgba(0, 0, 0, 0.5);
   }
 
   .bottom-dock {
     position: absolute;
+    z-index: 8;
     left: 0;
     right: 0;
     bottom: 0;
@@ -2346,7 +2420,7 @@ const rosterColumns = 13;
 
     .mobile-tile-selected {
       --selected-border-color: #f62624;
-      z-index: 6;
+      z-index: 5;
       border-color: #08090a;
       animation: selected-border-pulse 1.25s ease-in-out infinite;
       box-shadow:
