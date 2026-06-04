@@ -87,12 +87,23 @@ const confirmationQuestions = [
                 data-streamer-id={streamer.id}
                 data-streamer-name={streamer.name}
                 data-streamer-image={streamer.image ?? ""}
+                data-streamer-fallback-image={streamer.fallbackImage ?? ""}
                 aria-pressed={streamer.status === "featured" ? "true" : "false"}
               >
                 <div class="portrait" aria-hidden="true">
                   {
                     streamer.image ? (
-                      <img src={streamer.image} alt="" loading="lazy" />
+                      <img
+                        src={streamer.image}
+                        alt=""
+                        loading="lazy"
+                        data-fallback-src={streamer.fallbackImage ?? undefined}
+                        data-styled-streamer-image={
+                          streamer.fallbackImage && streamer.image !== streamer.fallbackImage
+                            ? "true"
+                            : undefined
+                        }
+                      />
                     ) : (
                       <>
                         <span class="portrait-shape portrait-shape-a" />
@@ -147,7 +158,11 @@ const confirmationQuestions = [
             <div class="panel-portrait" aria-hidden="true" data-desktop-selected-portrait>
               {
                 featuredStreamer.image ? (
-                  <img src={featuredStreamer.image} alt="" />
+                  <img
+                    src={featuredStreamer.image}
+                    alt=""
+                    data-fallback-src={featuredStreamer.fallbackImage ?? undefined}
+                  />
                 ) : (
                   <>
                     <span class="big-avatar-head"></span>
@@ -235,12 +250,23 @@ const confirmationQuestions = [
                 data-streamer-id={streamer.id}
                 data-streamer-name={streamer.name}
                 data-streamer-image={streamer.image ?? ""}
+                data-streamer-fallback-image={streamer.fallbackImage ?? ""}
                 aria-pressed="false"
               >
                 <span class="mobile-portrait" aria-hidden="true">
                   {
                     streamer.image ? (
-                      <img src={streamer.image} alt="" loading="lazy" />
+                      <img
+                        src={streamer.image}
+                        alt=""
+                        loading="lazy"
+                        data-fallback-src={streamer.fallbackImage ?? undefined}
+                        data-styled-streamer-image={
+                          streamer.fallbackImage && streamer.image !== streamer.fallbackImage
+                            ? "true"
+                            : undefined
+                        }
+                      />
                     ) : (
                       <>
                         <span class="mobile-portrait-shape mobile-portrait-shape-a" />
@@ -270,7 +296,11 @@ const confirmationQuestions = [
             <div class="mobile-cta-portrait" aria-hidden="true" data-mobile-selected-portrait>
               {
                 featuredStreamer.image ? (
-                  <img src={featuredStreamer.image} alt="" />
+                  <img
+                    src={featuredStreamer.image}
+                    alt=""
+                    data-fallback-src={featuredStreamer.fallbackImage ?? undefined}
+                  />
                 ) : (
                   <>
                     <span class="mobile-big-avatar-head"></span>
@@ -522,6 +552,33 @@ const confirmationQuestions = [
       const portraitFadeMs = 110;
       let hoverPreviewClearTimeout: number | undefined;
 
+      const applyImageFallback = (img: HTMLImageElement) => {
+        const fallbackImage = img.getAttribute("data-fallback-src") || "";
+
+        if (
+          !fallbackImage ||
+          img.getAttribute("data-fallback-active") === "true" ||
+          img.getAttribute("src") === fallbackImage
+        ) {
+          return;
+        }
+
+        img.setAttribute("data-fallback-active", "true");
+        img.src = fallbackImage;
+      };
+
+      const wireImageFallback = (img: HTMLImageElement, checkCurrent = true) => {
+        img.addEventListener("error", () => applyImageFallback(img), { once: false });
+
+        if (checkCurrent && img.complete && img.naturalWidth === 0) {
+          applyImageFallback(img);
+        }
+      };
+
+      document
+        .querySelectorAll<HTMLImageElement>("img[data-fallback-src]")
+        .forEach((img) => wireImageFallback(img));
+
       const hasSelection = () =>
         document.documentElement.classList.contains("has-streamer-selected");
 
@@ -619,9 +676,10 @@ const confirmationQuestions = [
 
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
         const streamerImage = card.getAttribute("data-streamer-image") || "";
+        const streamerFallbackImage = card.getAttribute("data-streamer-fallback-image") || "";
         document.documentElement.classList.add("has-streamer-hover-preview");
         setSelectedStreamerName(streamerName);
-        setSelectedStreamerPortrait(streamerImage);
+        setSelectedStreamerPortrait(streamerImage, streamerFallbackImage);
       };
 
       const resetReadyOverlayToEntrance = () => {
@@ -666,6 +724,7 @@ const confirmationQuestions = [
       const setSelectedPortrait = (
         target: Element | null,
         image: string,
+        fallbackImage: string,
         fallbackClasses: string[],
       ) => {
         if (!(target instanceof HTMLElement)) {
@@ -687,10 +746,14 @@ const confirmationQuestions = [
         if (image) {
           const previousChildren = Array.from(target.children);
           const img = document.createElement("img");
-          img.src = image;
           img.alt = "";
           img.decoding = "async";
+          if (fallbackImage) {
+            img.setAttribute("data-fallback-src", fallbackImage);
+            wireImageFallback(img, false);
+          }
           img.className = "portrait-crossfade-enter";
+          img.src = image;
           target.append(img);
 
           window.requestAnimationFrame(() => {
@@ -717,16 +780,21 @@ const confirmationQuestions = [
         });
       };
 
-      const setSelectedStreamerPortrait = (streamerImage: string) => {
+      const setSelectedStreamerPortrait = (
+        streamerImage: string,
+        streamerFallbackImage = "",
+      ) => {
         setSelectedPortrait(
           selectedPortrait,
           streamerImage,
+          streamerFallbackImage,
           desktopPortraitFallbackClasses,
         );
 
         setSelectedPortrait(
           mobileSelectedPortrait,
           streamerImage,
+          streamerFallbackImage,
           mobilePortraitFallbackClasses,
         );
       };
@@ -755,6 +823,7 @@ const confirmationQuestions = [
         const streamerId = card.getAttribute("data-streamer-id");
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
         const streamerImage = card.getAttribute("data-streamer-image") || "";
+        const streamerFallbackImage = card.getAttribute("data-streamer-fallback-image") || "";
 
         showReadyOverlay();
         document.documentElement.classList.remove("has-streamer-hover-preview");
@@ -781,7 +850,7 @@ const confirmationQuestions = [
         setSelectedStreamerName(streamerName);
         setTwitchConfirmButtonVisibility(streamerName);
         syncConfirmStreamerSelect();
-        setSelectedStreamerPortrait(streamerImage);
+        setSelectedStreamerPortrait(streamerImage, streamerFallbackImage);
 
         if (mobileCta instanceof HTMLElement && card.classList.contains("mobile-tile")) {
           const wasHidden = mobileCta.hidden;
@@ -2306,6 +2375,11 @@ const confirmationQuestions = [
     filter: saturate(1.08) contrast(1.05);
   }
 
+  .portrait img[data-styled-streamer-image="true"]:not([data-fallback-active="true"]) {
+    object-position: center top;
+    transform-origin: center top;
+  }
+
   .portrait-shape-a,
   .portrait-shape-b {
     position: absolute;
@@ -2823,7 +2897,6 @@ const confirmationQuestions = [
   .bottom-dock {
     position: absolute;
     z-index: auto;
-    isolation: isolate;
     left: 0;
     right: 0;
     bottom: 0;
@@ -3661,6 +3734,10 @@ const confirmationQuestions = [
       height: 100%;
       display: block;
       object-fit: cover;
+    }
+
+    .mobile-portrait img[data-styled-streamer-image="true"]:not([data-fallback-active="true"]) {
+      object-position: center top;
     }
 
     .mobile-portrait-shape-a,

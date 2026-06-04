@@ -1,13 +1,21 @@
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
 export interface StreamerProfile {
   id: string;
   name: string;
   image?: string;
+  fallbackImage?: string;
   profileUrl?: string;
   status: "open" | "invited" | "confirmed" | "featured";
   twitchHandle?: string;
 }
 
 type StreamerAssets = Pick<StreamerProfile, "image" | "profileUrl" | "twitchHandle">;
+type ResolvedStreamerAssets = Pick<
+  StreamerProfile,
+  "fallbackImage" | "image" | "profileUrl" | "twitchHandle"
+>;
 
 const names = [
   "Naysy",
@@ -218,6 +226,36 @@ const streamerAssets: Partial<Record<string, StreamerAssets>> = {
   },
 };
 
+const getStyledImage = (image: string) => {
+  const fileName = image.split("/").pop();
+  const stem = fileName?.replace(/\.[^.]+$/, "");
+
+  if (!stem) {
+    return image;
+  }
+
+  const styledImage = `/streamers-styled/${stem}.png`;
+  const styledImagePath = fileURLToPath(
+    new URL(`../../public${styledImage}`, import.meta.url),
+  );
+
+  return existsSync(styledImagePath) ? styledImage : image;
+};
+
+const resolveStreamerAssets = (
+  assets: StreamerAssets | undefined,
+): ResolvedStreamerAssets => {
+  if (!assets?.image) {
+    return assets ?? {};
+  }
+
+  return {
+    ...assets,
+    fallbackImage: assets.image,
+    image: getStyledImage(assets.image),
+  };
+};
+
 const featuredIndex = 0;
 const confirmedNames = new Set(["Adam", "Fasffy", "Danzie"]);
 
@@ -230,7 +268,7 @@ export const streamers: StreamerProfile[] = names.map((name, index) => ({
       : confirmedNames.has(name)
         ? "confirmed"
         : "open",
-  ...(streamerAssets[name] ?? {}),
+  ...resolveStreamerAssets(streamerAssets[name]),
 }));
 
 export const featuredStreamer = streamers[featuredIndex];

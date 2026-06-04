@@ -1,0 +1,618 @@
+﻿[
+    {
+        "number":  "01",
+        "slug":  "mario",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/01.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/mario/main.png",
+        "file":  "01_mario_main.png",
+        "bytes":  1191124
+    },
+    {
+        "number":  "02",
+        "slug":  "donkey_kong",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/02.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/donkey_kong/main.png",
+        "file":  "02_donkey_kong_main.png",
+        "bytes":  1887913
+    },
+    {
+        "number":  "03",
+        "slug":  "link",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/03.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/link/main.png",
+        "file":  "03_link_main.png",
+        "bytes":  2020845
+    },
+    {
+        "number":  "04",
+        "slug":  "samus",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/04.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/samus/main.png",
+        "file":  "04_samus_main.png",
+        "bytes":  2577856
+    },
+    {
+        "number":  "05",
+        "slug":  "yoshi",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/05.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/yoshi/main.png",
+        "file":  "05_yoshi_main.png",
+        "bytes":  878458
+    },
+    {
+        "number":  "06",
+        "slug":  "kirby",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/06.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/kirby/main.png",
+        "file":  "06_kirby_main.png",
+        "bytes":  650188
+    },
+    {
+        "number":  "07",
+        "slug":  "fox",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/07.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/fox/main.png",
+        "file":  "07_fox_main.png",
+        "bytes":  1764850
+    },
+    {
+        "number":  "08",
+        "slug":  "pikachu",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/08.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/pikachu/main.png",
+        "file":  "08_pikachu_main.png",
+        "bytes":  582425
+    },
+    {
+        "number":  "09",
+        "slug":  "luigi",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/09.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/luigi/main.png",
+        "file":  "09_luigi_main.png",
+        "bytes":  1109920
+    },
+    {
+        "number":  "10",
+        "slug":  "ness",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/10.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/ness/main.png",
+        "file":  "10_ness_main.png",
+        "bytes":  809903
+    },
+    {
+        "number":  "11",
+        "slug":  "captain_falcon",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/11.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/captain_falcon/main.png",
+        "file":  "11_captain_falcon_main.png",
+        "bytes":  2080900
+    },
+    {
+        "number":  "12",
+        "slug":  "jigglypuff",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/12.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/jigglypuff/main.png",
+        "file":  "12_jigglypuff_main.png",
+        "bytes":  409431
+    },
+    {
+        "number":  "13",
+        "slug":  "peach",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/13.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/peach/main.png",
+        "file":  "13_peach_main.png",
+        "bytes":  1774890
+    },
+    {
+        "number":  "14",
+        "slug":  "bowser",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/14.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/bowser/main.png",
+        "file":  "14_bowser_main.png",
+        "bytes":  1953363
+    },
+    {
+        "number":  "15",
+        "slug":  "ice_climbers",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/15.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/ice_climbers/main.png",
+        "file":  "15_ice_climbers_main.png",
+        "bytes":  2084749
+    },
+    {
+        "number":  "16",
+        "slug":  "sheik",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/16.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/sheik/main.png",
+        "file":  "16_sheik_main.png",
+        "bytes":  2145415
+    },
+    {
+        "number":  "17",
+        "slug":  "zelda",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/17.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/zelda/main.png",
+        "file":  "17_zelda_main.png",
+        "bytes":  1962894
+    },
+    {
+        "number":  "18",
+        "slug":  "dr_mario",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/18.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/dr_mario/main.png",
+        "file":  "18_dr_mario_main.png",
+        "bytes":  1155140
+    },
+    {
+        "number":  "19",
+        "slug":  "pichu",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/19.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/pichu/main.png",
+        "file":  "19_pichu_main.png",
+        "bytes":  471483
+    },
+    {
+        "number":  "20",
+        "slug":  "falco",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/20.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/falco/main.png",
+        "file":  "20_falco_main.png",
+        "bytes":  1760253
+    },
+    {
+        "number":  "21",
+        "slug":  "marth",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/21.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/marth/main.png",
+        "file":  "21_marth_main.png",
+        "bytes":  1947557
+    },
+    {
+        "number":  "22",
+        "slug":  "young_link",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/22.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/young_link/main.png",
+        "file":  "22_young_link_main.png",
+        "bytes":  1085407
+    },
+    {
+        "number":  "23",
+        "slug":  "ganondorf",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/23.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/ganondorf/main.png",
+        "file":  "23_ganondorf_main.png",
+        "bytes":  3646518
+    },
+    {
+        "number":  "24",
+        "slug":  "mewtwo",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/24.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/mewtwo/main.png",
+        "file":  "24_mewtwo_main.png",
+        "bytes":  922652
+    },
+    {
+        "number":  "25",
+        "slug":  "roy",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/25.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/roy/main.png",
+        "file":  "25_roy_main.png",
+        "bytes":  2202092
+    },
+    {
+        "number":  "26",
+        "slug":  "mr_game_and_watch",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/26.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/mr_game_and_watch/main.png",
+        "file":  "26_mr_game_and_watch_main.png",
+        "bytes":  194497
+    },
+    {
+        "number":  "27",
+        "slug":  "meta_knight",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/27.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/meta_knight/main.png",
+        "file":  "27_meta_knight_main.png",
+        "bytes":  2366827
+    },
+    {
+        "number":  "28",
+        "slug":  "pit",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/28.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/pit/main.png",
+        "file":  "28_pit_main.png",
+        "bytes":  1287901
+    },
+    {
+        "number":  "29",
+        "slug":  "zero_suit_samus",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/29.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/zero_suit_samus/main.png",
+        "file":  "29_zero_suit_samus_main.png",
+        "bytes":  2101791
+    },
+    {
+        "number":  "30",
+        "slug":  "wario",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/30.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/wario/main.png",
+        "file":  "30_wario_main.png",
+        "bytes":  1600068
+    },
+    {
+        "number":  "31",
+        "slug":  "snake",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/31.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/snake/main.png",
+        "file":  "31_snake_main.png",
+        "bytes":  2545286
+    },
+    {
+        "number":  "32",
+        "slug":  "ike",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/32.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/ike/main.png",
+        "file":  "32_ike_main.png",
+        "bytes":  3082023
+    },
+    {
+        "number":  "33-35",
+        "slug":  "pokemon_trainer",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/33-35.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/pokemon_trainer/main.png",
+        "file":  "33-35_pokemon_trainer_main.png",
+        "bytes":  1766115
+    },
+    {
+        "number":  "36",
+        "slug":  "diddy_kong",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/36.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/diddy_kong/main.png",
+        "file":  "36_diddy_kong_main.png",
+        "bytes":  1600956
+    },
+    {
+        "number":  "37",
+        "slug":  "lucas",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/37.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/lucas/main.png",
+        "file":  "37_lucas_main.png",
+        "bytes":  1140333
+    },
+    {
+        "number":  "38",
+        "slug":  "sonic",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/38.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/sonic/main.png",
+        "file":  "38_sonic_main.png",
+        "bytes":  1788669
+    },
+    {
+        "number":  "39",
+        "slug":  "king_dedede",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/39.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/king_dedede/main.png",
+        "file":  "39_king_dedede_main.png",
+        "bytes":  1726667
+    },
+    {
+        "number":  "40",
+        "slug":  "olimar",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/40.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/olimar/main.png",
+        "file":  "40_olimar_main.png",
+        "bytes":  986623
+    },
+    {
+        "number":  "41",
+        "slug":  "lucario",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/41.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/lucario/main.png",
+        "file":  "41_lucario_main.png",
+        "bytes":  1398634
+    },
+    {
+        "number":  "42",
+        "slug":  "rob",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/42.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/rob/main.png",
+        "file":  "42_rob_main.png",
+        "bytes":  1327115
+    },
+    {
+        "number":  "43",
+        "slug":  "toon_link",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/43.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/toon_link/main.png",
+        "file":  "43_toon_link_main.png",
+        "bytes":  1083232
+    },
+    {
+        "number":  "44",
+        "slug":  "wolf",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/44.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/wolf/main.png",
+        "file":  "44_wolf_main.png",
+        "bytes":  1676319
+    },
+    {
+        "number":  "45",
+        "slug":  "villager",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/45.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/villager/main.png",
+        "file":  "45_villager_main.png",
+        "bytes":  914511
+    },
+    {
+        "number":  "46",
+        "slug":  "mega_man",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/46.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/mega_man/main.png",
+        "file":  "46_mega_man_main.png",
+        "bytes":  1295494
+    },
+    {
+        "number":  "47",
+        "slug":  "wii_fit_trainer",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/47.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/wii_fit_trainer/main.png",
+        "file":  "47_wii_fit_trainer_main.png",
+        "bytes":  1971617
+    },
+    {
+        "number":  "48",
+        "slug":  "rosalina_and_luma",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/48.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/rosalina_and_luma/main.png",
+        "file":  "48_rosalina_and_luma_main.png",
+        "bytes":  1775464
+    },
+    {
+        "number":  "49",
+        "slug":  "little_mac",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/49.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/little_mac/main.png",
+        "file":  "49_little_mac_main.png",
+        "bytes":  1625269
+    },
+    {
+        "number":  "50",
+        "slug":  "greninja",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/50.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/greninja/main.png",
+        "file":  "50_greninja_main.png",
+        "bytes":  1612293
+    },
+    {
+        "number":  "51-53",
+        "slug":  "mii_fighter",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/51-53.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/mii_fighter/main_en.png",
+        "file":  "51-53_mii_fighter_main_en.png",
+        "bytes":  1269293
+    },
+    {
+        "number":  "54",
+        "slug":  "palutena",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/54.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/palutena/main.png",
+        "file":  "54_palutena_main.png",
+        "bytes":  2252308
+    },
+    {
+        "number":  "55",
+        "slug":  "pac_man",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/55.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/pac_man/main.png",
+        "file":  "55_pac_man_main.png",
+        "bytes":  798130
+    },
+    {
+        "number":  "56",
+        "slug":  "robin",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/56.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/robin/main.png",
+        "file":  "56_robin_main.png",
+        "bytes":  2800871
+    },
+    {
+        "number":  "57",
+        "slug":  "shulk",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/57.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/shulk/main.png",
+        "file":  "57_shulk_main.png",
+        "bytes":  2078301
+    },
+    {
+        "number":  "58",
+        "slug":  "bowser_jr",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/58.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/bowser_jr/main.png",
+        "file":  "58_bowser_jr_main.png",
+        "bytes":  1135474
+    },
+    {
+        "number":  "59",
+        "slug":  "duck_hunt",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/59.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/duck_hunt/main.png",
+        "file":  "59_duck_hunt_main.png",
+        "bytes":  945614
+    },
+    {
+        "number":  "60",
+        "slug":  "ryu",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/60.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/ryu/main.png",
+        "file":  "60_ryu_main.png",
+        "bytes":  3465217
+    },
+    {
+        "number":  "61",
+        "slug":  "cloud",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/61.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/cloud/main.png",
+        "file":  "61_cloud_main.png",
+        "bytes":  2319002
+    },
+    {
+        "number":  "62",
+        "slug":  "corrin",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/62.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/corrin/main.png",
+        "file":  "62_corrin_main.png",
+        "bytes":  2614494
+    },
+    {
+        "number":  "63",
+        "slug":  "bayonetta",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/63.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/bayonetta/main.png",
+        "file":  "63_bayonetta_main.png",
+        "bytes":  4319839
+    },
+    {
+        "number":  "64",
+        "slug":  "inkling",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/64.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/inkling/main.png",
+        "file":  "64_inkling_main.png",
+        "bytes":  1524348
+    },
+    {
+        "number":  "65",
+        "slug":  "ridley",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/65.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/ridley/main.png",
+        "file":  "65_ridley_main.png",
+        "bytes":  3203784
+    },
+    {
+        "number":  "66",
+        "slug":  "simon",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/66.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/simon/main.png",
+        "file":  "66_simon_main.png",
+        "bytes":  3264574
+    },
+    {
+        "number":  "67",
+        "slug":  "king_k_rool",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/67.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/king_k_rool/main.png",
+        "file":  "67_king_k_rool_main.png",
+        "bytes":  3636417
+    },
+    {
+        "number":  "68",
+        "slug":  "isabelle",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/68.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/isabelle/main.png",
+        "file":  "68_isabelle_main.png",
+        "bytes":  692772
+    },
+    {
+        "number":  "69",
+        "slug":  "incineroar",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/69.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/incineroar/main.png",
+        "file":  "69_incineroar_main.png",
+        "bytes":  3320725
+    },
+    {
+        "number":  "70",
+        "slug":  "piranha_plant",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/70.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/piranha_plant/main.png",
+        "file":  "70_piranha_plant_main.png",
+        "bytes":  1385471
+    },
+    {
+        "number":  "71",
+        "slug":  "joker",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/71.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/joker/main.png",
+        "file":  "71_joker_main.png",
+        "bytes":  1644222
+    },
+    {
+        "number":  "72",
+        "slug":  "dq_hero",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/72.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/dq_hero/main.png",
+        "file":  "72_dq_hero_main.png",
+        "bytes":  2846861
+    },
+    {
+        "number":  "73",
+        "slug":  "banjo_and_kazooie",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/73.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/banjo_and_kazooie/main.png",
+        "file":  "73_banjo_and_kazooie_main.png",
+        "bytes":  2225907
+    },
+    {
+        "number":  "74",
+        "slug":  "terry",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/74.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/terry/main.png",
+        "file":  "74_terry_main.png",
+        "bytes":  2166777
+    },
+    {
+        "number":  "75",
+        "slug":  "byleth",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/75.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/byleth/main.png",
+        "file":  "75_byleth_main.png",
+        "bytes":  1995587
+    },
+    {
+        "number":  "76",
+        "slug":  "minmin",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/76.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/minmin/main.png",
+        "file":  "76_minmin_main.png",
+        "bytes":  2145098
+    },
+    {
+        "number":  "77",
+        "slug":  "steve",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/77.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/steve/main.png",
+        "file":  "77_steve_main.png",
+        "bytes":  592940
+    },
+    {
+        "number":  "78",
+        "slug":  "sephiroth",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/78.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/sephiroth/main.png",
+        "file":  "78_sephiroth_main.png",
+        "bytes":  4163997
+    },
+    {
+        "number":  "79-80",
+        "slug":  "pyra",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/79-80.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/pyra/main.png",
+        "file":  "79-80_pyra_mythra_main.png",
+        "bytes":  2960115
+    },
+    {
+        "number":  "81",
+        "slug":  "kazuya",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/81.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/kazuya/main.png",
+        "file":  "81_kazuya_main.png",
+        "bytes":  2192926
+    },
+    {
+        "number":  "82",
+        "slug":  "sora",
+        "page_url":  "https://www.smashbros.com/en_US/fighter/82.html",
+        "image_url":  "https://www.smashbros.com/assets_v2/img/fighter/sora/main.png",
+        "file":  "82_sora_main.png",
+        "bytes":  1785003
+    }
+]
