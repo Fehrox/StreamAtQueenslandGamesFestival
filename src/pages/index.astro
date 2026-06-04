@@ -83,9 +83,9 @@ const rosterColumns = 13;
               <span class="ready-red-wedge"></span>
               <span class="ready-yellow-wedge"></span>
               <p class="ready-copy">
-                <span>READY</span>
-                <small>to</small>
-                <span>STREAM!</span>
+                <span data-ready-word="READY">READY</span>
+                <small data-ready-word="to">to</small>
+                <span data-ready-word="STREAM!">STREAM!</span>
               </p>
             </div>
             <span class="ready-rail ready-rail-bottom"></span>
@@ -1698,6 +1698,10 @@ const rosterColumns = 13;
     z-index: 1;
     --ready-panel-slide: -112%;
     --ready-panel-depth: translateX(-180px) perspective(1050px) rotateY(-13deg) rotateZ(-1.8deg) scaleX(1.35);
+    --ready-rail-delay: 120ms;
+    --ready-gradient-delay: 220ms;
+    --ready-black-delay: 320ms;
+    --ready-text-delay: 430ms;
     left: -120px;
     width: 2160px;
     top: 188px;
@@ -1722,18 +1726,40 @@ const rosterColumns = 13;
     box-shadow:
       0 7px 0 rgba(0, 0, 0, 0.72),
       0 -3px 0 rgba(255, 255, 255, 0.18);
+    opacity: 0;
+    transform: scaleX(0.02);
+    transform-origin: left center;
+    transition:
+      opacity 90ms ease,
+      transform 220ms cubic-bezier(0.2, 0.86, 0.24, 1);
   }
 
   :global(html.has-streamer-selected) .ready-panel {
     --ready-panel-slide: 0;
+    transition-delay: 80ms;
   }
 
   :global(html.ready-overlay-exiting) .ready-panel {
     --ready-panel-slide: 112%;
+    transition-delay: 0ms;
   }
 
   :global(html.ready-overlay-reset) .ready-panel {
     transition: none;
+  }
+
+  :global(html.has-streamer-selected) .ready-panel::before,
+  :global(html.ready-overlay-exiting) .ready-panel::before {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  :global(html.has-streamer-selected) .ready-panel::before {
+    transition-delay: var(--ready-gradient-delay);
+  }
+
+  :global(html.ready-overlay-exiting) .ready-panel::before {
+    transition-delay: 0ms;
   }
 
   .ready-rail {
@@ -1743,6 +1769,26 @@ const rosterColumns = 13;
     right: 0;
     display: block;
     background: linear-gradient(180deg, #ffffff, #dce3ee);
+    opacity: 0;
+    transform: scaleX(0.02);
+    transform-origin: left center;
+    transition:
+      opacity 90ms ease,
+      transform 220ms cubic-bezier(0.2, 0.86, 0.24, 1);
+  }
+
+  :global(html.has-streamer-selected) .ready-rail,
+  :global(html.ready-overlay-exiting) .ready-rail {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  :global(html.has-streamer-selected) .ready-rail {
+    transition-delay: var(--ready-rail-delay);
+  }
+
+  :global(html.ready-overlay-exiting) .ready-rail {
+    transition-delay: 0ms;
   }
 
   .ready-rail-top {
@@ -1764,13 +1810,7 @@ const rosterColumns = 13;
     top: 34px;
     height: 176px;
     overflow: visible;
-    background: #090a0b;
-    filter:
-      drop-shadow(0 14px 0 rgba(0, 0, 0, 0.62))
-      drop-shadow(0 0 18px rgba(0, 0, 0, 0.42));
-    box-shadow:
-      inset 0 0 0 5px rgba(255, 255, 255, 0.14),
-      inset 0 -12px 0 rgba(0, 0, 0, 0.38);
+    background: transparent;
     transform: translateY(5px) skewY(-1.1deg);
     transform-origin: right center;
   }
@@ -1783,30 +1823,73 @@ const rosterColumns = 13;
   }
 
   .ready-banner::before {
-    display: none;
+    z-index: 0;
+    inset: 0;
+    background: #090a0b;
+    box-shadow:
+      inset 0 0 0 5px rgba(255, 255, 255, 0.14),
+      inset 0 -12px 0 rgba(0, 0, 0, 0.38),
+      0 14px 0 rgba(0, 0, 0, 0.62),
+      0 0 18px rgba(0, 0, 0, 0.42);
+    opacity: 0;
+    transform: scaleX(0.02);
+    transform-origin: left center;
+    transition:
+      opacity 110ms ease,
+      transform 220ms cubic-bezier(0.2, 0.86, 0.24, 1);
   }
 
   .ready-banner::after {
-    z-index: 0;
+    z-index: 1;
     inset: 0;
     background:
       linear-gradient(105deg, transparent 0 22%, rgba(255, 255, 255, 0.09) 23% 31%, transparent 32% 100%),
       linear-gradient(180deg, rgba(255, 255, 255, 0.11), transparent 32%);
+    opacity: 0;
+    transform: scaleX(0.02);
+    transform-origin: left center;
+    transition:
+      opacity 110ms ease,
+      transform 220ms cubic-bezier(0.2, 0.86, 0.24, 1);
+  }
+
+  :global(html.has-streamer-selected) .ready-banner::before,
+  :global(html.has-streamer-selected) .ready-banner::after,
+  :global(html.ready-overlay-exiting) .ready-banner::before,
+  :global(html.ready-overlay-exiting) .ready-banner::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  :global(html.has-streamer-selected) .ready-banner::before,
+  :global(html.has-streamer-selected) .ready-banner::after {
+    transition-delay: var(--ready-black-delay);
+  }
+
+  :global(html.ready-overlay-exiting) .ready-banner::before,
+  :global(html.ready-overlay-exiting) .ready-banner::after {
+    transition-delay: 0ms;
   }
 
   .ready-red-wedge,
   .ready-yellow-wedge {
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     top: -24px;
     bottom: -24px;
     display: block;
+    opacity: 0;
+    transition:
+      opacity 100ms ease,
+      transform 220ms cubic-bezier(0.2, 0.86, 0.24, 1);
   }
 
   .ready-red-wedge {
     left: -134px;
     width: 260px;
     background: linear-gradient(105deg, #ef0012, #ff2920);
+    transform: translateX(-54px) scaleX(0.42);
+    transform-origin: right center;
     box-shadow:
       10px 0 0 rgba(0, 0, 0, 0.34),
       0 12px 0 rgba(0, 0, 0, 0.5);
@@ -1816,14 +1899,34 @@ const rosterColumns = 13;
     right: -146px;
     width: 330px;
     background: linear-gradient(96deg, #ffae00 0, #ffda04 48%, #fff04a 100%);
+    transform: translateX(54px) scaleX(0.42);
+    transform-origin: left center;
     box-shadow:
       -10px 0 0 rgba(0, 0, 0, 0.28),
       0 12px 0 rgba(0, 0, 0, 0.44);
   }
 
+  :global(html.has-streamer-selected) .ready-red-wedge,
+  :global(html.has-streamer-selected) .ready-yellow-wedge,
+  :global(html.ready-overlay-exiting) .ready-red-wedge,
+  :global(html.ready-overlay-exiting) .ready-yellow-wedge {
+    opacity: 1;
+    transform: translateX(0) scaleX(1);
+  }
+
+  :global(html.has-streamer-selected) .ready-red-wedge,
+  :global(html.has-streamer-selected) .ready-yellow-wedge {
+    transition-delay: var(--ready-gradient-delay);
+  }
+
+  :global(html.ready-overlay-exiting) .ready-red-wedge,
+  :global(html.ready-overlay-exiting) .ready-yellow-wedge {
+    transition-delay: 0ms;
+  }
+
   .ready-copy {
     position: absolute;
-    z-index: 2;
+    z-index: 3;
     inset: 0 174px 0 68px;
     display: flex;
     align-items: center;
@@ -1846,16 +1949,90 @@ const rosterColumns = 13;
       5px 5px 0 #050505,
       0 11px 0 rgba(0, 0, 0, 0.42),
       12px 16px 0 rgba(0, 0, 0, 0.5);
-    transform: skewX(-8deg) scaleX(1.14);
+    opacity: 0;
+    transform: translateY(18px) skewX(-8deg) scaleX(1.14);
     transform-origin: center;
+    transition:
+      opacity 120ms ease,
+      transform 190ms cubic-bezier(0.2, 0.86, 0.24, 1);
+  }
+
+  :global(html.has-streamer-selected) .ready-copy,
+  :global(html.ready-overlay-exiting) .ready-copy {
+    opacity: 1;
+    transform: translateY(0) skewX(-8deg) scaleX(1.14);
+  }
+
+  :global(html.has-streamer-selected) .ready-copy {
+    transition-delay: var(--ready-text-delay);
+  }
+
+  :global(html.ready-overlay-exiting) .ready-copy {
+    transition-delay: 0ms;
+  }
+
+  .ready-copy span,
+  .ready-copy small {
+    --ready-word-fill: #ffd817;
+    --ready-shimmer-delay: 650ms;
+    position: relative;
+    display: inline-block;
+    overflow: visible;
+    color: var(--ready-word-fill);
+    -webkit-text-fill-color: var(--ready-word-fill);
+  }
+
+  .ready-copy span::after,
+  .ready-copy small::after {
+    content: attr(data-ready-word);
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: block;
+    pointer-events: none;
+    color: transparent;
+    background:
+      linear-gradient(
+        105deg,
+        transparent 0 31%,
+        rgba(255, 244, 112, 0) 40%,
+        rgba(255, 244, 112, 0.9) 46%,
+        #fff 50%,
+        rgba(255, 244, 112, 0.9) 54%,
+        rgba(255, 244, 112, 0) 60%,
+        transparent 100%
+      );
+    background-size: 360% 100%;
+    background-position: 150% 0;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0;
+    text-shadow: none;
+    mix-blend-mode: screen;
+  }
+
+  :global(html.has-streamer-selected) .ready-copy span::after,
+  :global(html.has-streamer-selected) .ready-copy small::after {
+    opacity: 1;
+    animation: ready-text-shimmer 1.35s cubic-bezier(0.2, 0.76, 0.26, 1)
+      var(--ready-shimmer-delay) infinite;
+  }
+
+  :global(html.has-streamer-selected) .ready-copy small {
+    --ready-shimmer-delay: 730ms;
+  }
+
+  :global(html.has-streamer-selected) .ready-copy span:last-child {
+    --ready-shimmer-delay: 810ms;
   }
 
   .ready-copy span:last-child {
-    color: #ff9f00;
+    --ready-word-fill: #ff9f00;
   }
 
   .ready-copy small {
-    color: #fff;
+    --ready-word-fill: #fff;
     font-size: 58px;
     font-style: italic;
     letter-spacing: 0;
@@ -1866,6 +2043,25 @@ const rosterColumns = 13;
       4px 4px 0 #050505,
       0 8px 0 rgba(0, 0, 0, 0.42),
       8px 12px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  @keyframes ready-text-shimmer {
+    0%,
+    22% {
+      background-position: 150% 0;
+    }
+
+    78%,
+    100% {
+      background-position: -150% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.has-streamer-selected) .ready-copy span::after,
+    :global(html.has-streamer-selected) .ready-copy small::after {
+      animation-duration: 2.8s;
+    }
   }
 
   .bottom-dock {
