@@ -19,9 +19,16 @@ const rosterColumns = 13;
     <main class="viewport" aria-label="Queensland Games Festival streamer signup">
       <section class="stage" aria-label="Streamer selection screen">
         <header class="top-bar">
-          <div class="nav-plate" aria-hidden="true">
-            <span class="back-icon"></span>
-            <span class="book-icon"></span>
+          <div class="nav-plate">
+            <button
+              type="button"
+              class="back-action"
+              data-back-arrow
+              aria-label="Back to Queensland Games Festival"
+            >
+              <span class="back-icon" aria-hidden="true"></span>
+            </button>
+            <span class="book-icon" aria-hidden="true"></span>
           </div>
           <div class="title-tab">
             <span class="title-crop title-crop-left"></span>
@@ -118,9 +125,16 @@ const rosterColumns = 13;
 
       <section class="mobile-layout" aria-label="Mobile streamer signup">
         <header class="mobile-top-bar">
-          <div class="mobile-nav-plate" aria-hidden="true">
-            <span class="mobile-back-icon"></span>
-            <span class="mobile-book-icon"></span>
+          <div class="mobile-nav-plate">
+            <button
+              type="button"
+              class="mobile-back-action"
+              data-back-arrow
+              aria-label="Back to Queensland Games Festival"
+            >
+              <span class="mobile-back-icon" aria-hidden="true"></span>
+            </button>
+            <span class="mobile-book-icon" aria-hidden="true"></span>
           </div>
           <div class="mobile-title-tab">
             <h1>QGF Streamer Invite</h1>
@@ -226,9 +240,11 @@ const rosterColumns = 13;
       const streamerCards = document.querySelectorAll(
         "[data-streamer-card], [data-mobile-streamer-card]",
       );
+      const backArrows = document.querySelectorAll("[data-back-arrow]");
       const mobileCta = document.querySelector("[data-mobile-cta]");
       const selectedName = document.querySelector("[data-selected-name]");
       const mobileSelectedName = document.querySelector("[data-mobile-selected-name]");
+      const festivalUrl = "https://www.queenslandgamesfestival.com/";
 
       const hasSelection = () =>
         document.documentElement.classList.contains("has-streamer-selected");
@@ -317,6 +333,27 @@ const rosterColumns = 13;
         });
       });
 
+      backArrows.forEach((backArrow) => {
+        backArrow.addEventListener("pointerenter", (event) => {
+          if (event.pointerType === "mouse") {
+            document.documentElement.classList.add("custom-cursor-empty-hand");
+          }
+        });
+
+        backArrow.addEventListener("pointerleave", () => {
+          document.documentElement.classList.remove("custom-cursor-empty-hand");
+        });
+
+        backArrow.addEventListener("click", () => {
+          if (hasSelection()) {
+            clearSelection();
+            return;
+          }
+
+          window.location.href = festivalUrl;
+        });
+      });
+
       window.addEventListener("contextmenu", (event) => {
         if (!hasSelection()) {
           return;
@@ -387,6 +424,7 @@ const rosterColumns = 13;
       window.addEventListener("pointerout", (event) => {
         if (!event.relatedTarget && customCursor instanceof HTMLElement) {
           customCursor.classList.remove("custom-cursor-visible");
+          document.documentElement.classList.remove("custom-cursor-empty-hand");
         }
       });
 
@@ -394,6 +432,7 @@ const rosterColumns = 13;
         if (customCursor instanceof HTMLElement) {
           customCursor.classList.remove("custom-cursor-visible");
           customCursor.classList.remove("custom-cursor-pressed");
+          document.documentElement.classList.remove("custom-cursor-empty-hand");
         }
       });
 
@@ -1134,6 +1173,14 @@ const rosterColumns = 13;
     opacity: 1;
   }
 
+  :global(html.custom-cursor-empty-hand) .custom-cursor-hand-marker {
+    opacity: 0;
+  }
+
+  :global(html.custom-cursor-empty-hand) .custom-cursor-hand-empty {
+    opacity: 1;
+  }
+
   .custom-cursor-p1 {
     position: absolute;
     right: -10%;
@@ -1145,6 +1192,10 @@ const rosterColumns = 13;
   }
 
   :global(html.has-streamer-selected) .custom-cursor-p1 {
+    opacity: 0;
+  }
+
+  :global(html.custom-cursor-empty-hand) .custom-cursor-p1 {
     opacity: 0;
   }
 
@@ -1197,27 +1248,35 @@ const rosterColumns = 13;
     filter: drop-shadow(10px 8px 0 rgba(0, 0, 0, 0.72));
   }
 
+  .back-action {
+    position: absolute;
+    left: 26px;
+    top: 5px;
+    width: 84px;
+    height: 62px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .back-action:focus-visible {
+    outline: 4px solid #fff;
+    outline-offset: -4px;
+  }
+
   .back-icon {
     position: absolute;
-    left: 43px;
-    top: 16px;
-    width: 46px;
-    height: 33px;
-    border: 7px solid #f2a0a0;
-    border-right: 0;
-    border-radius: 24px 0 0 24px;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: url("/icons/BackArrowIcon2x.png") center / 65px 62px no-repeat;
+    opacity: 0.72;
+    pointer-events: none;
   }
 
   .back-icon::before {
-    content: "";
-    position: absolute;
-    left: -11px;
-    top: -14px;
-    width: 0;
-    height: 0;
-    border-top: 19px solid transparent;
-    border-bottom: 19px solid transparent;
-    border-right: 25px solid #f2a0a0;
+    content: none;
   }
 
   .book-icon {
@@ -1903,27 +1962,35 @@ const rosterColumns = 13;
       filter: drop-shadow(7px 6px 0 rgba(0, 0, 0, 0.72));
     }
 
+    .mobile-back-action {
+      position: absolute;
+      left: 7px;
+      top: 10px;
+      width: 57px;
+      height: 42px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .mobile-back-action:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: -3px;
+    }
+
     .mobile-back-icon {
       position: absolute;
-      left: 15px;
-      top: 17px;
-      width: 30px;
-      height: 21px;
-      border: 5px solid #f2a0a0;
-      border-right: 0;
-      border-radius: 18px 0 0 18px;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: url("/icons/BackArrowIcon2x.png") center / 44px 42px no-repeat;
+      opacity: 0.72;
+      pointer-events: none;
     }
 
     .mobile-back-icon::before {
-      content: "";
-      position: absolute;
-      left: -9px;
-      top: -11px;
-      width: 0;
-      height: 0;
-      border-top: 15px solid transparent;
-      border-bottom: 15px solid transparent;
-      border-right: 20px solid #f2a0a0;
+      content: none;
     }
 
     .mobile-book-icon {
