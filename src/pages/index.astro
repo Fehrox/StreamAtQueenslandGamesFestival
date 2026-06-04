@@ -125,10 +125,24 @@ const rosterColumns = 13;
             <div class="question-mark" aria-hidden="true">?</div>
             <div class="random-copy">
               <h2>Confirm Attendance</h2>
-              <div class="cpu-info">
-                <span>OAuth</span>
-                <strong>Soon</strong>
-              </div>
+              <button
+                type="button"
+                class="twitch-confirm-button"
+                data-twitch-confirm
+                hidden
+                aria-label="Confirm selected creator with Twitch"
+              >
+                <span class="twitch-wordmark" aria-hidden="true">
+                  <img
+                    class="twitch-icon"
+                    src="/icons/TwitchGlitchWhite.svg"
+                    alt=""
+                    draggable="false"
+                  />
+                  <span>Twitch</span>
+                </span>
+                <span class="twitch-confirm-label">Confirm with Twitch</span>
+              </button>
             </div>
             <aside class="side-buttons" aria-hidden="true">
               <span>+1</span>
@@ -212,7 +226,14 @@ const rosterColumns = 13;
                 <strong>0%</strong>
               </div>
               <button type="button" class="mobile-twitch-button" aria-disabled="true">
-                Confirm with Twitch
+                <img
+                  class="mobile-twitch-icon"
+                  src="/icons/TwitchGlitchWhite.svg"
+                  alt=""
+                  aria-hidden="true"
+                  draggable="false"
+                />
+                <span>Confirm with Twitch</span>
               </button>
             </div>
           </div>
@@ -265,6 +286,9 @@ const rosterColumns = 13;
       const mobileCta = document.querySelector("[data-mobile-cta]");
       const selectedName = document.querySelector("[data-selected-name]");
       const mobileSelectedName = document.querySelector("[data-mobile-selected-name]");
+      const twitchConfirmButtons = document.querySelectorAll<HTMLButtonElement>(
+        "[data-twitch-confirm]",
+      );
       const festivalUrl = "https://www.queenslandgamesfestival.com/";
       const readyOverlayExitMs = 280;
       let readyOverlayExitTimer: number | undefined;
@@ -284,6 +308,21 @@ const rosterColumns = 13;
 
       const setCursorOverStreamerCard = (isOver: boolean) => {
         document.documentElement.classList.toggle("custom-cursor-over-streamer-card", isOver);
+      };
+
+      const setTwitchConfirmButtonVisibility = (streamerName = "") => {
+        const hasStreamerName = streamerName.length > 0;
+
+        twitchConfirmButtons.forEach((button) => {
+          button.hidden = !hasStreamerName;
+          button.setAttribute("aria-disabled", String(!hasStreamerName));
+          button.setAttribute(
+            "aria-label",
+            hasStreamerName
+              ? `Confirm ${streamerName} with Twitch`
+              : "Confirm selected creator with Twitch",
+          );
+        });
       };
 
       const clearHoverPreview = () => {
@@ -353,6 +392,7 @@ const rosterColumns = 13;
         });
 
         setSelectedStreamerName("");
+        setTwitchConfirmButtonVisibility();
 
         if (mobileCta instanceof HTMLElement) {
           mobileCta.hidden = true;
@@ -382,6 +422,7 @@ const rosterColumns = 13;
         });
 
         setSelectedStreamerName(streamerName);
+        setTwitchConfirmButtonVisibility(streamerName);
 
         if (mobileCta instanceof HTMLElement && card.classList.contains("mobile-tile")) {
           const wasHidden = mobileCta.hidden;
@@ -2253,8 +2294,7 @@ const rosterColumns = 13;
     line-height: 0.95;
   }
 
-  .player-info,
-  .cpu-info {
+  .player-info {
     display: grid;
     grid-template-columns: 1fr 188px;
     gap: 8px;
@@ -2262,9 +2302,7 @@ const rosterColumns = 13;
   }
 
   .player-info span,
-  .player-info strong,
-  .cpu-info span,
-  .cpu-info strong {
+  .player-info strong {
     height: 61px;
     display: grid;
     place-items: center;
@@ -2276,8 +2314,7 @@ const rosterColumns = 13;
     line-height: 1;
   }
 
-  .player-info strong,
-  .cpu-info strong {
+  .player-info strong {
     color: #fff;
     background: rgba(255, 232, 232, 0.5);
     text-shadow:
@@ -2351,6 +2388,12 @@ const rosterColumns = 13;
       linear-gradient(74deg, #b8b8b8 0 22%, #ececec 22% 34%, #a9a9a9 34% 100%);
   }
 
+  :global(html.has-streamer-selected) .player-panel-random {
+    background:
+      linear-gradient(127deg, rgba(255, 255, 255, 0.9) 0 18%, transparent 18%),
+      linear-gradient(74deg, #0e0e10 0 22%, #c7a7ff 22% 60%, #ad80ff 60% 100%);
+  }
+
   .question-mark {
     align-self: center;
     justify-self: center;
@@ -2367,6 +2410,16 @@ const rosterColumns = 13;
       0 12px 0 rgba(0, 0, 0, 0.36);
   }
 
+  :global(html.has-streamer-selected) .question-mark {
+    color: #fff;
+    text-shadow:
+      -8px -8px 0 #0e0e10,
+      8px -8px 0 #0e0e10,
+      -8px 8px 0 #0e0e10,
+      8px 8px 0 #0e0e10,
+      0 12px 0 rgba(0, 0, 0, 0.46);
+  }
+
   .random-copy {
     position: relative;
     padding: 132px 86px 0 0;
@@ -2377,18 +2430,60 @@ const rosterColumns = 13;
     line-height: 0.92;
   }
 
-  .cpu-info {
-    grid-template-columns: 1fr 193px;
-    margin-top: 17px;
+  .twitch-confirm-button[hidden] {
+    display: none;
   }
 
-  .cpu-info span,
-  .cpu-info strong {
-    background: rgba(196, 196, 196, 0.72);
+  .twitch-confirm-button {
+    width: 100%;
+    min-height: 76px;
+    display: grid;
+    grid-template-columns: 156px minmax(0, 1fr);
+    align-items: center;
+    gap: 18px;
+    margin-top: 22px;
+    padding: 0 24px;
+    border: 0;
+    border-radius: 4px;
+    background: #9146ff;
+    color: #fff;
+    box-shadow:
+      0 8px 0 #5c16c5,
+      0 15px 24px rgba(14, 14, 16, 0.28);
+    cursor: default;
   }
 
-  .cpu-info strong {
-    color: #1de8e7;
+  .twitch-wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: #fff;
+    font-family: Inter, "Segoe UI", Arial, Helvetica, system-ui, sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: none !important;
+    white-space: nowrap;
+  }
+
+  .twitch-icon {
+    width: 34px;
+    height: 34px;
+    display: block;
+    object-fit: contain;
+    flex: 0 0 auto;
+  }
+
+  .twitch-confirm-label {
+    min-width: 0;
+    color: #fff;
+    font-family: Inter, "Segoe UI", Arial, Helvetica, system-ui, sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+    text-align: left;
+    text-shadow: none;
   }
 
   .side-buttons {
@@ -2887,7 +2982,12 @@ const rosterColumns = 13;
     .mobile-twitch-button {
       width: 100%;
       min-height: 47px;
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
       margin-top: 12px;
+      padding: 0 10px;
       border: 4px solid #171719;
       background: #9146ff;
       color: #fff;
@@ -2902,6 +3002,13 @@ const rosterColumns = 13;
         2px 2px 0 #000;
       box-shadow: 0 6px 0 rgba(0, 0, 0, 0.45);
       cursor: default;
+    }
+
+    .mobile-twitch-icon {
+      width: 28px;
+      height: 28px;
+      display: block;
+      object-fit: contain;
     }
 
     @media (min-width: 560px) {
