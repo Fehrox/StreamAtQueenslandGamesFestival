@@ -1,5 +1,5 @@
 ---
-import { streamers } from "@data/streamers";
+import { featuredStreamer, streamers } from "@data/streamers";
 
 const rosterColumns = 13;
 const confirmationQuestions = [
@@ -509,6 +509,18 @@ const confirmationQuestions = [
       const readyOverlayExitMs = 280;
       let readyOverlayExitTimer: number | undefined;
       let selectedStreamerId: string | undefined;
+      const desktopPortraitFallbackClasses = [
+        "big-avatar-head",
+        "big-avatar-body",
+        "big-avatar-arm",
+      ];
+      const mobilePortraitFallbackClasses = [
+        "mobile-big-avatar-head",
+        "mobile-big-avatar-body",
+        "mobile-big-avatar-arm",
+      ];
+      const portraitFadeMs = 110;
+      let hoverPreviewClearTimeout: number | undefined;
 
       const hasSelection = () =>
         document.documentElement.classList.contains("has-streamer-selected");
@@ -588,21 +600,28 @@ const confirmationQuestions = [
       };
 
       const clearHoverPreview = () => {
-        document.documentElement.classList.remove("has-streamer-hover-preview");
+        window.clearTimeout(hoverPreviewClearTimeout);
+        hoverPreviewClearTimeout = window.setTimeout(() => {
+          document.documentElement.classList.remove("has-streamer-hover-preview");
 
-        if (!hasSelection()) {
-          setSelectedStreamerName("");
-        }
+          if (!hasSelection()) {
+            setSelectedStreamerName("");
+            setSelectedStreamerPortrait("");
+          }
+        }, portraitFadeMs);
       };
 
       const previewStreamer = (card: HTMLElement) => {
+        window.clearTimeout(hoverPreviewClearTimeout);
         if (hasSelection()) {
           return;
         }
 
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
+        const streamerImage = card.getAttribute("data-streamer-image") || "";
         document.documentElement.classList.add("has-streamer-hover-preview");
         setSelectedStreamerName(streamerName);
+        setSelectedStreamerPortrait(streamerImage);
       };
 
       const resetReadyOverlayToEntrance = () => {
@@ -653,23 +672,63 @@ const confirmationQuestions = [
           return;
         }
 
-        target.replaceChildren();
+        const currentImage =
+          target.getAttribute("data-current-portrait-image") ||
+          target.querySelector("img")?.getAttribute("src") ||
+          "";
+
+        if (currentImage === image) {
+          return;
+        }
+
+        target.setAttribute("data-current-portrait-image", image);
         target.classList.toggle("selected-portrait-has-image", Boolean(image));
 
         if (image) {
+          const previousChildren = Array.from(target.children);
           const img = document.createElement("img");
           img.src = image;
           img.alt = "";
           img.decoding = "async";
+          img.className = "portrait-crossfade-enter";
           target.append(img);
+
+          window.requestAnimationFrame(() => {
+            img.classList.add("portrait-crossfade-enter-active");
+
+            previousChildren.forEach((child) => {
+              child.classList.add("portrait-crossfade-exit");
+              child.classList.add("portrait-crossfade-exit-active");
+            });
+          });
+
+          window.setTimeout(() => {
+            previousChildren.forEach((child) => child.remove());
+            img.classList.remove("portrait-crossfade-enter", "portrait-crossfade-enter-active");
+          }, portraitFadeMs + 40);
           return;
         }
 
+        target.replaceChildren();
         fallbackClasses.forEach((className) => {
           const span = document.createElement("span");
           span.className = className;
           target.append(span);
         });
+      };
+
+      const setSelectedStreamerPortrait = (streamerImage: string) => {
+        setSelectedPortrait(
+          selectedPortrait,
+          streamerImage,
+          desktopPortraitFallbackClasses,
+        );
+
+        setSelectedPortrait(
+          mobileSelectedPortrait,
+          streamerImage,
+          mobilePortraitFallbackClasses,
+        );
       };
 
       const clearSelection = () => {
@@ -685,18 +744,7 @@ const confirmationQuestions = [
 
         setSelectedStreamerName("");
         setTwitchConfirmButtonVisibility();
-
-        setSelectedPortrait(
-          selectedPortrait,
-          "",
-          ["big-avatar-head", "big-avatar-body", "big-avatar-arm"],
-        );
-
-        setSelectedPortrait(
-          mobileSelectedPortrait,
-          "",
-          ["mobile-big-avatar-head", "mobile-big-avatar-body", "mobile-big-avatar-arm"],
-        );
+        setSelectedStreamerPortrait("");
 
         if (mobileCta instanceof HTMLElement) {
           mobileCta.hidden = true;
@@ -733,18 +781,7 @@ const confirmationQuestions = [
         setSelectedStreamerName(streamerName);
         setTwitchConfirmButtonVisibility(streamerName);
         syncConfirmStreamerSelect();
-
-        setSelectedPortrait(
-          selectedPortrait,
-          streamerImage,
-          ["big-avatar-head", "big-avatar-body", "big-avatar-arm"],
-        );
-
-        setSelectedPortrait(
-          mobileSelectedPortrait,
-          streamerImage,
-          ["mobile-big-avatar-head", "mobile-big-avatar-body", "mobile-big-avatar-arm"],
-        );
+        setSelectedStreamerPortrait(streamerImage);
 
         if (mobileCta instanceof HTMLElement && card.classList.contains("mobile-tile")) {
           const wasHidden = mobileCta.hidden;
@@ -2934,25 +2971,48 @@ const confirmationQuestions = [
     position: absolute;
     z-index: 2;
     left: 28px;
-    top: 12px;
+    top: auto;
+    bottom: 0;
     width: 448px;
-    height: 359px;
+    height: 371px;
     overflow: hidden;
     clip-path: polygon(72px 0, 100% 0, 100% 100%, 0 100%, 0 72px);
   }
 
-  .panel-portrait img {
+  :global(.panel-portrait img) {
     position: absolute;
     left: 33px;
-    top: 8px;
-    width: 360px;
-    height: 360px;
+    bottom: 0;
+    width: 371px;
+    height: 371px;
     display: block;
     object-fit: cover;
     object-position: center top;
-    filter: saturate(1.14) contrast(1.05) drop-shadow(18px 18px 0 rgba(0, 0, 0, 0.28));
+    filter: saturate(1.14) contrast(1.05) drop-shadow(18px 0 0 rgba(0, 0, 0, 0.28));
     transform: scale(1.12);
     transform-origin: center bottom;
+  }
+
+  :global(.portrait-crossfade-enter),
+  :global(.portrait-crossfade-exit) {
+    transition: opacity 110ms ease;
+    will-change: opacity;
+  }
+
+  :global(.portrait-crossfade-enter) {
+    opacity: 0;
+  }
+
+  :global(.portrait-crossfade-enter-active) {
+    opacity: 1;
+  }
+
+  :global(.portrait-crossfade-exit) {
+    opacity: 1;
+  }
+
+  :global(.portrait-crossfade-exit-active) {
+    opacity: 0;
   }
 
   .big-avatar-head {
