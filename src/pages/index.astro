@@ -66,7 +66,7 @@ const rosterColumns = 13;
                 <h2>{streamer.name}</h2>
                 <img
                   class="selection-marker"
-                  src="/cursors/P1Marker.svg"
+                  src="/cursors/P1Marker.png"
                   alt=""
                   aria-hidden="true"
                   draggable="false"
@@ -172,7 +172,7 @@ const rosterColumns = 13;
                 <span class="mobile-tile-name">{streamer.name}</span>
                 <img
                   class="selection-marker"
-                  src="/cursors/P1Marker.svg"
+                  src="/cursors/P1Marker.png"
                   alt=""
                   aria-hidden="true"
                   draggable="false"
@@ -214,8 +214,14 @@ const rosterColumns = 13;
           draggable="false"
         />
         <img
-          class="custom-cursor-hand custom-cursor-hand-empty"
-          src="/cursors/EmptyHand.png"
+          class="custom-cursor-hand custom-cursor-hand-pointer"
+          src="/cursors/PointerHand.png"
+          alt=""
+          draggable="false"
+        />
+        <img
+          class="custom-cursor-hand custom-cursor-hand-open"
+          src="/cursors/OpenHand.png"
           alt=""
           draggable="false"
         />
@@ -248,6 +254,10 @@ const rosterColumns = 13;
 
       const hasSelection = () =>
         document.documentElement.classList.contains("has-streamer-selected");
+
+      const setCursorOverStreamerCard = (isOver) => {
+        document.documentElement.classList.toggle("custom-cursor-over-streamer-card", isOver);
+      };
 
       const clearSelection = () => {
         document.documentElement.classList.remove("has-streamer-selected");
@@ -319,6 +329,14 @@ const rosterColumns = 13;
       };
 
       streamerCards.forEach((card) => {
+        card.addEventListener("mouseenter", () => {
+          setCursorOverStreamerCard(true);
+        });
+
+        card.addEventListener("mouseleave", () => {
+          setCursorOverStreamerCard(false);
+        });
+
         card.addEventListener("click", () => {
           activateStreamer(card);
         });
@@ -334,16 +352,6 @@ const rosterColumns = 13;
       });
 
       backArrows.forEach((backArrow) => {
-        backArrow.addEventListener("pointerenter", (event) => {
-          if (event.pointerType === "mouse") {
-            document.documentElement.classList.add("custom-cursor-empty-hand");
-          }
-        });
-
-        backArrow.addEventListener("pointerleave", () => {
-          document.documentElement.classList.remove("custom-cursor-empty-hand");
-        });
-
         backArrow.addEventListener("click", () => {
           window.location.href = festivalUrl;
         });
@@ -376,6 +384,10 @@ const rosterColumns = 13;
       const syncCustomCursor = () => {
         const isEnabled = customCursorQuery.matches && customCursor instanceof HTMLElement;
         document.documentElement.classList.toggle("custom-cursor-enabled", isEnabled);
+
+        if (!isEnabled) {
+          setCursorOverStreamerCard(false);
+        }
 
         if (customCursor instanceof HTMLElement) {
           customCursor.hidden = !isEnabled;
@@ -419,7 +431,7 @@ const rosterColumns = 13;
       window.addEventListener("pointerout", (event) => {
         if (!event.relatedTarget && customCursor instanceof HTMLElement) {
           customCursor.classList.remove("custom-cursor-visible");
-          document.documentElement.classList.remove("custom-cursor-empty-hand");
+          setCursorOverStreamerCard(false);
         }
       });
 
@@ -427,7 +439,7 @@ const rosterColumns = 13;
         if (customCursor instanceof HTMLElement) {
           customCursor.classList.remove("custom-cursor-visible");
           customCursor.classList.remove("custom-cursor-pressed");
-          document.documentElement.classList.remove("custom-cursor-empty-hand");
+          setCursorOverStreamerCard(false);
         }
       });
 
@@ -1156,23 +1168,29 @@ const rosterColumns = 13;
     transition: opacity 120ms ease;
   }
 
-  .custom-cursor-hand-empty {
+  .custom-cursor-hand-marker,
+  .custom-cursor-hand-open,
+  .custom-cursor-p1 {
     opacity: 0;
   }
 
-  :global(html.has-streamer-selected) .custom-cursor-hand-marker {
+  :global(html.custom-cursor-over-streamer-card) .custom-cursor-hand-pointer {
     opacity: 0;
   }
 
-  :global(html.has-streamer-selected) .custom-cursor-hand-empty {
+  :global(html.custom-cursor-over-streamer-card) .custom-cursor-hand-marker,
+  :global(html.custom-cursor-over-streamer-card) .custom-cursor-p1 {
     opacity: 1;
   }
 
-  :global(html.custom-cursor-empty-hand) .custom-cursor-hand-marker {
+  :global(html.has-streamer-selected.custom-cursor-over-streamer-card)
+    .custom-cursor-hand-marker,
+  :global(html.has-streamer-selected.custom-cursor-over-streamer-card) .custom-cursor-p1 {
     opacity: 0;
   }
 
-  :global(html.custom-cursor-empty-hand) .custom-cursor-hand-empty {
+  :global(html.has-streamer-selected.custom-cursor-over-streamer-card)
+    .custom-cursor-hand-open {
     opacity: 1;
   }
 
@@ -1184,14 +1202,6 @@ const rosterColumns = 13;
     height: 42%;
     object-fit: contain;
     transition: opacity 120ms ease;
-  }
-
-  :global(html.has-streamer-selected) .custom-cursor-p1 {
-    opacity: 0;
-  }
-
-  :global(html.custom-cursor-empty-hand) .custom-cursor-p1 {
-    opacity: 0;
   }
 
   .viewport {
