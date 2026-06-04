@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.astro/
+qgf-render*.png
+dev-server.*.log
