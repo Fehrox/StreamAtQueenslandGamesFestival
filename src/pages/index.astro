@@ -35,13 +35,16 @@ const confirmationQuestions = [
   },
 ];
 
-const streamerVerificationProfiles = streamers.map(({ id, name, twitchHandle, image, fallbackImage }) => ({
-  id,
-  name,
-  image: image ?? "",
-  fallbackImage: fallbackImage ?? "",
-  twitchHandle: twitchHandle ?? "",
-}));
+const streamerVerificationProfiles = streamers.map(
+  ({ id, name, twitchHandle, image, fallbackImage, profileUrl }) => ({
+    id,
+    name,
+    image: image ?? "",
+    fallbackImage: fallbackImage ?? "",
+    profileUrl: profileUrl ?? "",
+    twitchHandle: twitchHandle ?? "",
+  }),
+);
 const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfiles).replace(
   /</g,
   "\\u003c",
@@ -808,6 +811,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         name: string;
         image: string;
         fallbackImage: string;
+        profileUrl: string;
         twitchHandle: string;
       };
 
@@ -870,6 +874,8 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
       const confirmWithTwitchButton = document.querySelector<HTMLButtonElement>(
         "[data-confirm-with-twitch]",
       );
+      const confirmWithTwitchButtonIdleText =
+        confirmWithTwitchButton?.textContent?.trim() || "Confirm with Twitch Account";
       const confirmWithoutVerifyingButton = document.querySelector<HTMLButtonElement>(
         "[data-confirm-without-verifying]",
       );
@@ -910,8 +916,8 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         "[data-streamer-verification-profiles]",
       );
       const twitchClientId = import.meta.env.PUBLIC_TWITCH_CLIENT_ID || "";
-      const twitchRedirectUri = "https://streamatqueenslandgamesfestival.com/";
-      const twitchRedirectUriFallback = "https://streamatqueenslandgamesfestival.com";
+      const twitchRedirectUri = "https://streamatqueenslandgamesfestival.com";
+      const twitchRedirectUriFallback = "https://streamatqueenslandgamesfestival.com/";
       const twitchRedirectUriAttempts = [twitchRedirectUri, twitchRedirectUriFallback];
       const pendingTwitchVerificationStorageKey = "qgfInvite:pendingTwitchVerification";
       const confirmationDetailsStorageKey = "qgfInvite:confirmationDetails";
@@ -919,6 +925,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
       const readyOverlayExitMs = 280;
       let readyOverlayExitTimer: number | undefined;
       let selectedStreamerId: string | undefined;
+      let isStartingTwitchVerification = false;
       const desktopPortraitFallbackClasses = [
         "big-avatar-head",
         "big-avatar-body",
@@ -981,6 +988,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
                 typeof profile.name === "string" &&
                 typeof profile.image === "string" &&
                 typeof profile.fallbackImage === "string" &&
+                typeof profile.profileUrl === "string" &&
                 typeof profile.twitchHandle === "string",
             )
             .map((profile) => ({
@@ -988,6 +996,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
               name: profile.name,
               image: profile.image,
               fallbackImage: profile.fallbackImage,
+              profileUrl: profile.profileUrl,
               twitchHandle: profile.twitchHandle,
             }));
         } catch {
@@ -1174,6 +1183,23 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         }
       };
 
+      const setTwitchVerificationStarting = (isStarting: boolean) => {
+        isStartingTwitchVerification = isStarting;
+
+        if (!(confirmWithTwitchButton instanceof HTMLButtonElement)) {
+          return;
+        }
+
+        confirmWithTwitchButton.disabled = isStarting;
+        confirmWithTwitchButton.setAttribute("aria-disabled", String(isStarting));
+
+        if (confirmWithTwitchButtonIdleText) {
+          confirmWithTwitchButton.textContent = isStarting
+            ? "Opening Twitch..."
+            : confirmWithTwitchButtonIdleText;
+        }
+      };
+
       const resultTitles: Record<VerificationResultStatus, string> = {
         verified: "Verified",
         mismatch: "Account Mismatch",
@@ -1308,6 +1334,54 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         return validation;
       };
 
+      const fetchTwitchProfileImage = async (accessToken: string, login: string) => {
+        const normalizedLogin = normalizeTwitchLogin(login);
+
+        if (!normalizedLogin) {
+          return "";
+        }
+
+        const userUrl = new URL("https://api.twitch.tv/helix/users");
+        userUrl.searchParams.set("login", normalizedLogin);
+
+        try {
+          const response = await fetch(userUrl.toString(), {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Client-Id": twitchClientId,
+            },
+          });
+
+          if (!response.ok) {
+            return "";
+          }
+
+          const payload = (await response.json()) as {
+            data?: Array<{
+              login?: string;
+              profile_image_url?: string;
+            }>;
+          };
+          const profile = payload.data?.find(
+            (user) => normalizeTwitchLogin(user.login || "") === normalizedLogin,
+          );
+
+          return typeof profile?.profile_image_url === "string"
+            ? profile.profile_image_url
+            : "";
+        } catch {
+          return "";
+        }
+      };
+
+      const withConfirmedProfileImage = (
+        streamerProfile: StreamerVerificationProfile,
+        twitchProfileImage: string,
+      ): StreamerVerificationProfile => ({
+        ...streamerProfile,
+        image: streamerProfile.image || twitchProfileImage,
+      });
+
       const getTwitchRedirectMismatchMessage = (
         authErrorDescription: string | null,
         attemptedRedirectUris: string[],
@@ -1333,7 +1407,14 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         redirectUri = twitchRedirectUri,
         attemptedRedirectUris = [redirectUri],
       ) => {
+        if (isStartingTwitchVerification) {
+          return;
+        }
+
+        setTwitchVerificationStarting(true);
+
         if (!twitchClientId || !details.expectedTwitchHandle) {
+          setTwitchVerificationStarting(false);
           openVerificationResult(
             "failed",
             "Twitch verification is unavailable for this selection.",
@@ -1350,6 +1431,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         };
 
         if (!writeSessionJson(pendingTwitchVerificationStorageKey, pendingVerification)) {
+          setTwitchVerificationStarting(false);
           openVerificationResult(
             "failed",
             "The browser could not store the Twitch verification request.",
@@ -1987,17 +2069,24 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
           }
 
           const matchedStreamerProfile = getStreamerProfileByTwitchLogin(returnedLogin);
+          const twitchProfileImage = matchedStreamerProfile?.image
+            ? ""
+            : await fetchTwitchProfileImage(accessToken, returnedLogin);
 
           if (matchedStreamerProfile) {
+            const confirmedStreamerProfile = withConfirmedProfileImage(
+              matchedStreamerProfile,
+              twitchProfileImage,
+            );
             const confirmedDetails = getDetailsForStreamerProfile(
               restoredDetails,
-              matchedStreamerProfile,
+              confirmedStreamerProfile,
             );
             pendingConfirmationDetails = confirmedDetails;
             saveConfirmationDetails(confirmedDetails);
-            selectStreamerById(matchedStreamerProfile.id);
+            selectStreamerById(confirmedStreamerProfile.id);
             openAttendanceConfirmedDialog(
-              matchedStreamerProfile,
+              confirmedStreamerProfile,
               returnedLogin,
               restoredDetails,
             );
@@ -3102,6 +3191,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
     font-size: 25px;
     font-weight: 800;
     line-height: 1.24;
+    overflow-wrap: anywhere;
   }
 
   .verification-modal-warning {
