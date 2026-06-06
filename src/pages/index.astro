@@ -1379,7 +1379,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         twitchProfileImage: string,
       ): StreamerVerificationProfile => ({
         ...streamerProfile,
-        image: streamerProfile.image || twitchProfileImage,
+        image: twitchProfileImage || streamerProfile.image,
       });
 
       const getTwitchRedirectMismatchMessage = (
@@ -2069,9 +2069,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
           }
 
           const matchedStreamerProfile = getStreamerProfileByTwitchLogin(returnedLogin);
-          const twitchProfileImage = matchedStreamerProfile?.image
-            ? ""
-            : await fetchTwitchProfileImage(accessToken, returnedLogin);
+          const twitchProfileImage = await fetchTwitchProfileImage(accessToken, returnedLogin);
 
           if (matchedStreamerProfile) {
             const confirmedStreamerProfile = withConfirmedProfileImage(
@@ -3282,7 +3280,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
     height: 100%;
     display: block;
     object-fit: cover;
-    object-position: center top;
+    object-position: center center;
   }
 
   .attendance-confirmed-portrait .big-avatar-head {
