@@ -21,19 +21,25 @@ const contentTypes = {
 const server = http.createServer((request, response) => {
   const requestPath = decodeURIComponent((request.url || "/").split("?")[0]);
   const candidatePath = path.resolve(root, requestPath === "/" ? "index.html" : `.${requestPath}`);
-  const filePath = candidatePath.startsWith(root) ? candidatePath : path.join(root, "index.html");
+  const safePath = candidatePath.startsWith(root) ? candidatePath : path.join(root, "index.html");
 
-  fs.readFile(filePath, (error, data) => {
-    if (error) {
-      response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-      response.end("Not found");
-      return;
-    }
+  fs.stat(safePath, (statError, stats) => {
+    const filePath = !statError && stats.isDirectory()
+      ? path.join(safePath, "index.html")
+      : safePath;
 
-    response.writeHead(200, {
-      "Content-Type": contentTypes[path.extname(filePath)] || "application/octet-stream",
+    fs.readFile(filePath, (error, data) => {
+      if (error) {
+        response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+        response.end("Not found");
+        return;
+      }
+
+      response.writeHead(200, {
+        "Content-Type": contentTypes[path.extname(filePath)] || "application/octet-stream",
+      });
+      response.end(data);
     });
-    response.end(data);
   });
 });
 

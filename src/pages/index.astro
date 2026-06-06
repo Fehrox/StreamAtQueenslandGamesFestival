@@ -1,5 +1,5 @@
 ---
-import { streamers } from "@data/streamers";
+import { getStreamerUrlSlug, streamers } from "@data/streamers";
 
 const rosterColumns = 13;
 const confirmationQuestions = [
@@ -103,6 +103,11 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
                 data-streamer-id={streamer.id}
                 data-streamer-name={streamer.name}
                 data-streamer-key={streamer.twitchHandle}
+                data-streamer-url-slug={
+                  streamer.image || streamer.twitchHandle
+                    ? getStreamerUrlSlug(streamer.name)
+                    : ""
+                }
                 data-streamer-image={streamer.image ?? ""}
                 data-streamer-fallback-image={streamer.fallbackImage ?? ""}
                 aria-pressed="false"
@@ -271,6 +276,11 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
                 data-streamer-id={streamer.id}
                 data-streamer-name={streamer.name}
                 data-streamer-key={streamer.twitchHandle}
+                data-streamer-url-slug={
+                  streamer.image || streamer.twitchHandle
+                    ? getStreamerUrlSlug(streamer.name)
+                    : ""
+                }
                 data-streamer-image={streamer.image ?? ""}
                 data-streamer-fallback-image={streamer.fallbackImage ?? ""}
                 aria-pressed="false"
@@ -923,9 +933,11 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
       const confirmationDetailsStorageKey = "qgfInvite:confirmationDetails";
       const festivalUrl = "https://www.queenslandgamesfestival.com/";
       const readyOverlayExitMs = 280;
+      const initialCreatorSelectionDelayMs = 700;
       let readyOverlayExitTimer: number | undefined;
       let selectedStreamerId: string | undefined;
       let isStartingTwitchVerification = false;
+      type UrlUpdateMode = "none" | "push" | "replace";
       const desktopPortraitFallbackClasses = [
         "big-avatar-head",
         "big-avatar-body",
@@ -1496,7 +1508,59 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         closeDialog(confirmModal);
       };
 
-      const selectStreamerById = (streamerId: string) => {
+      const setBrowserUrl = (targetUrl: URL, mode: UrlUpdateMode) => {
+        if (mode === "none" || targetUrl.href === window.location.href) {
+          return;
+        }
+
+        if (mode === "replace") {
+          window.history.replaceState({ selectedStreamerId }, "", targetUrl);
+          return;
+        }
+
+        window.history.pushState({ selectedStreamerId }, "", targetUrl);
+      };
+
+      const getRootSelectionUrl = () => {
+        const url = new URL(window.location.href);
+        url.pathname = "/";
+        url.search = "";
+        url.hash = "";
+
+        return url;
+      };
+
+      const getStreamerSelectionUrl = (card: HTMLElement) => {
+        const slug = card.getAttribute("data-streamer-url-slug") || "";
+
+        if (!slug) {
+          return undefined;
+        }
+
+        const url = new URL(window.location.href);
+        url.pathname = `/${slug}`;
+        url.search = "";
+        url.hash = "";
+
+        return url;
+      };
+
+      const updateUrlForSelectedStreamer = (card: HTMLElement, mode: UrlUpdateMode) => {
+        const url = getStreamerSelectionUrl(card);
+
+        if (url) {
+          setBrowserUrl(url, mode);
+          return;
+        }
+
+        updateUrlForClearedSelection(mode);
+      };
+
+      const updateUrlForClearedSelection = (mode: UrlUpdateMode) => {
+        setBrowserUrl(getRootSelectionUrl(), mode);
+      };
+
+      const selectStreamerById = (streamerId: string, urlMode: UrlUpdateMode = "push") => {
         const prefersMobileCard = window.matchMedia("(max-width: 900px)").matches;
         const candidates = Array.from(streamerCards);
         const preferredCard = candidates.find(
@@ -1511,31 +1575,67 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         const card = preferredCard || fallbackCard;
 
         if (card) {
-          selectStreamer(card);
+          selectStreamer(card, urlMode);
+          return true;
         }
+
+        return false;
       };
 
       const normalizeCreatorKey = (value: string) =>
-        value.trim().replace(/^@+/, "").toLowerCase();
+        value
+          .trim()
+          .replace(/^@+/, "")
+          .normalize("NFKD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/&/g, "and")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "");
+
+      const getCreatorKeyFromPath = () => {
+        const segments = window.location.pathname.split("/").filter(Boolean);
+
+        while (segments[segments.length - 1]?.toLowerCase() === "index.html") {
+          segments.pop();
+        }
+
+        const pathKey = segments[segments.length - 1] || "";
+
+        if (!pathKey) {
+          return "";
+        }
+
+        try {
+          return decodeURIComponent(pathKey.replace(/\+/g, " "));
+        } catch {
+          return pathKey;
+        }
+      };
 
       const getInitialCreatorKey = () => {
         const key = new URLSearchParams(window.location.search).get("c");
 
-        return key ? normalizeCreatorKey(key) : "";
+        return key || getCreatorKeyFromPath();
       };
 
-      const selectStreamerByCreatorKey = (creatorKey: string) => {
+      const selectStreamerByCreatorKey = (
+        creatorKey: string,
+        urlMode: UrlUpdateMode = "push",
+      ) => {
         const normalizedCreatorKey = normalizeCreatorKey(creatorKey);
 
         if (!normalizedCreatorKey) {
-          return;
+          return false;
         }
 
         const prefersMobileCard = window.matchMedia("(max-width: 900px)").matches;
         const candidates = Array.from(streamerCards);
         const matchesCreatorKey = (candidate: HTMLElement) =>
-          normalizeCreatorKey(candidate.getAttribute("data-streamer-key") || "") ===
-          normalizedCreatorKey;
+          [
+            candidate.getAttribute("data-streamer-key") || "",
+            candidate.getAttribute("data-streamer-name") || "",
+            candidate.getAttribute("data-streamer-id") || "",
+          ].some((candidateKey) => normalizeCreatorKey(candidateKey) === normalizedCreatorKey);
         const preferredCard = candidates.find(
           (candidate) =>
             matchesCreatorKey(candidate) &&
@@ -1545,8 +1645,11 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         const card = preferredCard || fallbackCard;
 
         if (card) {
-          selectStreamer(card);
+          selectStreamer(card, urlMode);
+          return true;
         }
+
+        return false;
       };
 
       const clearHoverPreview = () => {
@@ -1694,7 +1797,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         );
       };
 
-      const clearSelection = () => {
+      const clearSelection = (urlMode: UrlUpdateMode = "push") => {
         closeConfirmModal();
         closeDialog(verificationChoiceModal);
         closeDialog(verificationResultModal);
@@ -1716,9 +1819,11 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         if (mobileCta instanceof HTMLElement) {
           mobileCta.hidden = true;
         }
+
+        updateUrlForClearedSelection(urlMode);
       };
 
-      const selectStreamer = (card: HTMLElement) => {
+      const selectStreamer = (card: HTMLElement, urlMode: UrlUpdateMode = "push") => {
         const streamerId = card.getAttribute("data-streamer-id");
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
         const streamerImage = card.getAttribute("data-streamer-image") || "";
@@ -1754,6 +1859,8 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         if (mobileCta instanceof HTMLElement && card.classList.contains("mobile-tile")) {
           mobileCta.hidden = false;
         }
+
+        updateUrlForSelectedStreamer(card, urlMode);
       };
 
       confirmPanel?.addEventListener("click", () => {
@@ -1882,6 +1989,20 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
       confirmStreamerSelect?.addEventListener("change", () => {
         selectStreamerById(confirmStreamerSelect.value);
       });
+
+      const syncSelectionFromUrl = () => {
+        const creatorKey = getInitialCreatorKey();
+
+        if (creatorKey && selectStreamerByCreatorKey(creatorKey, "none")) {
+          return;
+        }
+
+        if (hasSelection()) {
+          clearSelection("none");
+        }
+      };
+
+      window.addEventListener("popstate", syncSelectionFromUrl);
 
       const activateStreamer = (card: HTMLElement) => {
         if (hasSelection()) {
@@ -2815,13 +2936,15 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
           return;
         }
 
-        selectStreamerByCreatorKey(getInitialCreatorKey());
+        selectStreamerByCreatorKey(getInitialCreatorKey(), "replace");
       };
 
       const scheduleInitialCreatorSelection = () => {
         const runAfterInitialPaint = () => {
           window.requestAnimationFrame(() => {
-            window.requestAnimationFrame(selectInitialCreatorFromUrl);
+            window.requestAnimationFrame(() => {
+              window.setTimeout(selectInitialCreatorFromUrl, initialCreatorSelectionDelayMs);
+            });
           });
         };
 

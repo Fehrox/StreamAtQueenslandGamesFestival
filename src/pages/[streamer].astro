@@ -1,0 +1,25 @@
+---
+import { getStreamerUrlSegments, streamers } from "@data/streamers";
+import StreamerInvitePage from "./index.astro";
+
+export function getStaticPaths() {
+  const usedSegments = new Set<string>();
+
+  return streamers.flatMap((streamer) =>
+    (streamer.image || streamer.twitchHandle ? getStreamerUrlSegments(streamer) : [])
+      .filter((segment) => {
+        if (usedSegments.has(segment)) {
+          return false;
+        }
+
+        usedSegments.add(segment);
+        return true;
+      })
+      .map((streamerSegment) => ({
+        params: { streamer: streamerSegment },
+      })),
+  );
+}
+---
+
+<StreamerInvitePage />
