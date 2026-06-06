@@ -78,7 +78,7 @@ const names = [
   "ZiggyDLive",
   "xara",
   "mee_shell",
-  "OPEN SLOT 12",
+  "BasedCode",
   "OPEN SLOT 13",
   "OPEN SLOT 14",
   "OPEN SLOT 15",
@@ -298,6 +298,10 @@ const streamerAssets: Partial<Record<string, StreamerAssets>> = {
     image: "/streamers/mee_shell.png",
     profileUrl: "https://www.twitch.tv/mee_shell",
     twitchHandle: "mee_shell",
+  },
+  BasedCode: {
+    profileUrl: "https://www.twitch.tv/basedcode",
+    twitchHandle: "basedcode",
   },
 };
 
