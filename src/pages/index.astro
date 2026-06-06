@@ -49,6 +49,16 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
   /</g,
   "\\u003c",
 );
+
+const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
+  const normalizedHandle = twitchHandle.trim().replace(/^@+/, "");
+
+  if (normalizedHandle) {
+    return `https://www.twitch.tv/${encodeURIComponent(normalizedHandle)}`;
+  }
+
+  return /^https:\/\/(www\.)?twitch\.tv\/[^/?#]+/i.test(profileUrl) ? profileUrl : "";
+};
 ---
 
 <!doctype html>
@@ -110,6 +120,10 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
                 }
                 data-streamer-image={streamer.image ?? ""}
                 data-streamer-fallback-image={streamer.fallbackImage ?? ""}
+                data-streamer-twitch-url={getTwitchProfileUrl(
+                  streamer.twitchHandle,
+                  streamer.profileUrl,
+                )}
                 aria-pressed="false"
               >
                 <div class="portrait" aria-hidden="true">
@@ -184,6 +198,22 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
             </div>
             <div class="player-red-card">
               <div class="watermark">QGF</div>
+              <a
+                class="twitch-profile-link"
+                data-selected-twitch-link
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Open Twitch profile"
+                aria-label="Open selected streamer on Twitch"
+                hidden
+              >
+                <img
+                  src="/icons/TwitchGlitchWhite.svg"
+                  alt=""
+                  aria-hidden="true"
+                  draggable="false"
+                />
+              </a>
               <h2 data-selected-name></h2>
               <div class="player-info">
                 <span>Streamer</span>
@@ -283,6 +313,10 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
                 }
                 data-streamer-image={streamer.image ?? ""}
                 data-streamer-fallback-image={streamer.fallbackImage ?? ""}
+                data-streamer-twitch-url={getTwitchProfileUrl(
+                  streamer.twitchHandle,
+                  streamer.profileUrl,
+                )}
                 aria-pressed="false"
               >
                 <span class="mobile-portrait" aria-hidden="true">
@@ -854,6 +888,9 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
       const mobileCta = document.querySelector("[data-mobile-cta]");
       const selectedName = document.querySelector("[data-selected-name]");
       const selectedPortrait = document.querySelector("[data-desktop-selected-portrait]");
+      const selectedTwitchProfileLink = document.querySelector<HTMLAnchorElement>(
+        "[data-selected-twitch-link]",
+      );
       const mobileSelectedName = document.querySelector("[data-mobile-selected-name]");
       const mobileSelectedPortrait = document.querySelector("[data-mobile-selected-portrait]");
       const twitchConfirmButtons = document.querySelectorAll<HTMLButtonElement>(
@@ -1470,6 +1507,32 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         }
       };
 
+      const setSelectedStreamerTwitchLink = (streamerName = "", twitchUrl = "") => {
+        if (!(selectedTwitchProfileLink instanceof HTMLAnchorElement)) {
+          return;
+        }
+
+        const hasTwitchUrl = twitchUrl.length > 0;
+        selectedTwitchProfileLink.hidden = !hasTwitchUrl;
+
+        if (!hasTwitchUrl) {
+          selectedTwitchProfileLink.removeAttribute("href");
+          selectedTwitchProfileLink.setAttribute(
+            "aria-label",
+            "Open selected streamer on Twitch",
+          );
+          selectedTwitchProfileLink.title = "Open Twitch profile";
+          return;
+        }
+
+        selectedTwitchProfileLink.href = twitchUrl;
+        selectedTwitchProfileLink.setAttribute(
+          "aria-label",
+          `Open ${streamerName}'s Twitch page`,
+        );
+        selectedTwitchProfileLink.title = `Open ${streamerName}'s Twitch page`;
+      };
+
       const setCursorOverStreamerCard = (isOver: boolean) => {
         document.documentElement.classList.toggle("custom-cursor-over-streamer-card", isOver);
       };
@@ -1659,6 +1722,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
 
           if (!hasSelection()) {
             setSelectedStreamerName("");
+            setSelectedStreamerTwitchLink();
             setSelectedStreamerPortrait("");
           }
         }, portraitFadeMs);
@@ -1673,8 +1737,10 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
         const streamerImage = card.getAttribute("data-streamer-image") || "";
         const streamerFallbackImage = card.getAttribute("data-streamer-fallback-image") || "";
+        const streamerTwitchUrl = card.getAttribute("data-streamer-twitch-url") || "";
         document.documentElement.classList.add("has-streamer-hover-preview");
         setSelectedStreamerName(streamerName);
+        setSelectedStreamerTwitchLink(streamerName, streamerTwitchUrl);
         setSelectedStreamerPortrait(streamerImage, streamerFallbackImage);
       };
 
@@ -1813,6 +1879,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         });
 
         setSelectedStreamerName("");
+        setSelectedStreamerTwitchLink();
         setTwitchConfirmButtonVisibility();
         setSelectedStreamerPortrait("");
 
@@ -1828,6 +1895,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
         const streamerImage = card.getAttribute("data-streamer-image") || "";
         const streamerFallbackImage = card.getAttribute("data-streamer-fallback-image") || "";
+        const streamerTwitchUrl = card.getAttribute("data-streamer-twitch-url") || "";
 
         showReadyOverlay();
         document.documentElement.classList.remove("has-streamer-hover-preview");
@@ -1852,6 +1920,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         });
 
         setSelectedStreamerName(streamerName);
+        setSelectedStreamerTwitchLink(streamerName, streamerTwitchUrl);
         setTwitchConfirmButtonVisibility(streamerName);
         syncConfirmStreamerSelect();
         setSelectedStreamerPortrait(streamerImage, streamerFallbackImage);
@@ -4646,6 +4715,54 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
     font-family: Impact, sans-serif;
     font-size: 79px;
     line-height: 1;
+  }
+
+  .twitch-profile-link[hidden] {
+    display: none;
+  }
+
+  .twitch-profile-link {
+    position: absolute;
+    left: 24px;
+    top: 25px;
+    width: 58px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border: 4px solid #171719;
+    border-radius: 4px;
+    background: #9146ff;
+    box-shadow:
+      0 6px 0 #5c16c5,
+      0 11px 18px rgba(14, 14, 16, 0.28);
+    cursor: pointer;
+    transform-origin: center;
+    transition:
+      box-shadow 110ms ease,
+      transform 110ms ease;
+  }
+
+  .twitch-profile-link:hover {
+    transform: translateY(-2px);
+  }
+
+  .twitch-profile-link:active {
+    box-shadow:
+      0 3px 0 #5c16c5,
+      0 7px 14px rgba(14, 14, 16, 0.24);
+    transform: translateY(3px);
+  }
+
+  .twitch-profile-link:focus-visible {
+    outline: 4px solid #fff;
+    outline-offset: 3px;
+  }
+
+  .twitch-profile-link img {
+    width: 31px;
+    height: 31px;
+    display: block;
+    object-fit: contain;
   }
 
   .player-red-card h2,
