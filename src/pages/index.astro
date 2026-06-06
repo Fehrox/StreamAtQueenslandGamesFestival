@@ -45,11 +45,6 @@ const confirmationQuestions = [
     label: "Would you like to apply for Travel Funding?",
   },
   {
-    id: "twitch-connect",
-    name: "twitchConnect",
-    label: "Will you be attending Twitch Connect?",
-  },
-  {
     id: "irl-streaming",
     name: "irlStreaming",
     label: "Will you be IRL streaming the event?",
@@ -455,7 +450,7 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
       data-confirm-modal
       aria-labelledby="confirm-modal-title"
     >
-      <form class="confirm-modal-frame" data-confirm-form method="dialog">
+      <form class="confirm-modal-frame" data-confirm-form method="post">
         <header class="confirm-modal-header">
           <div class="confirm-modal-brand" aria-hidden="true">
             <img
@@ -500,6 +495,18 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
                 name="creatorEmail"
                 autocomplete="email"
                 placeholder="creator@example.com"
+                data-confirm-email
+              />
+            </label>
+
+            <label class="confirm-honeypot" aria-hidden="true">
+              Leave this field empty
+              <input
+                type="text"
+                name="_gotcha"
+                autocomplete="off"
+                tabindex="-1"
+                data-confirm-honeypot
               />
             </label>
           </div>
@@ -521,6 +528,7 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
                         type="radio"
                         name={question.name}
                         value="yes"
+                        required
                       />
                       <span>Yes</span>
                     </label>
@@ -540,6 +548,12 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         </div>
 
         <footer class="confirm-modal-footer">
+          <p
+            class="confirm-submit-message"
+            data-confirm-submit-message
+            role="status"
+            aria-live="polite"
+          ></p>
           <button
             type="button"
             class="confirm-secondary-action"
@@ -547,8 +561,18 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
           >
             Cancel
           </button>
-          <button type="submit" class="confirm-primary-action">
-            Save Details
+          <button
+            type="submit"
+            class="confirm-primary-action"
+            data-confirm-submit
+          >
+            <span data-confirm-submit-label>Save Details</span>
+            <span
+              class="confirm-submit-spinner"
+              data-confirm-submit-spinner
+              hidden
+              aria-hidden="true"
+            ></span>
           </button>
         </footer>
       </form>
@@ -932,6 +956,21 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         | "cancelled"
         | "failed";
 
+      const eoiFormUrl = import.meta.env.PUBLIC_GOOGLE_EOI_FORM_URL || "";
+      const eoiConfiguredDeploymentId =
+        import.meta.env.PUBLIC_GOOGLE_EOI_DEPLOYMENT_ID || "";
+      const eoiDeploymentId =
+        eoiConfiguredDeploymentId ||
+        eoiFormUrl.match(/\/macros\/s\/([^/]+)\/exec/)?.[1] ||
+        "";
+      const eoiAnswerFieldNames = [
+        "streamingStation",
+        "twitchConnect",
+        "panelInterest",
+        "travelFunding",
+        "irlStreaming",
+      ];
+
       const streamerCards = document.querySelectorAll<HTMLElement>(
         "[data-streamer-card], [data-mobile-streamer-card]",
       );
@@ -956,6 +995,19 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
       );
       const confirmStreamerSelect = document.querySelector<HTMLSelectElement>(
         "[data-confirm-streamer-select]",
+      );
+      const confirmEmailInput = document.querySelector<HTMLInputElement>("[data-confirm-email]");
+      const confirmSubmitButton = document.querySelector<HTMLButtonElement>(
+        "[data-confirm-submit]",
+      );
+      const confirmSubmitLabel = document.querySelector<HTMLElement>(
+        "[data-confirm-submit-label]",
+      );
+      const confirmSubmitSpinner = document.querySelector<HTMLElement>(
+        "[data-confirm-submit-spinner]",
+      );
+      const confirmSubmitMessage = document.querySelector<HTMLElement>(
+        "[data-confirm-submit-message]",
       );
       const verificationChoiceModal = document.querySelector<HTMLDialogElement>(
         "[data-verification-choice-modal]",
@@ -1023,6 +1075,7 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
       const readyOverlayExitMs = 280;
       const initialCreatorSelectionDelayMs = 700;
       let readyOverlayExitTimer: number | undefined;
+      let confirmSubmitCloseTimer: number | undefined;
       let selectedStreamerId: string | undefined;
       let isStartingTwitchVerification = false;
       type UrlUpdateMode = "none" | "push" | "replace";
@@ -1218,7 +1271,7 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         const answers: Record<string, string> = {};
 
         formData.forEach((value, key) => {
-          if (key === "creator" || key === "creatorEmail") {
+          if (key === "creator" || key === "creatorEmail" || key === "_gotcha") {
             return;
           }
 
@@ -1627,6 +1680,91 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         closeDialog(confirmModal);
       };
 
+      const setConfirmSubmitMessage = (text = "", status = "") => {
+        if (!(confirmSubmitMessage instanceof HTMLElement)) {
+          return;
+        }
+
+        confirmSubmitMessage.textContent = text;
+
+        if (status) {
+          confirmSubmitMessage.dataset.status = status;
+        } else {
+          delete confirmSubmitMessage.dataset.status;
+        }
+      };
+
+      const setConfirmSubmitting = (isSubmitting: boolean) => {
+        if (confirmSubmitButton instanceof HTMLButtonElement) {
+          confirmSubmitButton.disabled = isSubmitting;
+
+          if (isSubmitting) {
+            confirmSubmitButton.setAttribute("aria-busy", "true");
+          } else {
+            confirmSubmitButton.removeAttribute("aria-busy");
+          }
+        }
+
+        if (confirmSubmitLabel instanceof HTMLElement) {
+          confirmSubmitLabel.textContent = isSubmitting ? "Saving..." : "Save Details";
+        }
+
+        if (confirmSubmitSpinner instanceof HTMLElement) {
+          confirmSubmitSpinner.hidden = !isSubmitting;
+        }
+      };
+
+      const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      const submitEoiDetails = async (details: ConfirmationDetails) => {
+        if (!eoiFormUrl) {
+          openVerificationResult("failed", "EOI saving is not configured yet.");
+          return false;
+        }
+
+        const submissionData = new FormData();
+        submissionData.append("creatorId", details.creatorId);
+        submissionData.append("creatorName", details.creatorName);
+        submissionData.append("creatorEmail", details.creatorEmail.trim().toLowerCase());
+        submissionData.append("userAgent", navigator.userAgent);
+        submissionData.append("deploymentId", eoiDeploymentId);
+        submissionData.append("source", "qgf-invite");
+
+        eoiAnswerFieldNames.forEach((fieldName) => {
+          submissionData.append(fieldName, details.answers[fieldName] || "");
+        });
+
+        try {
+          const response = await fetch(eoiFormUrl, {
+            method: "POST",
+            mode: "no-cors",
+            body: submissionData,
+          });
+
+          const isOpaque = response.type === "opaque" || response.status === 0;
+          let data: { ok?: boolean; message?: string; error?: string } = {};
+
+          if (!isOpaque) {
+            data = await response.json().catch(() => ({}));
+          }
+
+          const ok = isOpaque || (response.ok && (data.ok === undefined || data.ok));
+
+          if (!ok) {
+            openVerificationResult(
+              "failed",
+              data.error || "Something went wrong. Try again?",
+            );
+            return false;
+          }
+
+          return true;
+        } catch {
+          openVerificationResult("failed", "Network error. Please try again.");
+          return false;
+        }
+      };
+
       const setBrowserUrl = (targetUrl: URL, mode: UrlUpdateMode) => {
         if (mode === "none" || targetUrl.href === window.location.href) {
           return;
@@ -2001,13 +2139,43 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
 
       confirmForm?.addEventListener("submit", (event) => {
         event.preventDefault();
+        window.clearTimeout(confirmSubmitCloseTimer);
+        setConfirmSubmitMessage();
+
+        if (!(confirmForm instanceof HTMLFormElement)) {
+          return;
+        }
+
+        if (!confirmForm.checkValidity()) {
+          confirmForm.reportValidity();
+          setConfirmSubmitMessage("Please answer each question before saving.", "error");
+          return;
+        }
+
         const details = collectConfirmationDetails();
 
         if (!details) {
-          openVerificationResult(
-            "failed",
+          setConfirmSubmitMessage(
             "The selected creator could not be found. Choose a creator and try again.",
+            "error",
           );
+          return;
+        }
+
+        const formData = new FormData(confirmForm);
+        const honeypot = String(formData.get("_gotcha") || "").trim();
+
+        if (honeypot) {
+          return;
+        }
+
+        if (details.creatorEmail && !isValidEmail(details.creatorEmail)) {
+          setConfirmSubmitMessage("Enter a valid email address, or leave it blank.", "error");
+
+          if (confirmEmailInput instanceof HTMLInputElement) {
+            confirmEmailInput.focus();
+          }
+
           return;
         }
 
@@ -2029,6 +2197,9 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
 
       confirmModal?.addEventListener("close", () => {
         syncConfirmationDialogClass();
+        window.clearTimeout(confirmSubmitCloseTimer);
+        setConfirmSubmitting(false);
+        setConfirmSubmitMessage();
       });
 
       verificationChoiceCloseButtons.forEach((button) => {
@@ -2047,7 +2218,7 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         syncConfirmationDialogClass();
       });
 
-      confirmWithoutVerifyingButton?.addEventListener("click", () => {
+      confirmWithoutVerifyingButton?.addEventListener("click", async () => {
         const details = pendingConfirmationDetails || collectConfirmationDetails();
 
         if (!details) {
@@ -2055,6 +2226,10 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
             "failed",
             "The saved details could not be found. Save the form again.",
           );
+          return;
+        }
+
+        if (!(await submitEoiDetails(details))) {
           return;
         }
 
@@ -2065,7 +2240,7 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         );
       });
 
-      confirmWithTwitchButton?.addEventListener("click", () => {
+      confirmWithTwitchButton?.addEventListener("click", async () => {
         const details = pendingConfirmationDetails || collectConfirmationDetails();
 
         if (!details) {
@@ -2076,6 +2251,11 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
           return;
         }
 
+        if (!(await submitEoiDetails(details))) {
+          return;
+        }
+
+        saveConfirmationDetails(details);
         startTwitchVerification(details);
       });
 
@@ -3302,6 +3482,17 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
     padding: 0 13px;
   }
 
+  .confirm-honeypot {
+    position: absolute;
+    left: -100vw;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .confirm-question-list {
     display: grid;
     gap: 10px;
@@ -3385,9 +3576,32 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
     background: #101619;
   }
 
+  .confirm-submit-message {
+    grid-column: 1 / -1;
+    min-height: 23px;
+    margin: 0;
+    color: #fff;
+    font-family: "Segoe UI", Arial, Helvetica, system-ui, sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .confirm-submit-message[data-status="success"] {
+    color: #fff017;
+  }
+
+  .confirm-submit-message[data-status="error"] {
+    color: #ff7a86;
+  }
+
   .confirm-secondary-action,
   .confirm-primary-action {
     height: 60px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     border: 4px solid #101416;
     font-family: "Arial Black", Impact, sans-serif;
     font-size: 24px;
@@ -3413,6 +3627,25 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
     color: rgba(255, 255, 255, 0.78);
     box-shadow: 0 6px 0 rgba(0, 0, 0, 0.24);
     cursor: not-allowed;
+  }
+
+  .confirm-primary-action[aria-busy="true"] {
+    cursor: wait;
+  }
+
+  .confirm-submit-spinner {
+    width: 21px;
+    height: 21px;
+    border: 3px solid rgba(255, 255, 255, 0.45);
+    border-top-color: #fff;
+    border-radius: 999px;
+    animation: confirm-submit-spin 0.75s linear infinite;
+  }
+
+  @keyframes confirm-submit-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .verification-modal {
@@ -5161,6 +5394,11 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
       grid-template-columns: 1fr;
       gap: 9px;
       padding: 12px;
+    }
+
+    .confirm-submit-message {
+      min-height: 40px;
+      font-size: 15px;
     }
 
     .confirm-secondary-action,

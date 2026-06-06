@@ -44,9 +44,25 @@ jobs:
             exit 1
           fi
 
+      - name: Verify Google EOI config
+        env:
+          PUBLIC_GOOGLE_EOI_FORM_URL: ${{ vars.PUBLIC_GOOGLE_EOI_FORM_URL || secrets.PUBLIC_GOOGLE_EOI_FORM_URL }}
+          PUBLIC_GOOGLE_EOI_DEPLOYMENT_ID: ${{ vars.PUBLIC_GOOGLE_EOI_DEPLOYMENT_ID || secrets.PUBLIC_GOOGLE_EOI_DEPLOYMENT_ID }}
+        run: |
+          if [ -z "$PUBLIC_GOOGLE_EOI_FORM_URL" ]; then
+            echo "::error::Set PUBLIC_GOOGLE_EOI_FORM_URL as a GitHub Actions repository or github-pages environment variable."
+            exit 1
+          fi
+          if [ -z "$PUBLIC_GOOGLE_EOI_DEPLOYMENT_ID" ]; then
+            echo "::error::Set PUBLIC_GOOGLE_EOI_DEPLOYMENT_ID as a GitHub Actions repository or github-pages environment variable."
+            exit 1
+          fi
+
       - name: Build Astro site
         env:
           PUBLIC_TWITCH_CLIENT_ID: ${{ vars.PUBLIC_TWITCH_CLIENT_ID || secrets.PUBLIC_TWITCH_CLIENT_ID }}
+          PUBLIC_GOOGLE_EOI_FORM_URL: ${{ vars.PUBLIC_GOOGLE_EOI_FORM_URL || secrets.PUBLIC_GOOGLE_EOI_FORM_URL }}
+          PUBLIC_GOOGLE_EOI_DEPLOYMENT_ID: ${{ vars.PUBLIC_GOOGLE_EOI_DEPLOYMENT_ID || secrets.PUBLIC_GOOGLE_EOI_DEPLOYMENT_ID }}
         run: npm run build
 
       - name: Disable Jekyll
