@@ -22,10 +22,15 @@ For local development, copy `.env.example` to `.env.local` and set:
 PUBLIC_TWITCH_CLIENT_ID=your_twitch_client_id_here
 ```
 
-For deployment, add the same `PUBLIC_TWITCH_CLIENT_ID` value as a build-time
-environment variable in the hosting provider. The Twitch app must register the
-deployed page URL, and any local dev URL used for testing, as OAuth redirect
-URLs.
+For GitHub Pages deployment, `.env.local` is not used. Add the same value in
+GitHub under **Settings -> Secrets and variables -> Actions -> Variables** as
+either a repository variable or a `github-pages` environment variable named
+`PUBLIC_TWITCH_CLIENT_ID`. A repository or environment secret with the same name
+also works, but the Twitch client ID is public in the built site.
+
+The deploy workflow passes that value into `npm run build` and fails before
+building if it is missing. The Twitch app must register the deployed page URL,
+and any local dev URL used for testing, as OAuth redirect URLs.
 
 Per-streamer Twitch names are read from `twitchHandle` in `src/data/streamers.ts`.
 No Twitch client secret is used or stored by this static page.
