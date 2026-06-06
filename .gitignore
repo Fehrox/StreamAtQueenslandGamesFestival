@@ -1,6 +1,8 @@
 node_modules/
 dist/
 .astro/
+.env
+.env.local
 qgf-render*.png
 qgf-mobile-cdp*.png
 dev-server.*.log

@@ -14,6 +14,41 @@ npm run build
 The site is configured for root GitHub Pages or custom-domain hosting with
 `base: "/"`.
 
-Twitch OAuth confirmation and Google Sheets attendance writes are future work.
-Those pieces need a backend or serverless endpoint because GitHub Pages cannot
-securely store OAuth or Google API secrets.
+## Twitch verification
+
+For local development, copy `.env.example` to `.env.local` and set:
+
+```sh
+PUBLIC_TWITCH_CLIENT_ID=your_twitch_client_id_here
+```
+
+For GitHub Pages deployment, `.env.local` is not used. Add the same value in
+GitHub under **Settings -> Secrets and variables -> Actions -> Variables** as
+either a repository variable or a `github-pages` environment variable named
+`PUBLIC_TWITCH_CLIENT_ID`. A repository or environment secret with the same name
+also works, but the Twitch client ID is public in the built site.
+
+The deploy workflow passes that value into `npm run build` and fails before
+building if it is missing. The Twitch app should register this exact redirect
+URL:
+
+```txt
+https://streamatqueenslandgamesfestival.com
+```
+
+The page retries once with the slash root URL below if Twitch returns
+`redirect_mismatch`, but Twitch treats registered OAuth redirect URLs as exact
+values, so registering both avoids surprises:
+
+```txt
+https://streamatqueenslandgamesfestival.com/
+```
+
+If both fail, confirm the GitHub `PUBLIC_TWITCH_CLIENT_ID` value is the Client
+ID from that same Twitch app.
+
+Per-streamer Twitch names are read from `twitchHandle` in `src/data/streamers.ts`.
+No Twitch client secret is used or stored by this static page.
+
+Google Sheets attendance writes still need a backend or serverless endpoint
+because GitHub Pages cannot securely store Google API secrets.

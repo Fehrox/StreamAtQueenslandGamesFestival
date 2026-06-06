@@ -34,6 +34,21 @@ const confirmationQuestions = [
     label: "Will you be IRL streaming the event?",
   },
 ];
+
+const streamerVerificationProfiles = streamers.map(
+  ({ id, name, twitchHandle, image, fallbackImage, profileUrl }) => ({
+    id,
+    name,
+    image: image ?? "",
+    fallbackImage: fallbackImage ?? "",
+    profileUrl: profileUrl ?? "",
+    twitchHandle: twitchHandle ?? "",
+  }),
+);
+const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfiles).replace(
+  /</g,
+  "\\u003c",
+);
 ---
 
 <!doctype html>
@@ -333,6 +348,13 @@ const confirmationQuestions = [
       </section>
     </main>
 
+    <script
+      is:inline
+      type="application/json"
+      data-streamer-verification-profiles
+      set:html={streamerVerificationProfileJson}
+    ></script>
+
     <dialog
       class="confirm-modal"
       data-confirm-modal
@@ -471,6 +493,281 @@ const confirmationQuestions = [
       </div>
     </dialog>
 
+    <dialog
+      class="confirm-modal verification-modal"
+      data-verification-choice-modal
+      aria-labelledby="verification-choice-title"
+    >
+      <section class="confirm-modal-frame verification-modal-frame">
+        <header class="confirm-modal-header">
+          <div class="confirm-modal-brand" aria-hidden="true">
+            <img
+              src="/icons/TwitchGlitchWhite.svg"
+              alt=""
+              draggable="false"
+            />
+            <span>Twitch</span>
+          </div>
+          <h2 id="verification-choice-title">Confirm Account</h2>
+          <button
+            type="button"
+            class="confirm-modal-close"
+            data-verification-choice-close
+            aria-label="Close account confirmation"
+          >
+            X
+          </button>
+        </header>
+
+        <div class="confirm-modal-body verification-modal-body">
+          <p class="verification-modal-copy" data-verification-choice-copy>
+            Choose how to confirm these details.
+          </p>
+          <p
+            class="verification-modal-warning"
+            data-verification-choice-warning
+            hidden
+          ></p>
+        </div>
+
+        <footer class="confirm-modal-footer verification-modal-footer">
+          <button
+            type="button"
+            class="confirm-secondary-action"
+            data-confirm-without-verifying
+          >
+            Confirm Without Verifying
+          </button>
+          <button
+            type="button"
+            class="confirm-primary-action"
+            data-confirm-with-twitch
+          >
+            Confirm with Twitch Account
+          </button>
+        </footer>
+      </section>
+
+      <div
+        class="custom-cursor custom-cursor-modal"
+        data-custom-cursor
+        aria-hidden="true"
+        hidden
+      >
+        <div class="custom-cursor-art">
+          <img
+            class="custom-cursor-hand custom-cursor-hand-marker"
+            src="/cursors/MarkerHand.png"
+            alt=""
+            draggable="false"
+          />
+          <img
+            class="custom-cursor-hand custom-cursor-hand-pointer"
+            src="/cursors/PointerHand.png"
+            alt=""
+            draggable="false"
+          />
+          <img
+            class="custom-cursor-hand custom-cursor-hand-open"
+            src="/cursors/OpenHand.png"
+            alt=""
+            draggable="false"
+          />
+          <img
+            class="custom-cursor-p1"
+            src="/cursors/P1.png"
+            alt=""
+            draggable="false"
+          />
+        </div>
+      </div>
+    </dialog>
+
+    <dialog
+      class="confirm-modal verification-modal"
+      data-verification-result-modal
+      aria-labelledby="verification-result-title"
+    >
+      <section class="confirm-modal-frame verification-modal-frame">
+        <header class="confirm-modal-header">
+          <div class="confirm-modal-brand" aria-hidden="true">
+            <img
+              src="/icons/TwitchGlitchWhite.svg"
+              alt=""
+              draggable="false"
+            />
+            <span>Twitch</span>
+          </div>
+          <h2 id="verification-result-title" data-verification-result-title>
+            Verification Result
+          </h2>
+          <button
+            type="button"
+            class="confirm-modal-close"
+            data-verification-result-close
+            aria-label="Close verification result"
+          >
+            X
+          </button>
+        </header>
+
+        <div class="confirm-modal-body verification-modal-body">
+          <strong
+            class="verification-result-status"
+            data-verification-result-status
+          >
+            Pending
+          </strong>
+          <p class="verification-modal-copy" data-verification-result-copy>
+            Waiting for a verification result.
+          </p>
+        </div>
+
+        <footer class="confirm-modal-footer verification-result-footer">
+          <button
+            type="button"
+            class="confirm-primary-action"
+            data-verification-result-close
+          >
+            Done
+          </button>
+        </footer>
+      </section>
+
+      <div
+        class="custom-cursor custom-cursor-modal"
+        data-custom-cursor
+        aria-hidden="true"
+        hidden
+      >
+        <div class="custom-cursor-art">
+          <img
+            class="custom-cursor-hand custom-cursor-hand-marker"
+            src="/cursors/MarkerHand.png"
+            alt=""
+            draggable="false"
+          />
+          <img
+            class="custom-cursor-hand custom-cursor-hand-pointer"
+            src="/cursors/PointerHand.png"
+            alt=""
+            draggable="false"
+          />
+          <img
+            class="custom-cursor-hand custom-cursor-hand-open"
+            src="/cursors/OpenHand.png"
+            alt=""
+            draggable="false"
+          />
+          <img
+            class="custom-cursor-p1"
+            src="/cursors/P1.png"
+            alt=""
+            draggable="false"
+          />
+        </div>
+      </div>
+    </dialog>
+
+    <dialog
+      class="confirm-modal attendance-confirmed-modal"
+      data-attendance-confirmed-modal
+      aria-labelledby="attendance-confirmed-title"
+    >
+      <section class="confirm-modal-frame attendance-confirmed-frame">
+        <header class="confirm-modal-header">
+          <div class="confirm-modal-brand" aria-hidden="true">
+            <img
+              src="/icons/TwitchGlitchWhite.svg"
+              alt=""
+              draggable="false"
+            />
+            <span>Twitch</span>
+          </div>
+          <h2 id="attendance-confirmed-title" data-attendance-confirmed-title>
+            Attendance Confirmed
+          </h2>
+          <button
+            type="button"
+            class="confirm-modal-close"
+            data-attendance-confirmed-close
+            aria-label="Close attendance confirmation"
+          >
+            X
+          </button>
+        </header>
+
+        <div class="confirm-modal-body attendance-confirmed-body">
+          <div
+            class="attendance-confirmed-portrait"
+            data-attendance-confirmed-portrait
+            aria-hidden="true"
+          >
+            <span class="big-avatar-head"></span>
+            <span class="big-avatar-body"></span>
+            <span class="big-avatar-arm"></span>
+          </div>
+          <div class="attendance-confirmed-copy">
+            <strong data-attendance-confirmed-heading>
+              Confirmed
+            </strong>
+            <p data-attendance-confirmed-copy>
+              Twitch confirmed this creator.
+            </p>
+            <p
+              class="attendance-confirmed-note"
+              data-attendance-confirmed-note
+              hidden
+            ></p>
+          </div>
+        </div>
+
+        <footer class="confirm-modal-footer verification-result-footer">
+          <button
+            type="button"
+            class="confirm-primary-action"
+            data-attendance-confirmed-close
+          >
+            Done
+          </button>
+        </footer>
+      </section>
+
+      <div
+        class="custom-cursor custom-cursor-modal"
+        data-custom-cursor
+        aria-hidden="true"
+        hidden
+      >
+        <div class="custom-cursor-art">
+          <img
+            class="custom-cursor-hand custom-cursor-hand-marker"
+            src="/cursors/MarkerHand.png"
+            alt=""
+            draggable="false"
+          />
+          <img
+            class="custom-cursor-hand custom-cursor-hand-pointer"
+            src="/cursors/PointerHand.png"
+            alt=""
+            draggable="false"
+          />
+          <img
+            class="custom-cursor-hand custom-cursor-hand-open"
+            src="/cursors/OpenHand.png"
+            alt=""
+            draggable="false"
+          />
+          <img
+            class="custom-cursor-p1"
+            src="/cursors/P1.png"
+            alt=""
+            draggable="false"
+          />
+        </div>
+      </div>
+    </dialog>
+
     <div class="custom-cursor" data-custom-cursor aria-hidden="true" hidden>
       <div class="custom-cursor-art">
         <img
@@ -509,6 +806,37 @@ const confirmationQuestions = [
       setStageScale();
       window.addEventListener("resize", setStageScale, { passive: true });
 
+      type StreamerVerificationProfile = {
+        id: string;
+        name: string;
+        image: string;
+        fallbackImage: string;
+        profileUrl: string;
+        twitchHandle: string;
+      };
+
+      type ConfirmationDetails = {
+        creatorId: string;
+        creatorName: string;
+        creatorEmail: string;
+        answers: Record<string, string>;
+        expectedTwitchHandle: string;
+        savedAt: string;
+      };
+
+      type PendingTwitchVerification = ConfirmationDetails & {
+        state: string;
+        redirectUri: string;
+        attemptedRedirectUris?: string[];
+      };
+
+      type VerificationResultStatus =
+        | "verified"
+        | "mismatch"
+        | "unverified"
+        | "cancelled"
+        | "failed";
+
       const streamerCards = document.querySelectorAll<HTMLElement>(
         "[data-streamer-card], [data-mobile-streamer-card]",
       );
@@ -524,16 +852,80 @@ const confirmationQuestions = [
       const confirmPanel = document.querySelector<HTMLElement>("[data-confirm-panel]");
       const confirmOpenButtons = document.querySelectorAll<HTMLButtonElement>("[data-confirm-open]");
       const confirmModal = document.querySelector<HTMLDialogElement>("[data-confirm-modal]");
+      const confirmForm = document.querySelector<HTMLFormElement>("[data-confirm-form]");
       const confirmModalCloseButtons = document.querySelectorAll<HTMLButtonElement>(
         "[data-confirm-modal-close]",
       );
       const confirmStreamerSelect = document.querySelector<HTMLSelectElement>(
         "[data-confirm-streamer-select]",
       );
+      const verificationChoiceModal = document.querySelector<HTMLDialogElement>(
+        "[data-verification-choice-modal]",
+      );
+      const verificationChoiceCloseButtons = document.querySelectorAll<HTMLButtonElement>(
+        "[data-verification-choice-close]",
+      );
+      const verificationChoiceCopy = document.querySelector<HTMLElement>(
+        "[data-verification-choice-copy]",
+      );
+      const verificationChoiceWarning = document.querySelector<HTMLElement>(
+        "[data-verification-choice-warning]",
+      );
+      const confirmWithTwitchButton = document.querySelector<HTMLButtonElement>(
+        "[data-confirm-with-twitch]",
+      );
+      const confirmWithTwitchButtonIdleText =
+        confirmWithTwitchButton?.textContent?.trim() || "Confirm with Twitch Account";
+      const confirmWithoutVerifyingButton = document.querySelector<HTMLButtonElement>(
+        "[data-confirm-without-verifying]",
+      );
+      const verificationResultModal = document.querySelector<HTMLDialogElement>(
+        "[data-verification-result-modal]",
+      );
+      const verificationResultCloseButtons = document.querySelectorAll<HTMLButtonElement>(
+        "[data-verification-result-close]",
+      );
+      const verificationResultTitle = document.querySelector<HTMLElement>(
+        "[data-verification-result-title]",
+      );
+      const verificationResultStatus = document.querySelector<HTMLElement>(
+        "[data-verification-result-status]",
+      );
+      const verificationResultCopy = document.querySelector<HTMLElement>(
+        "[data-verification-result-copy]",
+      );
+      const attendanceConfirmedModal = document.querySelector<HTMLDialogElement>(
+        "[data-attendance-confirmed-modal]",
+      );
+      const attendanceConfirmedCloseButtons = document.querySelectorAll<HTMLButtonElement>(
+        "[data-attendance-confirmed-close]",
+      );
+      const attendanceConfirmedPortrait = document.querySelector<HTMLElement>(
+        "[data-attendance-confirmed-portrait]",
+      );
+      const attendanceConfirmedHeading = document.querySelector<HTMLElement>(
+        "[data-attendance-confirmed-heading]",
+      );
+      const attendanceConfirmedCopy = document.querySelector<HTMLElement>(
+        "[data-attendance-confirmed-copy]",
+      );
+      const attendanceConfirmedNote = document.querySelector<HTMLElement>(
+        "[data-attendance-confirmed-note]",
+      );
+      const streamerVerificationProfileData = document.querySelector<HTMLScriptElement>(
+        "[data-streamer-verification-profiles]",
+      );
+      const twitchClientId = import.meta.env.PUBLIC_TWITCH_CLIENT_ID || "";
+      const twitchRedirectUri = "https://streamatqueenslandgamesfestival.com";
+      const twitchRedirectUriFallback = "https://streamatqueenslandgamesfestival.com/";
+      const twitchRedirectUriAttempts = [twitchRedirectUri, twitchRedirectUriFallback];
+      const pendingTwitchVerificationStorageKey = "qgfInvite:pendingTwitchVerification";
+      const confirmationDetailsStorageKey = "qgfInvite:confirmationDetails";
       const festivalUrl = "https://www.queenslandgamesfestival.com/";
       const readyOverlayExitMs = 280;
       let readyOverlayExitTimer: number | undefined;
       let selectedStreamerId: string | undefined;
+      let isStartingTwitchVerification = false;
       const desktopPortraitFallbackClasses = [
         "big-avatar-head",
         "big-avatar-body",
@@ -573,11 +965,488 @@ const confirmationQuestions = [
       document
         .querySelectorAll<HTMLImageElement>("img[data-fallback-src]")
         .forEach((img) => wireImageFallback(img));
+      let pendingConfirmationDetails: ConfirmationDetails | undefined;
+
+      const parseStreamerVerificationProfiles = (): StreamerVerificationProfile[] => {
+        if (!streamerVerificationProfileData?.textContent) {
+          return [];
+        }
+
+        try {
+          const profiles = JSON.parse(streamerVerificationProfileData.textContent);
+
+          if (!Array.isArray(profiles)) {
+            return [];
+          }
+
+          return profiles
+            .filter(
+              (profile): profile is StreamerVerificationProfile =>
+                typeof profile === "object" &&
+                profile !== null &&
+                typeof profile.id === "string" &&
+                typeof profile.name === "string" &&
+                typeof profile.image === "string" &&
+                typeof profile.fallbackImage === "string" &&
+                typeof profile.profileUrl === "string" &&
+                typeof profile.twitchHandle === "string",
+            )
+            .map((profile) => ({
+              id: profile.id,
+              name: profile.name,
+              image: profile.image,
+              fallbackImage: profile.fallbackImage,
+              profileUrl: profile.profileUrl,
+              twitchHandle: profile.twitchHandle,
+            }));
+        } catch {
+          return [];
+        }
+      };
+
+      const clientStreamerVerificationProfiles = parseStreamerVerificationProfiles();
 
       const hasSelection = () =>
         document.documentElement.classList.contains("has-streamer-selected");
 
-      const isConfirmModalOpen = () => confirmModal instanceof HTMLDialogElement && confirmModal.open;
+      const confirmationDialogs = [
+        confirmModal,
+        verificationChoiceModal,
+        verificationResultModal,
+        attendanceConfirmedModal,
+      ];
+
+      const isConfirmationDialogOpen = () =>
+        confirmationDialogs.some((dialog) => dialog instanceof HTMLDialogElement && dialog.open);
+
+      const syncConfirmationDialogClass = () => {
+        document.documentElement.classList.toggle(
+          "has-confirm-modal-open",
+          isConfirmationDialogOpen(),
+        );
+      };
+
+      const openDialog = (dialog: HTMLDialogElement | null) => {
+        if (!(dialog instanceof HTMLDialogElement)) {
+          return;
+        }
+
+        document.documentElement.classList.add("has-confirm-modal-open");
+
+        if (!dialog.open) {
+          dialog.showModal();
+        }
+      };
+
+      const closeDialog = (dialog: HTMLDialogElement | null) => {
+        if (dialog instanceof HTMLDialogElement && dialog.open) {
+          dialog.close();
+        }
+      };
+
+      const normalizeTwitchLogin = (value = "") =>
+        value.trim().replace(/^@+/, "").toLowerCase();
+
+      const formatTwitchHandle = (value = "") => {
+        const login = normalizeTwitchLogin(value);
+        return login ? `@${login}` : "";
+      };
+
+      const getStreamerProfile = (streamerId = "") =>
+        clientStreamerVerificationProfiles.find((profile) => profile.id === streamerId);
+
+      const getStreamerProfileByTwitchLogin = (twitchLogin = "") => {
+        const normalizedLogin = normalizeTwitchLogin(twitchLogin);
+
+        return clientStreamerVerificationProfiles.find(
+          (profile) => normalizeTwitchLogin(profile.twitchHandle) === normalizedLogin,
+        );
+      };
+
+      const getDetailsForStreamerProfile = (
+        details: ConfirmationDetails,
+        streamerProfile: StreamerVerificationProfile,
+      ): ConfirmationDetails => ({
+        ...details,
+        creatorId: streamerProfile.id,
+        creatorName: streamerProfile.name,
+        expectedTwitchHandle: normalizeTwitchLogin(streamerProfile.twitchHandle),
+      });
+
+      const writeSessionJson = (key: string, value: unknown) => {
+        try {
+          window.sessionStorage.setItem(key, JSON.stringify(value));
+          return true;
+        } catch {
+          return false;
+        }
+      };
+
+      const readSessionJson = <T,>(key: string): T | undefined => {
+        try {
+          const value = window.sessionStorage.getItem(key);
+          return value ? (JSON.parse(value) as T) : undefined;
+        } catch {
+          return undefined;
+        }
+      };
+
+      const removeSessionItem = (key: string) => {
+        try {
+          window.sessionStorage.removeItem(key);
+        } catch {
+          return;
+        }
+      };
+
+      const saveConfirmationDetails = (details: ConfirmationDetails) =>
+        writeSessionJson(confirmationDetailsStorageKey, details);
+
+      const collectConfirmationDetails = (): ConfirmationDetails | undefined => {
+        if (!(confirmForm instanceof HTMLFormElement)) {
+          return undefined;
+        }
+
+        const formData = new FormData(confirmForm);
+        const creatorId = String(formData.get("creator") || selectedStreamerId || "");
+        const streamerProfile = getStreamerProfile(creatorId);
+
+        if (!creatorId || !streamerProfile) {
+          return undefined;
+        }
+
+        const answers: Record<string, string> = {};
+
+        formData.forEach((value, key) => {
+          if (key === "creator" || key === "creatorEmail") {
+            return;
+          }
+
+          answers[key] = typeof value === "string" ? value : value.name;
+        });
+
+        return {
+          creatorId,
+          creatorName: streamerProfile.name,
+          creatorEmail: String(formData.get("creatorEmail") || "").trim(),
+          answers,
+          expectedTwitchHandle: normalizeTwitchLogin(streamerProfile.twitchHandle),
+          savedAt: new Date().toISOString(),
+        };
+      };
+
+      const createOAuthState = () => {
+        if (window.crypto?.getRandomValues) {
+          const bytes = new Uint8Array(16);
+          window.crypto.getRandomValues(bytes);
+          return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+        }
+
+        return `${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+      };
+
+      const setVerificationChoiceState = (details: ConfirmationDetails) => {
+        const expectedHandle = formatTwitchHandle(details.expectedTwitchHandle);
+        const hasTwitchHandle = expectedHandle.length > 0;
+        const hasTwitchClientId = twitchClientId.length > 0;
+        const canVerifyWithTwitch = hasTwitchHandle && hasTwitchClientId;
+
+        if (verificationChoiceCopy instanceof HTMLElement) {
+          verificationChoiceCopy.textContent = expectedHandle
+            ? `Confirm ${details.creatorName} with ${expectedHandle}, or continue without account verification.`
+            : `Confirm ${details.creatorName} without account verification.`;
+        }
+
+        if (verificationChoiceWarning instanceof HTMLElement) {
+          let warning = "";
+
+          if (!hasTwitchHandle && !hasTwitchClientId) {
+            warning =
+              "Twitch verification needs a configured Twitch handle and PUBLIC_TWITCH_CLIENT_ID.";
+          } else if (!hasTwitchHandle) {
+            warning = "This creator does not have a Twitch handle configured yet.";
+          } else if (!hasTwitchClientId) {
+            warning =
+              "Twitch verification is not configured for this deployment. Set PUBLIC_TWITCH_CLIENT_ID.";
+          }
+
+          verificationChoiceWarning.textContent = warning;
+          verificationChoiceWarning.hidden = warning.length === 0;
+        }
+
+        if (confirmWithTwitchButton instanceof HTMLButtonElement) {
+          confirmWithTwitchButton.disabled = !canVerifyWithTwitch;
+          confirmWithTwitchButton.setAttribute("aria-disabled", String(!canVerifyWithTwitch));
+          confirmWithTwitchButton.title = canVerifyWithTwitch
+            ? ""
+            : "Twitch verification is unavailable for this selection.";
+        }
+      };
+
+      const setTwitchVerificationStarting = (isStarting: boolean) => {
+        isStartingTwitchVerification = isStarting;
+
+        if (!(confirmWithTwitchButton instanceof HTMLButtonElement)) {
+          return;
+        }
+
+        confirmWithTwitchButton.disabled = isStarting;
+        confirmWithTwitchButton.setAttribute("aria-disabled", String(isStarting));
+
+        if (confirmWithTwitchButtonIdleText) {
+          confirmWithTwitchButton.textContent = isStarting
+            ? "Opening Twitch..."
+            : confirmWithTwitchButtonIdleText;
+        }
+      };
+
+      const resultTitles: Record<VerificationResultStatus, string> = {
+        verified: "Verified",
+        mismatch: "Account Mismatch",
+        unverified: "Unverified Confirmation",
+        cancelled: "Verification Cancelled",
+        failed: "Verification Failed",
+      };
+
+      const resultLabels: Record<VerificationResultStatus, string> = {
+        verified: "Verified",
+        mismatch: "Mismatch",
+        unverified: "Unverified",
+        cancelled: "Cancelled",
+        failed: "Verification Failed",
+      };
+
+      const openVerificationResult = (status: VerificationResultStatus, message: string) => {
+        closeDialog(confirmModal);
+        closeDialog(verificationChoiceModal);
+        closeDialog(attendanceConfirmedModal);
+
+        if (verificationResultModal instanceof HTMLDialogElement) {
+          verificationResultModal.setAttribute("data-verification-status", status);
+        }
+
+        if (verificationResultTitle instanceof HTMLElement) {
+          verificationResultTitle.textContent = resultTitles[status];
+        }
+
+        if (verificationResultStatus instanceof HTMLElement) {
+          verificationResultStatus.textContent = resultLabels[status];
+        }
+
+        if (verificationResultCopy instanceof HTMLElement) {
+          verificationResultCopy.textContent = message;
+        }
+
+        openDialog(verificationResultModal);
+      };
+
+      const setAttendanceConfirmedPortrait = (streamerProfile: StreamerVerificationProfile) => {
+        if (!(attendanceConfirmedPortrait instanceof HTMLElement)) {
+          return;
+        }
+
+        attendanceConfirmedPortrait.replaceChildren();
+        attendanceConfirmedPortrait.classList.toggle(
+          "attendance-confirmed-portrait-has-image",
+          Boolean(streamerProfile.image),
+        );
+
+        if (streamerProfile.image) {
+          const img = document.createElement("img");
+          img.alt = "";
+          img.decoding = "async";
+          img.src = streamerProfile.image;
+
+          if (streamerProfile.fallbackImage) {
+            img.setAttribute("data-fallback-src", streamerProfile.fallbackImage);
+            wireImageFallback(img, false);
+          }
+
+          attendanceConfirmedPortrait.append(img);
+          return;
+        }
+
+        desktopPortraitFallbackClasses.forEach((className) => {
+          const span = document.createElement("span");
+          span.className = className;
+          attendanceConfirmedPortrait.append(span);
+        });
+      };
+
+      const openAttendanceConfirmedDialog = (
+        streamerProfile: StreamerVerificationProfile,
+        returnedLogin: string,
+        originalDetails: ConfirmationDetails,
+      ) => {
+        const formattedLogin = formatTwitchHandle(returnedLogin);
+        const selectedDifferentStreamer = streamerProfile.id !== originalDetails.creatorId;
+
+        closeDialog(confirmModal);
+        closeDialog(verificationChoiceModal);
+        closeDialog(verificationResultModal);
+
+        if (attendanceConfirmedHeading instanceof HTMLElement) {
+          attendanceConfirmedHeading.textContent = `Confirmed ${streamerProfile.name}`;
+        }
+
+        if (attendanceConfirmedCopy instanceof HTMLElement) {
+          attendanceConfirmedCopy.textContent = `Confirmed ${streamerProfile.name} with ${formattedLogin}.`;
+        }
+
+        if (attendanceConfirmedNote instanceof HTMLElement) {
+          attendanceConfirmedNote.textContent = selectedDifferentStreamer
+            ? `You selected ${originalDetails.creatorName}, but Twitch returned ${formattedLogin}. We matched that account to ${streamerProfile.name}.`
+            : "";
+          attendanceConfirmedNote.hidden = !selectedDifferentStreamer;
+        }
+
+        setAttendanceConfirmedPortrait(streamerProfile);
+        openDialog(attendanceConfirmedModal);
+      };
+
+      const openVerificationChoiceModal = (details: ConfirmationDetails) => {
+        pendingConfirmationDetails = details;
+        setVerificationChoiceState(details);
+        closeDialog(confirmModal);
+        openDialog(verificationChoiceModal);
+      };
+
+      const validateTwitchAccessToken = async (accessToken: string) => {
+        const response = await fetch("https://id.twitch.tv/oauth2/validate", {
+          headers: {
+            Authorization: `OAuth ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Twitch token validation failed.");
+        }
+
+        const validation = (await response.json()) as {
+          client_id?: string;
+          login?: string;
+        };
+
+        if (validation.client_id !== twitchClientId) {
+          throw new Error("Twitch token was issued for a different client.");
+        }
+
+        return validation;
+      };
+
+      const fetchTwitchProfileImage = async (accessToken: string, login: string) => {
+        const normalizedLogin = normalizeTwitchLogin(login);
+
+        if (!normalizedLogin) {
+          return "";
+        }
+
+        const userUrl = new URL("https://api.twitch.tv/helix/users");
+        userUrl.searchParams.set("login", normalizedLogin);
+
+        try {
+          const response = await fetch(userUrl.toString(), {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Client-Id": twitchClientId,
+            },
+          });
+
+          if (!response.ok) {
+            return "";
+          }
+
+          const payload = (await response.json()) as {
+            data?: Array<{
+              login?: string;
+              profile_image_url?: string;
+            }>;
+          };
+          const profile = payload.data?.find(
+            (user) => normalizeTwitchLogin(user.login || "") === normalizedLogin,
+          );
+
+          return typeof profile?.profile_image_url === "string"
+            ? profile.profile_image_url
+            : "";
+        } catch {
+          return "";
+        }
+      };
+
+      const withConfirmedProfileImage = (
+        streamerProfile: StreamerVerificationProfile,
+        twitchProfileImage: string,
+      ): StreamerVerificationProfile => ({
+        ...streamerProfile,
+        image: twitchProfileImage || streamerProfile.image,
+      });
+
+      const getTwitchRedirectMismatchMessage = (
+        authErrorDescription: string | null,
+        attemptedRedirectUris: string[],
+      ) => {
+        const attemptedRedirectText = attemptedRedirectUris.join(" then ");
+        const description = authErrorDescription ? ` Twitch returned: ${authErrorDescription}.` : "";
+
+        return `Twitch rejected the OAuth Redirect URL.${description} The deployed site tried ${attemptedRedirectText} for client ID ${twitchClientId}. In the matching Twitch developer app, register ${twitchRedirectUri} as an OAuth Redirect URL and confirm GitHub PUBLIC_TWITCH_CLIENT_ID uses that same app.`;
+      };
+
+      const getNextTwitchRedirectUri = (pendingVerification: PendingTwitchVerification) => {
+        const attemptedRedirectUris = pendingVerification.attemptedRedirectUris || [
+          pendingVerification.redirectUri,
+        ];
+
+        return twitchRedirectUriAttempts.find(
+          (redirectUri) => !attemptedRedirectUris.includes(redirectUri),
+        );
+      };
+
+      const startTwitchVerification = (
+        details: ConfirmationDetails,
+        redirectUri = twitchRedirectUri,
+        attemptedRedirectUris = [redirectUri],
+      ) => {
+        if (isStartingTwitchVerification) {
+          return;
+        }
+
+        setTwitchVerificationStarting(true);
+
+        if (!twitchClientId || !details.expectedTwitchHandle) {
+          setTwitchVerificationStarting(false);
+          openVerificationResult(
+            "failed",
+            "Twitch verification is unavailable for this selection.",
+          );
+          return;
+        }
+
+        const state = createOAuthState();
+        const pendingVerification: PendingTwitchVerification = {
+          ...details,
+          state,
+          redirectUri,
+          attemptedRedirectUris,
+        };
+
+        if (!writeSessionJson(pendingTwitchVerificationStorageKey, pendingVerification)) {
+          setTwitchVerificationStarting(false);
+          openVerificationResult(
+            "failed",
+            "The browser could not store the Twitch verification request.",
+          );
+          return;
+        }
+
+        const authorizeUrl = new URL("https://id.twitch.tv/oauth2/authorize");
+        authorizeUrl.searchParams.set("client_id", twitchClientId);
+        authorizeUrl.searchParams.set("redirect_uri", redirectUri);
+        authorizeUrl.searchParams.set("response_type", "token");
+        authorizeUrl.searchParams.set("state", state);
+        authorizeUrl.searchParams.set("force_verify", "true");
+        window.location.assign(authorizeUrl.toString());
+      };
 
       const setSelectedStreamerName = (streamerName: string) => {
         if (selectedName instanceof HTMLElement) {
@@ -620,17 +1489,11 @@ const confirmationQuestions = [
         }
 
         syncConfirmStreamerSelect();
-        document.documentElement.classList.add("has-confirm-modal-open");
-
-        if (!confirmModal.open) {
-          confirmModal.showModal();
-        }
+        openDialog(confirmModal);
       };
 
       const closeConfirmModal = () => {
-        if (confirmModal instanceof HTMLDialogElement && confirmModal.open) {
-          confirmModal.close();
-        }
+        closeDialog(confirmModal);
       };
 
       const selectStreamerById = (streamerId: string) => {
@@ -833,9 +1696,13 @@ const confirmationQuestions = [
 
       const clearSelection = () => {
         closeConfirmModal();
+        closeDialog(verificationChoiceModal);
+        closeDialog(verificationResultModal);
+        closeDialog(attendanceConfirmedModal);
         hideReadyOverlay();
         document.documentElement.classList.remove("has-streamer-hover-preview");
         selectedStreamerId = undefined;
+        pendingConfirmationDetails = undefined;
 
         streamerCards.forEach((candidate) => {
           candidate.classList.remove("tile-selected", "mobile-tile-selected");
@@ -900,6 +1767,22 @@ const confirmationQuestions = [
         });
       });
 
+      confirmForm?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const details = collectConfirmationDetails();
+
+        if (!details) {
+          openVerificationResult(
+            "failed",
+            "The selected creator could not be found. Choose a creator and try again.",
+          );
+          return;
+        }
+
+        saveConfirmationDetails(details);
+        openVerificationChoiceModal(details);
+      });
+
       confirmModalCloseButtons.forEach((button) => {
         button.addEventListener("click", () => {
           closeConfirmModal();
@@ -913,7 +1796,87 @@ const confirmationQuestions = [
       });
 
       confirmModal?.addEventListener("close", () => {
-        document.documentElement.classList.remove("has-confirm-modal-open");
+        syncConfirmationDialogClass();
+      });
+
+      verificationChoiceCloseButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          closeDialog(verificationChoiceModal);
+        });
+      });
+
+      verificationChoiceModal?.addEventListener("click", (event) => {
+        if (event.target === verificationChoiceModal) {
+          closeDialog(verificationChoiceModal);
+        }
+      });
+
+      verificationChoiceModal?.addEventListener("close", () => {
+        syncConfirmationDialogClass();
+      });
+
+      confirmWithoutVerifyingButton?.addEventListener("click", () => {
+        const details = pendingConfirmationDetails || collectConfirmationDetails();
+
+        if (!details) {
+          openVerificationResult(
+            "failed",
+            "The saved details could not be found. Save the form again.",
+          );
+          return;
+        }
+
+        saveConfirmationDetails(details);
+        openVerificationResult(
+          "unverified",
+          `${details.creatorName} was confirmed without Twitch account verification.`,
+        );
+      });
+
+      confirmWithTwitchButton?.addEventListener("click", () => {
+        const details = pendingConfirmationDetails || collectConfirmationDetails();
+
+        if (!details) {
+          openVerificationResult(
+            "failed",
+            "The saved details could not be found. Save the form again.",
+          );
+          return;
+        }
+
+        startTwitchVerification(details);
+      });
+
+      verificationResultCloseButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          closeDialog(verificationResultModal);
+        });
+      });
+
+      verificationResultModal?.addEventListener("click", (event) => {
+        if (event.target === verificationResultModal) {
+          closeDialog(verificationResultModal);
+        }
+      });
+
+      verificationResultModal?.addEventListener("close", () => {
+        syncConfirmationDialogClass();
+      });
+
+      attendanceConfirmedCloseButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          closeDialog(attendanceConfirmedModal);
+        });
+      });
+
+      attendanceConfirmedModal?.addEventListener("click", (event) => {
+        if (event.target === attendanceConfirmedModal) {
+          closeDialog(attendanceConfirmedModal);
+        }
+      });
+
+      attendanceConfirmedModal?.addEventListener("close", () => {
+        syncConfirmationDialogClass();
       });
 
       confirmStreamerSelect?.addEventListener("change", () => {
@@ -961,7 +1924,7 @@ const confirmationQuestions = [
       });
 
       window.addEventListener("contextmenu", (event) => {
-        if (isConfirmModalOpen()) {
+        if (isConfirmationDialogOpen()) {
           return;
         }
 
@@ -974,7 +1937,7 @@ const confirmationQuestions = [
       });
 
       window.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && isConfirmModalOpen()) {
+        if (event.key === "Escape" && isConfirmationDialogOpen()) {
           return;
         }
 
@@ -985,6 +1948,163 @@ const confirmationQuestions = [
         event.preventDefault();
         clearSelection();
       });
+
+      const getConfirmationDetailsFromPending = (
+        pendingVerification: PendingTwitchVerification,
+      ): ConfirmationDetails => ({
+        creatorId: pendingVerification.creatorId,
+        creatorName: pendingVerification.creatorName,
+        creatorEmail: pendingVerification.creatorEmail,
+        answers: pendingVerification.answers,
+        expectedTwitchHandle: pendingVerification.expectedTwitchHandle,
+        savedAt: pendingVerification.savedAt,
+      });
+
+      const handleTwitchOAuthRedirect = async () => {
+        const queryParams = new URLSearchParams(window.location.search);
+        const hasQueryOAuthError = queryParams.has("error");
+
+        if (
+          !hasQueryOAuthError &&
+          (!window.location.hash ||
+            (!window.location.hash.includes("access_token=") &&
+              !window.location.hash.includes("error=")))
+        ) {
+          return;
+        }
+
+        const callbackParams = hasQueryOAuthError
+          ? queryParams
+          : new URLSearchParams(window.location.hash.slice(1));
+        const returnedState = callbackParams.get("state") || "";
+        const pendingVerification = readSessionJson<PendingTwitchVerification>(
+          pendingTwitchVerificationStorageKey,
+        );
+        window.history.replaceState(
+          null,
+          document.title,
+          window.location.pathname,
+        );
+
+        if (!pendingVerification || !returnedState || pendingVerification.state !== returnedState) {
+          removeSessionItem(pendingTwitchVerificationStorageKey);
+          openVerificationResult(
+            "failed",
+            "Twitch verification failed because the returned state did not match this session.",
+          );
+          return;
+        }
+
+        const restoredDetails = getConfirmationDetailsFromPending(pendingVerification);
+        pendingConfirmationDetails = restoredDetails;
+        saveConfirmationDetails(restoredDetails);
+        selectStreamerById(restoredDetails.creatorId);
+
+        const authError = callbackParams.get("error");
+
+        if (authError) {
+          const authErrorDescription = callbackParams.get("error_description");
+          const attemptedRedirectUris = pendingVerification.attemptedRedirectUris || [
+            pendingVerification.redirectUri,
+          ];
+
+          if (authError === "redirect_mismatch") {
+            const nextRedirectUri = getNextTwitchRedirectUri(pendingVerification);
+
+            if (nextRedirectUri) {
+              startTwitchVerification(restoredDetails, nextRedirectUri, [
+                ...attemptedRedirectUris,
+                nextRedirectUri,
+              ]);
+              return;
+            }
+          }
+
+          removeSessionItem(pendingTwitchVerificationStorageKey);
+          openVerificationResult(
+            authError === "access_denied" ? "cancelled" : "failed",
+            authError === "access_denied"
+              ? `${restoredDetails.creatorName} was not verified because Twitch authorization was cancelled.`
+              : authError === "redirect_mismatch"
+                ? getTwitchRedirectMismatchMessage(authErrorDescription, attemptedRedirectUris)
+              : `Twitch verification failed with error: ${authError}${
+                  authErrorDescription ? ` (${authErrorDescription})` : ""
+                }.`,
+          );
+          return;
+        }
+
+        if (!twitchClientId) {
+          removeSessionItem(pendingTwitchVerificationStorageKey);
+          openVerificationResult(
+            "failed",
+            "Twitch verification is not configured for this deployment.",
+          );
+          return;
+        }
+
+        const accessToken = callbackParams.get("access_token");
+
+        if (!accessToken) {
+          removeSessionItem(pendingTwitchVerificationStorageKey);
+          openVerificationResult(
+            "failed",
+            "Twitch did not return an access token for validation.",
+          );
+          return;
+        }
+
+        try {
+          const validation = await validateTwitchAccessToken(accessToken);
+          const returnedLogin = normalizeTwitchLogin(validation.login || "");
+          const expectedLogin = normalizeTwitchLogin(restoredDetails.expectedTwitchHandle);
+          removeSessionItem(pendingTwitchVerificationStorageKey);
+
+          if (!returnedLogin) {
+            openVerificationResult(
+              "failed",
+              "Twitch validated the token but did not return an account login.",
+            );
+            return;
+          }
+
+          const matchedStreamerProfile = getStreamerProfileByTwitchLogin(returnedLogin);
+          const twitchProfileImage = await fetchTwitchProfileImage(accessToken, returnedLogin);
+
+          if (matchedStreamerProfile) {
+            const confirmedStreamerProfile = withConfirmedProfileImage(
+              matchedStreamerProfile,
+              twitchProfileImage,
+            );
+            const confirmedDetails = getDetailsForStreamerProfile(
+              restoredDetails,
+              confirmedStreamerProfile,
+            );
+            pendingConfirmationDetails = confirmedDetails;
+            saveConfirmationDetails(confirmedDetails);
+            selectStreamerById(confirmedStreamerProfile.id);
+            openAttendanceConfirmedDialog(
+              confirmedStreamerProfile,
+              returnedLogin,
+              restoredDetails,
+            );
+            return;
+          }
+
+          openVerificationResult(
+            "mismatch",
+            `${restoredDetails.creatorName} is configured as @${expectedLogin}, but Twitch returned @${returnedLogin}.`,
+          );
+        } catch {
+          removeSessionItem(pendingTwitchVerificationStorageKey);
+          openVerificationResult(
+            "failed",
+            "Twitch verification failed while validating the returned access token.",
+          );
+        }
+      };
+
+      void handleTwitchOAuthRedirect();
 
       const customCursors = document.querySelectorAll<HTMLElement>("[data-custom-cursor]");
       const customCursorQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
@@ -2038,6 +3158,180 @@ const confirmationQuestions = [
     background: #9146ff;
     color: #fff;
     text-shadow: none;
+  }
+
+  .confirm-primary-action:disabled {
+    background: #8d8f94;
+    color: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.24);
+    cursor: not-allowed;
+  }
+
+  .verification-modal {
+    width: min(780px, calc(100vw - 40px));
+  }
+
+  .verification-modal-frame {
+    min-height: 360px;
+  }
+
+  .verification-modal-body {
+    display: grid;
+    align-content: center;
+    gap: 18px;
+  }
+
+  .verification-modal-copy,
+  .verification-modal-warning {
+    margin: 0;
+    color: #101416;
+    font-family: "Segoe UI", Arial, Helvetica, system-ui, sans-serif;
+    font-size: 25px;
+    font-weight: 800;
+    line-height: 1.24;
+    overflow-wrap: anywhere;
+  }
+
+  .verification-modal-warning {
+    padding: 14px 16px;
+    border: 4px solid #101416;
+    background: #fff017;
+    font-size: 20px;
+    line-height: 1.2;
+    box-shadow: 0 5px 0 rgba(16, 20, 22, 0.28);
+  }
+
+  .verification-modal-footer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .verification-result-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .verification-modal-footer .confirm-secondary-action,
+  .verification-modal-footer .confirm-primary-action,
+  .verification-result-footer .confirm-primary-action {
+    height: auto;
+    min-height: 64px;
+    padding: 10px 16px;
+    white-space: normal;
+  }
+
+  .verification-result-status {
+    justify-self: start;
+    display: inline-grid;
+    place-items: center;
+    min-height: 52px;
+    padding: 0 18px;
+    border: 4px solid #101416;
+    background: #9146ff;
+    color: #fff;
+    font-family: "Arial Black", Impact, sans-serif;
+    font-size: 24px;
+    line-height: 1;
+    text-transform: uppercase;
+    box-shadow: 0 5px 0 rgba(16, 20, 22, 0.28);
+  }
+
+  .verification-modal[data-verification-status="verified"] .verification-result-status {
+    background: #188f45;
+  }
+
+  .verification-modal[data-verification-status="mismatch"] .verification-result-status,
+  .verification-modal[data-verification-status="failed"] .verification-result-status {
+    background: #e60010;
+  }
+
+  .verification-modal[data-verification-status="unverified"] .verification-result-status,
+  .verification-modal[data-verification-status="cancelled"] .verification-result-status {
+    background: #fa8a00;
+  }
+
+  .attendance-confirmed-modal {
+    width: min(880px, calc(100vw - 40px));
+  }
+
+  .attendance-confirmed-frame {
+    min-height: 430px;
+  }
+
+  .attendance-confirmed-body {
+    display: grid;
+    grid-template-columns: 232px minmax(0, 1fr);
+    align-items: center;
+    gap: 24px;
+  }
+
+  .attendance-confirmed-portrait {
+    position: relative;
+    width: 232px;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 6px solid #101416;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0 20%, transparent 20%),
+      linear-gradient(160deg, #1d51b8 0%, #f7f4f5 48%, #c82735 100%);
+    box-shadow: 0 8px 0 rgba(16, 20, 22, 0.34);
+  }
+
+  .attendance-confirmed-portrait img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center center;
+  }
+
+  .attendance-confirmed-portrait .big-avatar-head {
+    left: 82px;
+    top: 29px;
+    width: 84px;
+    height: 78px;
+  }
+
+  .attendance-confirmed-portrait .big-avatar-body {
+    left: 44px;
+    top: 103px;
+    width: 156px;
+    height: 130px;
+  }
+
+  .attendance-confirmed-portrait .big-avatar-arm {
+    left: 144px;
+    top: 118px;
+    width: 94px;
+    height: 42px;
+  }
+
+  .attendance-confirmed-copy {
+    min-width: 0;
+    display: grid;
+    gap: 14px;
+  }
+
+  .attendance-confirmed-copy strong {
+    color: #101416;
+    font-family: "Arial Black", Impact, sans-serif;
+    font-size: 34px;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .attendance-confirmed-copy p {
+    margin: 0;
+    color: #101416;
+    font-family: "Segoe UI", Arial, Helvetica, system-ui, sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.24;
+  }
+
+  .attendance-confirmed-note {
+    padding: 14px 16px;
+    border: 4px solid #101416;
+    background: #fff017;
+    box-shadow: 0 5px 0 rgba(16, 20, 22, 0.28);
   }
 
   :global(html.custom-cursor-enabled),
@@ -3566,6 +4860,96 @@ const confirmationQuestions = [
       height: 50px;
       border-width: 3px;
       font-size: 19px;
+    }
+
+    .verification-modal-frame {
+      min-height: 300px;
+    }
+
+    .verification-modal-copy {
+      font-size: 19px;
+      line-height: 1.28;
+    }
+
+    .verification-modal-warning {
+      padding: 11px 12px;
+      border-width: 3px;
+      font-size: 16px;
+    }
+
+    .verification-modal-footer {
+      grid-template-columns: 1fr;
+    }
+
+    .verification-modal-footer .confirm-secondary-action,
+    .verification-modal-footer .confirm-primary-action,
+    .verification-result-footer .confirm-primary-action {
+      min-height: 52px;
+      padding: 8px 10px;
+      font-size: 17px;
+    }
+
+    .verification-result-status {
+      min-height: 44px;
+      padding: 0 13px;
+      border-width: 3px;
+      font-size: 19px;
+    }
+
+    .attendance-confirmed-frame {
+      min-height: 360px;
+    }
+
+    .attendance-confirmed-body {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      gap: 15px;
+    }
+
+    .attendance-confirmed-portrait {
+      width: min(190px, 62vw);
+      border-width: 4px;
+    }
+
+    .attendance-confirmed-portrait .big-avatar-head {
+      left: 35%;
+      top: 13%;
+      width: 36%;
+      height: 33%;
+    }
+
+    .attendance-confirmed-portrait .big-avatar-body {
+      left: 19%;
+      top: 43%;
+      width: 68%;
+      height: 58%;
+    }
+
+    .attendance-confirmed-portrait .big-avatar-arm {
+      left: 62%;
+      top: 50%;
+      width: 40%;
+      height: 18%;
+    }
+
+    .attendance-confirmed-copy {
+      justify-items: center;
+      text-align: center;
+      gap: 10px;
+    }
+
+    .attendance-confirmed-copy strong {
+      font-size: 23px;
+    }
+
+    .attendance-confirmed-copy p {
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .attendance-confirmed-note {
+      padding: 10px 12px;
+      border-width: 3px;
     }
   }
 
