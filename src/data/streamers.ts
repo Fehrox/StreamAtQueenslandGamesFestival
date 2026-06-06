@@ -106,12 +106,6 @@ const names = [
   "OPEN SLOT 37",
   "OPEN SLOT 38",
   "OPEN SLOT 39",
-  "OPEN SLOT 40",
-  "OPEN SLOT 41",
-  "OPEN SLOT 42",
-  "OPEN SLOT 43",
-  "OPEN SLOT 44",
-  "OPEN SLOT 45",
 ];
 
 const streamerAssets: Partial<Record<string, StreamerAssets>> = {

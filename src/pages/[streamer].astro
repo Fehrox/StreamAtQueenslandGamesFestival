@@ -2,6 +2,8 @@
 import { getStreamerUrlSegments, streamers } from "@data/streamers";
 import StreamerInvitePage from "./index.astro";
 
+const { selectedStreamer } = Astro.props;
+
 export function getStaticPaths() {
   const usedSegments = new Set<string>();
 
@@ -17,9 +19,10 @@ export function getStaticPaths() {
       })
       .map((streamerSegment) => ({
         params: { streamer: streamerSegment },
+        props: { selectedStreamer: streamer },
       })),
   );
 }
 ---
 
-<StreamerInvitePage />
+<StreamerInvitePage selectedStreamer={selectedStreamer} />
