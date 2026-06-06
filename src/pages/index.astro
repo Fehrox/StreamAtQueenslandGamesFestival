@@ -1,7 +1,28 @@
 ---
-import { getStreamerUrlSlug, streamers } from "@data/streamers";
+import {
+  getStreamerUrlSlug,
+  streamers,
+  type StreamerProfile,
+} from "@data/streamers";
 
 const rosterColumns = 13;
+const siteUrl = Astro.site ?? new URL("https://streamatqueenslandgamesfestival.com/");
+const { selectedStreamer } = Astro.props as { selectedStreamer?: StreamerProfile };
+const pageTitle = selectedStreamer
+  ? `${selectedStreamer.name} | QGF Streamer Invite`
+  : "Queensland Games Festival Streamer Invite";
+const pageDescription = selectedStreamer
+  ? `Queensland Games Festival streamer invite for ${selectedStreamer.name}.`
+  : "Queensland Games Festival streamer invite screen.";
+const pageUrl = new URL(
+  selectedStreamer ? `/${getStreamerUrlSlug(selectedStreamer.name)}/` : "/",
+  siteUrl,
+).toString();
+const socialImagePath = selectedStreamer?.fallbackImage || selectedStreamer?.image || "";
+const socialImageUrl = socialImagePath ? new URL(socialImagePath, siteUrl).toString() : "";
+const socialImageAlt = selectedStreamer
+  ? `${selectedStreamer.name} profile picture`
+  : "Queensland Games Festival streamer invite";
 const confirmationQuestions = [
   {
     id: "streaming-station",
@@ -68,10 +89,39 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Queensland Games Festival streamer invite screen."
+      content={pageDescription}
     />
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Queensland Games Festival" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={pageUrl} />
+    {
+      socialImageUrl && (
+        <>
+          <meta property="og:image" content={socialImageUrl} />
+          <meta property="og:image:secure_url" content={socialImageUrl} />
+          <meta property="og:image:alt" content={socialImageAlt} />
+        </>
+      )
+    }
+    <meta
+      name="twitter:card"
+      content={socialImageUrl ? "summary_large_image" : "summary"}
+    />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    {
+      socialImageUrl && (
+        <>
+          <meta name="twitter:image" content={socialImageUrl} />
+          <meta name="twitter:image:alt" content={socialImageAlt} />
+        </>
+      )
+    }
     <link rel="icon" href="/favicon.ico" sizes="any" />
-    <title>Queensland Games Festival Streamer Invite</title>
+    <title>{pageTitle}</title>
   </head>
   <body>
     <main class="viewport" aria-label="Queensland Games Festival streamer signup">
@@ -198,25 +248,26 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
             </div>
             <div class="player-red-card">
               <div class="watermark">QGF</div>
-              <a
-                class="twitch-profile-link"
-                data-selected-twitch-link
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Open Twitch profile"
-                aria-label="Open selected streamer on Twitch"
-                hidden
-              >
-                <img
-                  src="/icons/TwitchGlitchWhite.svg"
-                  alt=""
-                  aria-hidden="true"
-                  draggable="false"
-                />
-              </a>
               <h2 data-selected-name></h2>
               <div class="player-info">
-                <span>Streamer</span>
+                <a
+                  class="twitch-profile-link"
+                  data-selected-twitch-link
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Open Twitch profile"
+                  aria-label="Open selected streamer on Twitch"
+                  aria-disabled="true"
+                  data-twitch-link-disabled
+                  tabindex="-1"
+                >
+                  <img
+                    src="/icons/TwitchGlitchWhite.svg"
+                    alt=""
+                    aria-hidden="true"
+                    draggable="false"
+                  />
+                </a>
                 <strong>0%</strong>
               </div>
               <div class="controller-strip">
@@ -1513,7 +1564,12 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         }
 
         const hasTwitchUrl = twitchUrl.length > 0;
-        selectedTwitchProfileLink.hidden = !hasTwitchUrl;
+        selectedTwitchProfileLink.toggleAttribute(
+          "data-twitch-link-disabled",
+          !hasTwitchUrl,
+        );
+        selectedTwitchProfileLink.setAttribute("aria-disabled", String(!hasTwitchUrl));
+        selectedTwitchProfileLink.tabIndex = hasTwitchUrl ? 0 : -1;
 
         if (!hasTwitchUrl) {
           selectedTwitchProfileLink.removeAttribute("href");
@@ -4717,21 +4773,32 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
     line-height: 1;
   }
 
-  .twitch-profile-link[hidden] {
-    display: none;
+  .twitch-profile-link[data-twitch-link-disabled] {
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .twitch-profile-link {
-    position: absolute;
-    left: 24px;
-    top: 25px;
-    width: 58px;
-    height: 52px;
+    min-width: 0;
+    width: 61px;
+    height: 61px;
     display: grid;
     place-items: center;
+    padding: 0;
     border: 4px solid #171719;
     border-radius: 4px;
     background: #9146ff;
+    color: #fff;
+    font-family: "Arial Black", Impact, sans-serif;
+    font-size: 31px;
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+    text-shadow:
+      -2px -2px 0 #000,
+      2px -2px 0 #000,
+      -2px 2px 0 #000,
+      2px 2px 0 #000;
     box-shadow:
       0 6px 0 #5c16c5,
       0 11px 18px rgba(14, 14, 16, 0.28);
@@ -4759,8 +4826,8 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
   }
 
   .twitch-profile-link img {
-    width: 31px;
-    height: 31px;
+    width: 34px;
+    height: 34px;
     display: block;
     object-fit: contain;
   }
@@ -4786,12 +4853,13 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
 
   .player-info {
     display: grid;
-    grid-template-columns: 1fr 188px;
+    grid-template-columns: 61px 188px;
+    justify-content: end;
     gap: 8px;
     margin-top: 18px;
   }
 
-  .player-info span,
+  .player-info > span,
   .player-info strong {
     height: 61px;
     display: grid;
