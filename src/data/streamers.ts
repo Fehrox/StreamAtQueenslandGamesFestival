@@ -335,6 +335,39 @@ const resolveStreamerAssets = (
   };
 };
 
+const cleanUrlSegment = (value: string) =>
+  value.trim().replace(/^@+/, "").replace(/[\\/]+/g, "-");
+
+export const getStreamerUrlSlug = (value: string) =>
+  cleanUrlSegment(value)
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/&/g, "and")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+export const getStreamerUrlKey = (value: string) =>
+  getStreamerUrlSlug(value).replace(/-/g, "");
+
+export const getStreamerUrlSegments = (streamer: StreamerProfile) => {
+  const values = [streamer.name, streamer.twitchHandle].filter(
+    (value): value is string => Boolean(value),
+  );
+
+  return Array.from(
+    new Set(
+      values
+        .flatMap((value) => [
+          getStreamerUrlSlug(value),
+          cleanUrlSegment(value).toLowerCase(),
+          getStreamerUrlKey(value),
+        ])
+        .filter((segment) => segment && segment !== "index.html"),
+    ),
+  );
+};
+
 const featuredIndex = 0;
 const confirmedNames = new Set(["Adam", "Fasffy", "Danzie"]);
 

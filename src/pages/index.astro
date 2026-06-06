@@ -923,6 +923,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
       const confirmationDetailsStorageKey = "qgfInvite:confirmationDetails";
       const festivalUrl = "https://www.queenslandgamesfestival.com/";
       const readyOverlayExitMs = 280;
+      const initialCreatorSelectionDelayMs = 700;
       let readyOverlayExitTimer: number | undefined;
       let selectedStreamerId: string | undefined;
       let isStartingTwitchVerification = false;
@@ -1516,12 +1517,39 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
       };
 
       const normalizeCreatorKey = (value: string) =>
-        value.trim().replace(/^@+/, "").toLowerCase();
+        value
+          .trim()
+          .replace(/^@+/, "")
+          .normalize("NFKD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/&/g, "and")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "");
+
+      const getCreatorKeyFromPath = () => {
+        const segments = window.location.pathname.split("/").filter(Boolean);
+
+        while (segments[segments.length - 1]?.toLowerCase() === "index.html") {
+          segments.pop();
+        }
+
+        const pathKey = segments[segments.length - 1] || "";
+
+        if (!pathKey) {
+          return "";
+        }
+
+        try {
+          return decodeURIComponent(pathKey.replace(/\+/g, " "));
+        } catch {
+          return pathKey;
+        }
+      };
 
       const getInitialCreatorKey = () => {
         const key = new URLSearchParams(window.location.search).get("c");
 
-        return key ? normalizeCreatorKey(key) : "";
+        return key || getCreatorKeyFromPath();
       };
 
       const selectStreamerByCreatorKey = (creatorKey: string) => {
@@ -1534,8 +1562,11 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         const prefersMobileCard = window.matchMedia("(max-width: 900px)").matches;
         const candidates = Array.from(streamerCards);
         const matchesCreatorKey = (candidate: HTMLElement) =>
-          normalizeCreatorKey(candidate.getAttribute("data-streamer-key") || "") ===
-          normalizedCreatorKey;
+          [
+            candidate.getAttribute("data-streamer-key") || "",
+            candidate.getAttribute("data-streamer-name") || "",
+            candidate.getAttribute("data-streamer-id") || "",
+          ].some((candidateKey) => normalizeCreatorKey(candidateKey) === normalizedCreatorKey);
         const preferredCard = candidates.find(
           (candidate) =>
             matchesCreatorKey(candidate) &&
@@ -2821,7 +2852,9 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
       const scheduleInitialCreatorSelection = () => {
         const runAfterInitialPaint = () => {
           window.requestAnimationFrame(() => {
-            window.requestAnimationFrame(selectInitialCreatorFromUrl);
+            window.requestAnimationFrame(() => {
+              window.setTimeout(selectInitialCreatorFromUrl, initialCreatorSelectionDelayMs);
+            });
           });
         };
 
