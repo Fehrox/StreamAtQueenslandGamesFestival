@@ -27,7 +27,6 @@ Do not use this for sensitive data, passwords, payments, account creation, or an
 The current website submits these fields:
 
 - `email`: the user's email address.
-- `userAgent`: `navigator.userAgent` from the browser.
 - `deploymentId`: the Google Apps Script deployment id.
 
 The form also contains a hidden honeypot field named `_gotcha`. If that field has a value, the browser silently drops the submission.
@@ -41,7 +40,7 @@ The browser uses `fetch(..., { method: 'POST', mode: 'no-cors', body: formData }
 3. Add this header row:
 
 ```text
-Timestamp | Email | User Agent | Deployment Id | Source | Notes
+Timestamp | Email | Deployment Id | Source | Notes
 ```
 
 The Apps Script below will also create the header row if it is missing.
@@ -61,7 +60,6 @@ function doPost(e) {
     const params = e && e.parameter ? e.parameter : {};
 
     const email = String(params.email || '').trim().toLowerCase();
-    const userAgent = String(params.userAgent || '').trim();
     const deploymentId = String(params.deploymentId || '').trim();
     const gotcha = String(params._gotcha || '').trim();
 
@@ -76,7 +74,6 @@ function doPost(e) {
     sheet.appendRow([
       new Date(),
       email,
-      userAgent,
       deploymentId,
       'website',
       ''
@@ -101,7 +98,7 @@ function getSignupSheet_() {
   }
 
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Timestamp', 'Email', 'User Agent', 'Deployment Id', 'Source', 'Notes']);
+    sheet.appendRow(['Timestamp', 'Email', 'Deployment Id', 'Source', 'Notes']);
   }
 
   return sheet;
@@ -316,7 +313,6 @@ Place this script after the form markup:
       try {
         const formData = new FormData();
         formData.append('email', email);
-        formData.append('userAgent', navigator.userAgent);
         formData.append('deploymentId', DEPLOYMENT_ID);
 
         const response = await fetch(FORM_URL, {
@@ -380,7 +376,7 @@ If no row appears in the sheet:
 - Confirm the deployment access is `Anyone`.
 - Confirm Apps Script was deployed after the latest script changes.
 - Open the Apps Script execution logs and check for errors.
-- Submit directly with a tool like Postman or curl using `email`, `userAgent`, and `deploymentId`.
+- Submit directly with a tool like Postman or curl using `email` and `deploymentId`.
 
 If the page always shows success but the sheet is empty:
 
@@ -413,7 +409,6 @@ if (existingEmails.includes(email)) {
 sheet.appendRow([
   new Date(),
   email,
-  userAgent,
   deploymentId,
   'website',
   ''

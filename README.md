@@ -58,6 +58,8 @@ The confirmation / EOI modal can write to Google Sheets through a deployed
 Google Apps Script web app. Because GitHub Pages serves static files, these
 values must be available when GitHub Actions builds the site. They are baked
 into the generated JavaScript and are not runtime server environment variables.
+When a creator confirms through Twitch, the sheet row includes the Twitch login
+returned by OAuth.
 
 For the GitHub Pages deployment, add these as repository variables or
 `github-pages` environment variables in

@@ -40,11 +40,6 @@ const confirmationQuestions = [
     label: "Are you interested in participating in a panel?",
   },
   {
-    id: "travel-funding",
-    name: "travelFunding",
-    label: "Would you like to apply for Travel Funding?",
-  },
-  {
     id: "irl-streaming",
     name: "irlStreaming",
     label: "Will you be IRL streaming the event?",
@@ -967,7 +962,6 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         "streamingStation",
         "twitchConnect",
         "panelInterest",
-        "travelFunding",
         "irlStreaming",
       ];
 
@@ -1716,7 +1710,10 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
 
       const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-      const submitEoiDetails = async (details: ConfirmationDetails) => {
+      const submitEoiDetails = async (
+        details: ConfirmationDetails,
+        twitchOAuthLogin = "",
+      ) => {
         if (!eoiFormUrl) {
           openVerificationResult("failed", "EOI saving is not configured yet.");
           return false;
@@ -1726,9 +1723,9 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         submissionData.append("creatorId", details.creatorId);
         submissionData.append("creatorName", details.creatorName);
         submissionData.append("creatorEmail", details.creatorEmail.trim().toLowerCase());
-        submissionData.append("userAgent", navigator.userAgent);
         submissionData.append("deploymentId", eoiDeploymentId);
         submissionData.append("source", "qgf-invite");
+        submissionData.append("twitchOAuthLogin", twitchOAuthLogin);
 
         eoiAnswerFieldNames.forEach((fieldName) => {
           submissionData.append(fieldName, details.answers[fieldName] || "");
@@ -2251,10 +2248,6 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
           return;
         }
 
-        if (!(await submitEoiDetails(details))) {
-          return;
-        }
-
         saveConfirmationDetails(details);
         startTwitchVerification(details);
       });
@@ -2507,6 +2500,11 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
               confirmedStreamerProfile,
             );
             pendingConfirmationDetails = confirmedDetails;
+
+            if (!(await submitEoiDetails(confirmedDetails, returnedLogin))) {
+              return;
+            }
+
             saveConfirmationDetails(confirmedDetails);
             selectStreamerById(confirmedStreamerProfile.id);
             openAttendanceConfirmedDialog(
@@ -2514,6 +2512,10 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
               returnedLogin,
               restoredDetails,
             );
+            return;
+          }
+
+          if (!(await submitEoiDetails(restoredDetails, returnedLogin))) {
             return;
           }
 
