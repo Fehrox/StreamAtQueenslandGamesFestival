@@ -1012,7 +1012,6 @@ const confirmationQuestions = [
 
       const customCursors = document.querySelectorAll<HTMLElement>("[data-custom-cursor]");
       const customCursorQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
-      let cursorFrame = 0;
       let cursorX = -200;
       let cursorY = -200;
 
@@ -1035,35 +1034,39 @@ const confirmationQuestions = [
           customCursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
         });
 
-        cursorFrame = 0;
       };
 
       syncCustomCursor();
       customCursorQuery.addEventListener("change", syncCustomCursor);
 
-      window.addEventListener(
-        "pointermove",
-        (event) => {
-          if (
-            event.pointerType !== "mouse" ||
-            !customCursorQuery.matches ||
-            customCursors.length === 0
-          ) {
-            return;
-          }
+      const handleCustomCursorMove = (event: PointerEvent) => {
+        if (
+          event.pointerType !== "mouse" ||
+          !customCursorQuery.matches ||
+          customCursors.length === 0
+        ) {
+          return;
+        }
 
-          cursorX = event.clientX;
-          cursorY = event.clientY;
-          customCursors.forEach((customCursor) => {
-            customCursor.classList.add("custom-cursor-visible");
-          });
+        const coalescedEvents =
+          typeof event.getCoalescedEvents === "function" ? event.getCoalescedEvents() : [];
+        const latestEvent = coalescedEvents[coalescedEvents.length - 1] || event;
 
-          if (!cursorFrame) {
-            cursorFrame = window.requestAnimationFrame(positionCustomCursor);
-          }
-        },
-        { passive: true },
-      );
+        cursorX = latestEvent.clientX;
+        cursorY = latestEvent.clientY;
+        customCursors.forEach((customCursor) => {
+          customCursor.classList.add("custom-cursor-visible");
+        });
+        positionCustomCursor();
+      };
+
+      window.addEventListener("pointermove", handleCustomCursorMove, { passive: true });
+
+      if ("onpointerrawupdate" in window) {
+        window.addEventListener("pointerrawupdate", handleCustomCursorMove as EventListener, {
+          passive: true,
+        });
+      }
 
       window.addEventListener("pointerout", (event) => {
         if (!event.relatedTarget && customCursors.length > 0) {
