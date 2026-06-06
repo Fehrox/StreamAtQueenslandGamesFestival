@@ -2391,6 +2391,19 @@ const confirmationQuestions = [
       inset 0 -24px 28px rgba(0, 0, 0, 0.34);
   }
 
+  @media (hover: hover) and (pointer: fine) {
+    :global(html:not(.has-streamer-selected)) .tile:hover {
+      --selected-border-color: #f62624;
+      z-index: 5;
+      border-color: #08090a;
+      animation: selected-border-pulse 1.25s ease-in-out infinite;
+      box-shadow:
+        inset 0 0 0 4px var(--selected-border-color),
+        inset 0 0 0 7px #08090a,
+        inset 0 -24px 28px rgba(0, 0, 0, 0.34);
+    }
+  }
+
   .tile:focus-visible,
   .mobile-tile:focus-visible {
     outline: 4px solid #fff;
@@ -3861,6 +3874,19 @@ const confirmationQuestions = [
         inset 0 0 0 3px var(--selected-border-color),
         inset 0 0 0 6px #08090a,
         inset 0 -24px 28px rgba(0, 0, 0, 0.36);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      :global(html:not(.has-streamer-selected)) .mobile-tile:hover {
+        --selected-border-color: #f62624;
+        z-index: 5;
+        border-color: #08090a;
+        animation: selected-border-pulse 1.25s ease-in-out infinite;
+        box-shadow:
+          inset 0 0 0 3px var(--selected-border-color),
+          inset 0 0 0 6px #08090a,
+          inset 0 -24px 28px rgba(0, 0, 0, 0.36);
+      }
     }
 
     .mobile-tile .selection-marker {
