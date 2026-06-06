@@ -3105,27 +3105,28 @@ const confirmationQuestions = [
   .panel-portrait {
     position: absolute;
     z-index: 2;
-    left: 28px;
-    top: auto;
+    left: 0;
+    top: 0;
     bottom: 0;
     width: 448px;
-    height: 371px;
+    height: auto;
     overflow: hidden;
     clip-path: polygon(72px 0, 100% 0, 100% 100%, 0 100%, 0 72px);
   }
 
   :global(.panel-portrait img) {
     position: absolute;
-    left: 33px;
+    left: 0;
+    top: 0;
     bottom: 0;
-    width: 371px;
-    height: 371px;
+    width: 100%;
+    height: 100%;
     display: block;
     object-fit: cover;
-    object-position: center top;
+    object-position: left top;
     filter: saturate(1.14) contrast(1.05) drop-shadow(18px 0 0 rgba(0, 0, 0, 0.28));
-    transform: scale(1.12);
-    transform-origin: center bottom;
+    transform: none;
+    transform-origin: left top;
   }
 
   :global(.portrait-crossfade-enter),
@@ -3913,29 +3914,28 @@ const confirmationQuestions = [
 
     .mobile-cta-portrait {
       position: absolute;
-      left: 3%;
-      top: 12px;
+      left: 0;
+      top: 0;
+      bottom: 0;
       width: 50%;
-      height: 260px;
+      height: auto;
       overflow: hidden;
     }
 
     .mobile-cta-portrait img {
       position: absolute;
-      left: 4%;
-      top: 15px;
-      width: min(78%, 220px);
-      aspect-ratio: 1;
-      height: auto;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
       display: block;
       object-fit: cover;
-      object-position: center;
-      border: 6px solid #101416;
+      object-position: left top;
+      border: 0;
       background: #101416;
-      box-shadow:
-        10px 12px 0 rgba(0, 0, 0, 0.3),
-        inset 0 0 0 2px rgba(255, 255, 255, 0.24);
-      transform: rotate(-8deg);
+      box-shadow: none;
+      transform: none;
     }
 
     .mobile-big-avatar-head {

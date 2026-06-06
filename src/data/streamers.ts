@@ -40,7 +40,7 @@ const names = [
   "Krystll",
   "t10nat",
   "Arii",
-  "Jackson",
+  "Jxsn",
   "Winter",
   "Randy",
   "Jacque",
@@ -151,7 +151,7 @@ const streamerAssets: Partial<Record<string, StreamerAssets>> = {
   Krystll: { image: "/streamers/krystll.png", twitchHandle: "krysttl" },
   t10nat: { image: "/streamers/t10nat.png", twitchHandle: "t10nat" },
   Arii: { image: "/streamers/arii.png", twitchHandle: "arii" },
-  Jackson: {
+  Jxsn: {
     image: "/streamers/jackson.png",
     profileUrl: "https://www.twitch.tv/jxsn",
     twitchHandle: "jxsn",
