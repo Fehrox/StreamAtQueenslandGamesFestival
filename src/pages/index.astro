@@ -1,5 +1,5 @@
 ---
-import { streamers } from "@data/streamers";
+import { featuredStreamer, streamers } from "@data/streamers";
 
 const rosterColumns = 13;
 const confirmationQuestions = [
@@ -77,21 +77,43 @@ const confirmationQuestions = [
           {
             streamers.map((streamer, index) => (
               <article
-                class={`tile tile-${streamer.status}`}
+                class={`tile tile-${streamer.status}${streamer.status === "featured" ? " tile-selected" : ""}`}
                 style={`--tile-index: ${index}`}
                 data-streamer-card
-                data-streamer-id={streamer.id}
-                data-streamer-name={streamer.name}
+                aria-label={`${streamer.name} streamer slot`}
                 role="button"
                 tabindex="0"
-                aria-pressed="false"
-                aria-label={`${streamer.name} streamer slot`}
+                data-desktop-streamer-card
+                data-streamer-id={streamer.id}
+                data-streamer-name={streamer.name}
+                data-streamer-key={streamer.twitchHandle}
+                data-streamer-image={streamer.image ?? ""}
+                data-streamer-fallback-image={streamer.fallbackImage ?? ""}
+                aria-pressed={streamer.status === "featured" ? "true" : "false"}
               >
                 <div class="portrait" aria-hidden="true">
-                  <span class="portrait-shape portrait-shape-a" />
-                  <span class="portrait-shape portrait-shape-b" />
-                  <span class="portrait-head" />
-                  <span class="portrait-body" />
+                  {
+                    streamer.image ? (
+                      <img
+                        src={streamer.image}
+                        alt=""
+                        loading="lazy"
+                        data-fallback-src={streamer.fallbackImage ?? undefined}
+                        data-styled-streamer-image={
+                          streamer.fallbackImage && streamer.image !== streamer.fallbackImage
+                            ? "true"
+                            : undefined
+                        }
+                      />
+                    ) : (
+                      <>
+                        <span class="portrait-shape portrait-shape-a" />
+                        <span class="portrait-shape portrait-shape-b" />
+                        <span class="portrait-head" />
+                        <span class="portrait-body" />
+                      </>
+                    )
+                  }
                 </div>
                 <div class="tile-shine" aria-hidden="true" />
                 <h2>{streamer.name}</h2>
@@ -130,11 +152,26 @@ const confirmationQuestions = [
             aria-hidden="true"
           ></canvas>
           <article class="player-panel player-panel-primary">
-            <div class="panel-slash"></div>
-            <div class="panel-portrait" aria-hidden="true">
-              <span class="big-avatar-head"></span>
-              <span class="big-avatar-body"></span>
-              <span class="big-avatar-arm"></span>
+            <div class="panel-shadow" aria-hidden="true"></div>
+            <div class="panel-background" aria-hidden="true">
+              <div class="panel-slash"></div>
+            </div>
+            <div class="panel-portrait" aria-hidden="true" data-desktop-selected-portrait>
+              {
+                featuredStreamer.image ? (
+                  <img
+                    src={featuredStreamer.image}
+                    alt=""
+                    data-fallback-src={featuredStreamer.fallbackImage ?? undefined}
+                  />
+                ) : (
+                  <>
+                    <span class="big-avatar-head"></span>
+                    <span class="big-avatar-body"></span>
+                    <span class="big-avatar-arm"></span>
+                  </>
+                )
+              }
             </div>
             <div class="player-red-card">
               <div class="watermark">QGF</div>
@@ -213,12 +250,25 @@ const confirmationQuestions = [
                 data-mobile-streamer-card
                 data-streamer-id={streamer.id}
                 data-streamer-name={streamer.name}
+                data-streamer-key={streamer.twitchHandle}
+                data-streamer-image={streamer.image ?? ""}
+                data-streamer-fallback-image={streamer.fallbackImage ?? ""}
                 aria-pressed="false"
               >
                 <span class="mobile-portrait" aria-hidden="true">
                   {
                     streamer.image ? (
-                      <img src={streamer.image} alt="" loading="lazy" />
+                      <img
+                        src={streamer.image}
+                        alt=""
+                        loading="lazy"
+                        data-fallback-src={streamer.fallbackImage ?? undefined}
+                        data-styled-streamer-image={
+                          streamer.fallbackImage && streamer.image !== streamer.fallbackImage
+                            ? "true"
+                            : undefined
+                        }
+                      />
                     ) : (
                       <>
                         <span class="mobile-portrait-shape mobile-portrait-shape-a" />
@@ -245,10 +295,22 @@ const confirmationQuestions = [
 
         <section class="mobile-cta" data-mobile-cta hidden aria-live="polite">
           <div class="mobile-cta-panel">
-            <div class="mobile-cta-portrait" aria-hidden="true">
-              <span class="mobile-big-avatar-head"></span>
-              <span class="mobile-big-avatar-body"></span>
-              <span class="mobile-big-avatar-arm"></span>
+            <div class="mobile-cta-portrait" aria-hidden="true" data-mobile-selected-portrait>
+              {
+                featuredStreamer.image ? (
+                  <img
+                    src={featuredStreamer.image}
+                    alt=""
+                    data-fallback-src={featuredStreamer.fallbackImage ?? undefined}
+                  />
+                ) : (
+                  <>
+                    <span class="mobile-big-avatar-head"></span>
+                    <span class="mobile-big-avatar-body"></span>
+                    <span class="mobile-big-avatar-arm"></span>
+                  </>
+                )
+              }
             </div>
             <div class="mobile-cta-card">
               <div class="mobile-watermark">QGF</div>
@@ -460,7 +522,9 @@ const confirmationQuestions = [
       const backArrows = document.querySelectorAll<HTMLElement>("[data-back-arrow]");
       const mobileCta = document.querySelector("[data-mobile-cta]");
       const selectedName = document.querySelector("[data-selected-name]");
+      const selectedPortrait = document.querySelector("[data-desktop-selected-portrait]");
       const mobileSelectedName = document.querySelector("[data-mobile-selected-name]");
+      const mobileSelectedPortrait = document.querySelector("[data-mobile-selected-portrait]");
       const twitchConfirmButtons = document.querySelectorAll<HTMLButtonElement>(
         "[data-twitch-confirm]",
       );
@@ -477,6 +541,45 @@ const confirmationQuestions = [
       const readyOverlayExitMs = 280;
       let readyOverlayExitTimer: number | undefined;
       let selectedStreamerId: string | undefined;
+      const desktopPortraitFallbackClasses = [
+        "big-avatar-head",
+        "big-avatar-body",
+        "big-avatar-arm",
+      ];
+      const mobilePortraitFallbackClasses = [
+        "mobile-big-avatar-head",
+        "mobile-big-avatar-body",
+        "mobile-big-avatar-arm",
+      ];
+      const portraitFadeMs = 110;
+      let hoverPreviewClearTimeout: number | undefined;
+
+      const applyImageFallback = (img: HTMLImageElement) => {
+        const fallbackImage = img.getAttribute("data-fallback-src") || "";
+
+        if (
+          !fallbackImage ||
+          img.getAttribute("data-fallback-active") === "true" ||
+          img.getAttribute("src") === fallbackImage
+        ) {
+          return;
+        }
+
+        img.setAttribute("data-fallback-active", "true");
+        img.src = fallbackImage;
+      };
+
+      const wireImageFallback = (img: HTMLImageElement, checkCurrent = true) => {
+        img.addEventListener("error", () => applyImageFallback(img), { once: false });
+
+        if (checkCurrent && img.complete && img.naturalWidth === 0) {
+          applyImageFallback(img);
+        }
+      };
+
+      document
+        .querySelectorAll<HTMLImageElement>("img[data-fallback-src]")
+        .forEach((img) => wireImageFallback(img));
 
       const hasSelection = () =>
         document.documentElement.classList.contains("has-streamer-selected");
@@ -548,6 +651,41 @@ const confirmationQuestions = [
         const fallbackCard = candidates.find(
           (candidate) => candidate.getAttribute("data-streamer-id") === streamerId,
         );
+
+        const card = preferredCard || fallbackCard;
+
+        if (card) {
+          selectStreamer(card);
+        }
+      };
+
+      const normalizeCreatorKey = (value: string) =>
+        value.trim().replace(/^@+/, "").toLowerCase();
+
+      const getInitialCreatorKey = () => {
+        const key = new URLSearchParams(window.location.search).get("c");
+
+        return key ? normalizeCreatorKey(key) : "";
+      };
+
+      const selectStreamerByCreatorKey = (creatorKey: string) => {
+        const normalizedCreatorKey = normalizeCreatorKey(creatorKey);
+
+        if (!normalizedCreatorKey) {
+          return;
+        }
+
+        const prefersMobileCard = window.matchMedia("(max-width: 900px)").matches;
+        const candidates = Array.from(streamerCards);
+        const matchesCreatorKey = (candidate: HTMLElement) =>
+          normalizeCreatorKey(candidate.getAttribute("data-streamer-key") || "") ===
+          normalizedCreatorKey;
+        const preferredCard = candidates.find(
+          (candidate) =>
+            matchesCreatorKey(candidate) &&
+            candidate.classList.contains(prefersMobileCard ? "mobile-tile" : "tile"),
+        );
+        const fallbackCard = candidates.find(matchesCreatorKey);
         const card = preferredCard || fallbackCard;
 
         if (card) {
@@ -556,21 +694,29 @@ const confirmationQuestions = [
       };
 
       const clearHoverPreview = () => {
-        document.documentElement.classList.remove("has-streamer-hover-preview");
+        window.clearTimeout(hoverPreviewClearTimeout);
+        hoverPreviewClearTimeout = window.setTimeout(() => {
+          document.documentElement.classList.remove("has-streamer-hover-preview");
 
-        if (!hasSelection()) {
-          setSelectedStreamerName("");
-        }
+          if (!hasSelection()) {
+            setSelectedStreamerName("");
+            setSelectedStreamerPortrait("");
+          }
+        }, portraitFadeMs);
       };
 
       const previewStreamer = (card: HTMLElement) => {
+        window.clearTimeout(hoverPreviewClearTimeout);
         if (hasSelection()) {
           return;
         }
 
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
+        const streamerImage = card.getAttribute("data-streamer-image") || "";
+        const streamerFallbackImage = card.getAttribute("data-streamer-fallback-image") || "";
         document.documentElement.classList.add("has-streamer-hover-preview");
         setSelectedStreamerName(streamerName);
+        setSelectedStreamerPortrait(streamerImage, streamerFallbackImage);
       };
 
       const resetReadyOverlayToEntrance = () => {
@@ -612,6 +758,84 @@ const confirmationQuestions = [
         }, readyOverlayExitMs);
       };
 
+      const setSelectedPortrait = (
+        target: Element | null,
+        image: string,
+        fallbackImage: string,
+        fallbackClasses: string[],
+      ) => {
+        if (!(target instanceof HTMLElement)) {
+          return;
+        }
+
+        const currentImage =
+          target.getAttribute("data-current-portrait-image") ||
+          target.querySelector("img")?.getAttribute("src") ||
+          "";
+
+        if (currentImage === image) {
+          return;
+        }
+
+        target.setAttribute("data-current-portrait-image", image);
+        target.classList.toggle("selected-portrait-has-image", Boolean(image));
+
+        if (image) {
+          const previousChildren = Array.from(target.children);
+          const img = document.createElement("img");
+          img.alt = "";
+          img.decoding = "async";
+          if (fallbackImage) {
+            img.setAttribute("data-fallback-src", fallbackImage);
+            wireImageFallback(img, false);
+          }
+          img.className = "portrait-crossfade-enter";
+          img.src = image;
+          target.append(img);
+
+          window.requestAnimationFrame(() => {
+            img.classList.add("portrait-crossfade-enter-active");
+
+            previousChildren.forEach((child) => {
+              child.classList.add("portrait-crossfade-exit");
+              child.classList.add("portrait-crossfade-exit-active");
+            });
+          });
+
+          window.setTimeout(() => {
+            previousChildren.forEach((child) => child.remove());
+            img.classList.remove("portrait-crossfade-enter", "portrait-crossfade-enter-active");
+          }, portraitFadeMs + 40);
+          return;
+        }
+
+        target.replaceChildren();
+        fallbackClasses.forEach((className) => {
+          const span = document.createElement("span");
+          span.className = className;
+          target.append(span);
+        });
+      };
+
+      const setSelectedStreamerPortrait = (
+        streamerImage: string,
+        streamerFallbackImage = "",
+      ) => {
+        setSelectedPortrait(
+          selectedPortrait,
+          streamerImage,
+          streamerFallbackImage,
+          desktopPortraitFallbackClasses,
+        );
+
+        setSelectedPortrait(
+          mobileSelectedPortrait,
+          streamerImage,
+          streamerFallbackImage,
+          mobilePortraitFallbackClasses,
+        );
+      };
+
       const clearSelection = () => {
         closeConfirmModal();
         hideReadyOverlay();
@@ -625,6 +849,7 @@ const confirmationQuestions = [
 
         setSelectedStreamerName("");
         setTwitchConfirmButtonVisibility();
+        setSelectedStreamerPortrait("");
 
         if (mobileCta instanceof HTMLElement) {
           mobileCta.hidden = true;
@@ -634,6 +859,8 @@ const confirmationQuestions = [
       const selectStreamer = (card: HTMLElement) => {
         const streamerId = card.getAttribute("data-streamer-id");
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
+        const streamerImage = card.getAttribute("data-streamer-image") || "";
+        const streamerFallbackImage = card.getAttribute("data-streamer-fallback-image") || "";
 
         showReadyOverlay();
         document.documentElement.classList.remove("has-streamer-hover-preview");
@@ -643,13 +870,16 @@ const confirmationQuestions = [
           const isSelected = streamerId
             ? candidate.getAttribute("data-streamer-id") === streamerId
             : candidate === card;
+          const isDesktopCard = candidate.classList.contains("tile");
+          const isMobileCard = candidate.classList.contains("mobile-tile");
+
           candidate.classList.toggle(
             "tile-selected",
-            isSelected && candidate.classList.contains("tile"),
+            isSelected && isDesktopCard,
           );
           candidate.classList.toggle(
             "mobile-tile-selected",
-            isSelected && candidate.classList.contains("mobile-tile"),
+            isSelected && isMobileCard,
           );
           candidate.setAttribute("aria-pressed", String(isSelected));
         });
@@ -657,6 +887,7 @@ const confirmationQuestions = [
         setSelectedStreamerName(streamerName);
         setTwitchConfirmButtonVisibility(streamerName);
         syncConfirmStreamerSelect();
+        setSelectedStreamerPortrait(streamerImage, streamerFallbackImage);
 
         if (mobileCta instanceof HTMLElement && card.classList.contains("mobile-tile")) {
           const wasHidden = mobileCta.hidden;
@@ -724,7 +955,7 @@ const confirmationQuestions = [
         });
 
         card.addEventListener("keydown", (event) => {
-          if (event.key !== "Enter" && event.key !== " ") {
+          if (!(event instanceof KeyboardEvent) || (event.key !== "Enter" && event.key !== " ")) {
             return;
           }
 
@@ -1465,6 +1696,31 @@ const confirmationQuestions = [
 
       createRosterShader();
       createDockShader();
+
+      const selectInitialCreatorFromUrl = () => {
+        if (hasSelection()) {
+          return;
+        }
+
+        selectStreamerByCreatorKey(getInitialCreatorKey());
+      };
+
+      const scheduleInitialCreatorSelection = () => {
+        const runAfterInitialPaint = () => {
+          window.requestAnimationFrame(() => {
+            window.requestAnimationFrame(selectInitialCreatorFromUrl);
+          });
+        };
+
+        if (document.readyState === "complete") {
+          runAfterInitialPaint();
+          return;
+        }
+
+        window.addEventListener("load", runAfterInitialPaint, { once: true });
+      };
+
+      scheduleInitialCreatorSelection();
     </script>
   </body>
 </html>
@@ -2145,6 +2401,7 @@ const confirmationQuestions = [
   .mobile-tile:focus-visible {
     outline: 4px solid #fff;
     outline-offset: -8px;
+    z-index: 3;
   }
 
   .tile-confirmed {
@@ -2168,6 +2425,21 @@ const confirmationQuestions = [
     position: absolute;
     inset: 0;
     overflow: hidden;
+  }
+
+  .portrait img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+    transform: scale(1.05);
+    filter: saturate(1.08) contrast(1.05);
+  }
+
+  .portrait img[data-styled-streamer-image="true"]:not([data-fallback-active="true"]) {
+    object-position: center top;
+    transform-origin: center top;
   }
 
   .portrait-shape-a,
@@ -2728,21 +3000,82 @@ const confirmationQuestions = [
     z-index: 8;
   }
 
+  .bottom-dock::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 49px;
+    background: #101416;
+    pointer-events: none;
+  }
+
   .player-panel {
     position: relative;
     z-index: 8;
     height: 389px;
-    overflow: hidden;
-    border: 9px solid #101416;
-    background: #e7e7e7;
-    clip-path: polygon(9% 0, 100% 0, 100% 100%, 0 100%, 0 25%);
   }
 
   .player-panel-primary {
+    --primary-panel-clip: polygon(92px 0, 100% 0, 100% 100%, 0 100%, 0 92px);
+    height: 371px;
+    margin-left: 18px;
+    margin-top: 18px;
+    isolation: isolate;
+    overflow: visible;
+  }
+
+  .panel-shadow,
+  .panel-background {
+    position: absolute;
+    clip-path: var(--primary-panel-clip);
+  }
+
+  .panel-shadow {
+    z-index: 0;
+    inset: 0 3px 4px 0;
+    background: #101416;
+    transform: translate(-9px, -9px) scale(1.018);
+    transform-origin: center;
+  }
+
+  .panel-background {
+    z-index: 1;
+    inset: 0 13px 0 0;
+    overflow: hidden;
     background:
-      linear-gradient(131deg, #ff1968 0 24%, transparent 24%),
-      linear-gradient(100deg, rgba(255, 255, 255, 0.92) 0 45%, transparent 45%),
-      #ff2a2f;
+      linear-gradient(132deg, #ff1c6a 0 22%, transparent 22.2%),
+      linear-gradient(103deg, rgba(255, 255, 255, 0.92) 0 48%, transparent 48.2%),
+      linear-gradient(23deg, rgba(187, 0, 0, 0.46) 0 19%, transparent 19.2%),
+      linear-gradient(180deg, #ff3034 0%, #f81418 100%);
+  }
+
+  .panel-background::before,
+  .panel-background::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .panel-background::before {
+    left: -68px;
+    bottom: -60px;
+    width: 500px;
+    height: 190px;
+    background: rgba(255, 255, 255, 0.16);
+    transform: rotate(-18deg);
+  }
+
+  .panel-background::after {
+    right: 36px;
+    top: 35px;
+    width: 170px;
+    height: 92px;
+    border-radius: 54% 46% 42% 58%;
+    background: rgba(105, 0, 0, 0.2);
+    transform: rotate(-12deg) skewX(-24deg);
   }
 
   .player-panel-primary .panel-portrait,
@@ -2760,9 +3093,9 @@ const confirmationQuestions = [
 
   .panel-slash {
     position: absolute;
-    left: 409px;
-    top: -76px;
-    width: 150px;
+    left: 415px;
+    top: -82px;
+    width: 142px;
     height: 560px;
     background: rgba(255, 255, 255, 0.82);
     transform: rotate(12deg);
@@ -2771,18 +3104,59 @@ const confirmationQuestions = [
 
   .panel-portrait {
     position: absolute;
-    left: 46px;
-    top: 16px;
-    width: 418px;
-    height: 350px;
+    z-index: 2;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 448px;
+    height: auto;
+    overflow: hidden;
+    clip-path: polygon(72px 0, 100% 0, 100% 100%, 0 100%, 0 72px);
+  }
+
+  :global(.panel-portrait img) {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: left top;
+    filter: saturate(1.14) contrast(1.05) drop-shadow(18px 0 0 rgba(0, 0, 0, 0.28));
+    transform: none;
+    transform-origin: left top;
+  }
+
+  :global(.portrait-crossfade-enter),
+  :global(.portrait-crossfade-exit) {
+    transition: opacity 110ms ease;
+    will-change: opacity;
+  }
+
+  :global(.portrait-crossfade-enter) {
+    opacity: 0;
+  }
+
+  :global(.portrait-crossfade-enter-active) {
+    opacity: 1;
+  }
+
+  :global(.portrait-crossfade-exit) {
+    opacity: 1;
+  }
+
+  :global(.portrait-crossfade-exit-active) {
+    opacity: 0;
   }
 
   .big-avatar-head {
     position: absolute;
-    left: 142px;
-    top: 35px;
-    width: 145px;
-    height: 126px;
+    left: 135px;
+    top: 28px;
+    width: 157px;
+    height: 137px;
     border-radius: 48% 47% 42% 43%;
     background:
       radial-gradient(circle at 36% 45%, #063251 0 10px, transparent 11px),
@@ -2792,15 +3166,16 @@ const confirmationQuestions = [
       -48px -18px 0 -19px #bc2030,
       0 11px 0 rgba(0, 0, 0, 0.24),
       0 0 0 7px rgba(0, 0, 0, 0.11);
+    filter: drop-shadow(18px 17px 0 rgba(0, 0, 0, 0.24));
     transform: rotate(-12deg);
   }
 
   .big-avatar-body {
     position: absolute;
-    left: 88px;
+    left: 76px;
     top: 145px;
-    width: 250px;
-    height: 205px;
+    width: 280px;
+    height: 228px;
     border-radius: 45% 52% 0 0;
     background:
       linear-gradient(145deg, #1d51b8 0 42%, #f7f4f5 43% 51%, #c82735 52% 100%);
@@ -2810,10 +3185,10 @@ const confirmationQuestions = [
 
   .big-avatar-arm {
     position: absolute;
-    left: 245px;
-    top: 164px;
-    width: 168px;
-    height: 68px;
+    left: 254px;
+    top: 171px;
+    width: 178px;
+    height: 72px;
     border-radius: 36px;
     background: linear-gradient(90deg, #f7f7f7, #aeb8c5);
     transform: rotate(-18deg);
@@ -2822,15 +3197,17 @@ const confirmationQuestions = [
 
   .player-red-card {
     position: absolute;
+    z-index: 3;
     right: 20px;
-    top: 28px;
-    width: 446px;
-    height: 334px;
+    top: 27px;
+    width: 455px;
+    height: 335px;
     padding: 112px 22px 0;
     background:
       linear-gradient(140deg, transparent 0 30%, rgba(255, 255, 255, 0.16) 31% 42%, transparent 43%),
       linear-gradient(#ff3031, #f21814);
     color: #fff;
+    box-shadow: -20px 0 0 rgba(150, 0, 0, 0.1);
   }
 
   .watermark {
@@ -2896,7 +3273,7 @@ const confirmationQuestions = [
     position: absolute;
     left: 44px;
     right: 62px;
-    bottom: -3px;
+    bottom: 6px;
     height: 72px;
     display: grid;
     grid-template-columns: 118px 1fr 150px;
@@ -2940,7 +3317,8 @@ const confirmationQuestions = [
   .controller-strip strong {
     justify-self: end;
     font-family: "Arial Black", Impact, sans-serif;
-    font-size: 58px;
+    font-size: 54px;
+    line-height: 1;
     text-shadow:
       -4px -4px 0 #000,
       4px -4px 0 #000,
@@ -2951,9 +3329,12 @@ const confirmationQuestions = [
   .player-panel-random {
     display: grid;
     grid-template-columns: 395px 1fr 67px;
+    overflow: hidden;
+    border: 9px solid #101416;
     background:
       linear-gradient(127deg, rgba(255, 255, 255, 0.88) 0 18%, transparent 18%),
       linear-gradient(74deg, #b8b8b8 0 22%, #ececec 22% 34%, #a9a9a9 34% 100%);
+    clip-path: polygon(9% 0, 100% 0, 100% 100%, 0 100%, 0 25%);
   }
 
   :global(html.has-streamer-selected) .player-panel-random {
@@ -3395,7 +3776,6 @@ const confirmationQuestions = [
       box-shadow:
         inset 0 0 0 3px var(--selected-border-color),
         inset 0 0 0 6px #08090a,
-        0 0 0 2px #fff,
         inset 0 -24px 28px rgba(0, 0, 0, 0.36);
     }
 
@@ -3417,6 +3797,10 @@ const confirmationQuestions = [
       height: 100%;
       display: block;
       object-fit: cover;
+    }
+
+    .mobile-portrait img[data-styled-streamer-image="true"]:not([data-fallback-active="true"]) {
+      object-position: center top;
     }
 
     .mobile-portrait-shape-a,
@@ -3530,11 +3914,28 @@ const confirmationQuestions = [
 
     .mobile-cta-portrait {
       position: absolute;
-      left: 3%;
-      top: 12px;
+      left: 0;
+      top: 0;
+      bottom: 0;
       width: 50%;
-      height: 260px;
+      height: auto;
       overflow: hidden;
+    }
+
+    .mobile-cta-portrait img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: left top;
+      border: 0;
+      background: #101416;
+      box-shadow: none;
+      transform: none;
     }
 
     .mobile-big-avatar-head {
