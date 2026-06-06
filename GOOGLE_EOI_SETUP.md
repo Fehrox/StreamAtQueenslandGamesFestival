@@ -131,8 +131,9 @@ function json_(data) {
 5. Deploy and approve the requested permissions.
 6. Copy the `/exec` web app URL.
 
-For GitHub Pages, add these as repository variables in
-`Settings > Secrets and variables > Actions > Variables`:
+For GitHub Pages, add these as GitHub Actions variables in
+`Settings > Secrets and variables > Actions > Variables`. Repository variables
+work, and `github-pages` environment variables also work:
 
 ```text
 PUBLIC_GOOGLE_EOI_FORM_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
@@ -140,7 +141,8 @@ PUBLIC_GOOGLE_EOI_DEPLOYMENT_ID=YOUR_DEPLOYMENT_ID
 ```
 
 The deploy workflow passes those variables into `npm run build`, and Astro bakes
-them into the static JavaScript served by GitHub Pages.
+them into the static JavaScript served by GitHub Pages. The workflow fails before
+deploying if either value is missing.
 
 `PUBLIC_GOOGLE_EOI_DEPLOYMENT_ID` is optional when the id can be parsed from the URL, but setting it explicitly keeps the sheet row clear.
 
