@@ -72,6 +72,12 @@ const names = [
   "MCMDesigns",
   "LordHappyCats",
   "BloodyDrongo",
+  "Sanjioker",
+  "GYmedia",
+  "Kaztelle",
+  "ZiggyDLive",
+  "xara",
+  "mee_shell",
   "OPEN SLOT 12",
   "OPEN SLOT 13",
   "OPEN SLOT 14",
@@ -262,6 +268,36 @@ const streamerAssets: Partial<Record<string, StreamerAssets>> = {
     image: "/streamers/bloodydrongo.png",
     profileUrl: "https://www.twitch.tv/BloodyDrongo",
     twitchHandle: "bloodydrongo",
+  },
+  Sanjioker: {
+    image: "/streamers/sanjioker.png",
+    profileUrl: "https://www.twitch.tv/sanjioker",
+    twitchHandle: "sanjioker",
+  },
+  GYmedia: {
+    image: "/streamers/gymedia.png",
+    profileUrl: "https://www.twitch.tv/gymedia",
+    twitchHandle: "gymedia",
+  },
+  Kaztelle: {
+    image: "/streamers/kaztelle.png",
+    profileUrl: "https://www.twitch.tv/kaztelle",
+    twitchHandle: "kaztelle",
+  },
+  ZiggyDLive: {
+    image: "/streamers/ziggydlive.jpeg",
+    profileUrl: "https://www.twitch.tv/ziggydlive",
+    twitchHandle: "ziggydlive",
+  },
+  xara: {
+    image: "/streamers/xara.png",
+    profileUrl: "https://www.twitch.tv/xara",
+    twitchHandle: "xara",
+  },
+  mee_shell: {
+    image: "/streamers/mee_shell.png",
+    profileUrl: "https://www.twitch.tv/mee_shell",
+    twitchHandle: "mee_shell",
   },
 };
 
