@@ -4,3 +4,4 @@ dist/
 qgf-render*.png
 qgf-mobile-cdp*.png
 dev-server.*.log
+/Worktrees/
