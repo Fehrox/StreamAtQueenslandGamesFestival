@@ -823,6 +823,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
       type PendingTwitchVerification = ConfirmationDetails & {
         state: string;
         redirectUri: string;
+        attemptedRedirectUris?: string[];
       };
 
       type VerificationResultStatus =
@@ -910,6 +911,8 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
       );
       const twitchClientId = import.meta.env.PUBLIC_TWITCH_CLIENT_ID || "";
       const twitchRedirectUri = "https://streamatqueenslandgamesfestival.com/";
+      const twitchRedirectUriFallback = "https://streamatqueenslandgamesfestival.com";
+      const twitchRedirectUriAttempts = [twitchRedirectUri, twitchRedirectUriFallback];
       const pendingTwitchVerificationStorageKey = "qgfInvite:pendingTwitchVerification";
       const confirmationDetailsStorageKey = "qgfInvite:confirmationDetails";
       const festivalUrl = "https://www.queenslandgamesfestival.com/";
@@ -1305,7 +1308,31 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         return validation;
       };
 
-      const startTwitchVerification = (details: ConfirmationDetails) => {
+      const getTwitchRedirectMismatchMessage = (
+        authErrorDescription: string | null,
+        attemptedRedirectUris: string[],
+      ) => {
+        const attemptedRedirectText = attemptedRedirectUris.join(" then ");
+        const description = authErrorDescription ? ` Twitch returned: ${authErrorDescription}.` : "";
+
+        return `Twitch rejected the OAuth Redirect URL.${description} The deployed site tried ${attemptedRedirectText} for client ID ${twitchClientId}. In the matching Twitch developer app, register ${twitchRedirectUri} as an OAuth Redirect URL and confirm GitHub PUBLIC_TWITCH_CLIENT_ID uses that same app.`;
+      };
+
+      const getNextTwitchRedirectUri = (pendingVerification: PendingTwitchVerification) => {
+        const attemptedRedirectUris = pendingVerification.attemptedRedirectUris || [
+          pendingVerification.redirectUri,
+        ];
+
+        return twitchRedirectUriAttempts.find(
+          (redirectUri) => !attemptedRedirectUris.includes(redirectUri),
+        );
+      };
+
+      const startTwitchVerification = (
+        details: ConfirmationDetails,
+        redirectUri = twitchRedirectUri,
+        attemptedRedirectUris = [redirectUri],
+      ) => {
         if (!twitchClientId || !details.expectedTwitchHandle) {
           openVerificationResult(
             "failed",
@@ -1318,7 +1345,8 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
         const pendingVerification: PendingTwitchVerification = {
           ...details,
           state,
-          redirectUri: twitchRedirectUri,
+          redirectUri,
+          attemptedRedirectUris,
         };
 
         if (!writeSessionJson(pendingTwitchVerificationStorageKey, pendingVerification)) {
@@ -1331,7 +1359,7 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
 
         const authorizeUrl = new URL("https://id.twitch.tv/oauth2/authorize");
         authorizeUrl.searchParams.set("client_id", twitchClientId);
-        authorizeUrl.searchParams.set("redirect_uri", twitchRedirectUri);
+        authorizeUrl.searchParams.set("redirect_uri", redirectUri);
         authorizeUrl.searchParams.set("response_type", "token");
         authorizeUrl.searchParams.set("state", state);
         authorizeUrl.searchParams.set("force_verify", "true");
@@ -1894,11 +1922,29 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
 
         if (authError) {
           const authErrorDescription = callbackParams.get("error_description");
+          const attemptedRedirectUris = pendingVerification.attemptedRedirectUris || [
+            pendingVerification.redirectUri,
+          ];
+
+          if (authError === "redirect_mismatch") {
+            const nextRedirectUri = getNextTwitchRedirectUri(pendingVerification);
+
+            if (nextRedirectUri) {
+              startTwitchVerification(restoredDetails, nextRedirectUri, [
+                ...attemptedRedirectUris,
+                nextRedirectUri,
+              ]);
+              return;
+            }
+          }
+
           removeSessionItem(pendingTwitchVerificationStorageKey);
           openVerificationResult(
             authError === "access_denied" ? "cancelled" : "failed",
             authError === "access_denied"
               ? `${restoredDetails.creatorName} was not verified because Twitch authorization was cancelled.`
+              : authError === "redirect_mismatch"
+                ? getTwitchRedirectMismatchMessage(authErrorDescription, attemptedRedirectUris)
               : `Twitch verification failed with error: ${authError}${
                   authErrorDescription ? ` (${authErrorDescription})` : ""
                 }.`,
