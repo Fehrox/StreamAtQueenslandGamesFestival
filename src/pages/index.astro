@@ -222,6 +222,22 @@ const confirmationQuestions = [
         </section>
       </section>
 
+      <section class="ready-overlay mobile-ready-overlay" aria-hidden="true">
+        <div class="ready-panel">
+          <span class="ready-rail ready-rail-top"></span>
+          <div class="ready-banner">
+            <span class="ready-red-wedge"></span>
+            <span class="ready-yellow-wedge"></span>
+            <p class="ready-copy">
+              <span data-ready-word="READY">READY</span>
+              <small data-ready-word="to">to</small>
+              <span data-ready-word="STREAM!">STREAM!</span>
+            </p>
+          </div>
+          <span class="ready-rail ready-rail-bottom"></span>
+        </div>
+      </section>
+
       <section class="mobile-layout" aria-label="Mobile streamer signup">
         <header class="mobile-top-bar">
           <div class="mobile-nav-plate">
@@ -723,7 +739,9 @@ const confirmationQuestions = [
       const resetReadyOverlayToEntrance = () => {
         document.documentElement.classList.add("ready-overlay-reset");
         document.documentElement.classList.remove("ready-overlay-exiting");
-        document.querySelector(".ready-panel")?.getBoundingClientRect();
+        document.querySelectorAll(".ready-panel").forEach((panel) => {
+          panel.getBoundingClientRect();
+        });
         window.requestAnimationFrame(() => {
           document.documentElement.classList.remove("ready-overlay-reset");
         });
@@ -891,12 +909,7 @@ const confirmationQuestions = [
         setSelectedStreamerPortrait(streamerImage, streamerFallbackImage);
 
         if (mobileCta instanceof HTMLElement && card.classList.contains("mobile-tile")) {
-          const wasHidden = mobileCta.hidden;
           mobileCta.hidden = false;
-
-          if (wasHidden && window.matchMedia("(max-width: 900px)").matches) {
-            mobileCta.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
         }
       };
 
@@ -2559,6 +2572,10 @@ const confirmationQuestions = [
     pointer-events: none;
   }
 
+  .mobile-ready-overlay {
+    display: none;
+  }
+
   .ready-overlay::before {
     content: "";
     position: absolute;
@@ -2959,7 +2976,7 @@ const confirmationQuestions = [
 
   .bottom-dock {
     position: absolute;
-    z-index: auto;
+    z-index: 7;
     left: 0;
     right: 0;
     bottom: 0;
@@ -3590,6 +3607,92 @@ const confirmationQuestions = [
       padding: 86px 8px 28px;
     }
 
+    :global(html.has-streamer-selected) .mobile-layout {
+      padding-bottom: calc(320px + max(12px, env(safe-area-inset-bottom)));
+    }
+
+    .mobile-ready-overlay {
+      position: fixed;
+      z-index: 45;
+      display: block;
+      inset: 0;
+    }
+
+    .mobile-ready-overlay .ready-panel {
+      --mobile-ready-top-rail: clamp(16px, 4vw, 28px);
+      --mobile-ready-bottom-rail: clamp(28px, 7vw, 46px);
+      --mobile-ready-side-wedge: clamp(58px, 16vw, 126px);
+      --ready-panel-depth: translateX(-50%) perspective(780px) rotateY(-8deg) rotateZ(-1.3deg) scaleX(1);
+      left: 50%;
+      top: clamp(150px, 28svh, 260px);
+      width: min(960px, calc(100vw + 160px));
+      height: clamp(132px, 25vw, 214px);
+      filter: drop-shadow(0 10px 0 rgba(0, 0, 0, 0.54));
+      transform-origin: 76% 50%;
+    }
+
+    .mobile-ready-overlay .ready-panel::before {
+      top: calc(100% - var(--mobile-ready-bottom-rail) - clamp(20px, 5vw, 36px));
+      height: clamp(20px, 5vw, 36px);
+    }
+
+    .mobile-ready-overlay .ready-rail-top {
+      height: var(--mobile-ready-top-rail);
+    }
+
+    .mobile-ready-overlay .ready-rail-bottom {
+      top: calc(100% - var(--mobile-ready-bottom-rail));
+      height: var(--mobile-ready-bottom-rail);
+    }
+
+    .mobile-ready-overlay .ready-banner {
+      left: var(--mobile-ready-side-wedge);
+      right: var(--mobile-ready-side-wedge);
+      top: var(--mobile-ready-top-rail);
+      bottom: var(--mobile-ready-bottom-rail);
+      height: auto;
+      transform: translateY(3px) skewY(-1deg);
+    }
+
+    .mobile-ready-overlay .ready-red-wedge,
+    .mobile-ready-overlay .ready-yellow-wedge {
+      top: clamp(-17px, -3.4vw, -10px);
+      bottom: clamp(-17px, -3.4vw, -10px);
+    }
+
+    .mobile-ready-overlay .ready-red-wedge {
+      left: calc(var(--mobile-ready-side-wedge) * -1);
+      width: calc(var(--mobile-ready-side-wedge) + clamp(34px, 9vw, 76px));
+    }
+
+    .mobile-ready-overlay .ready-yellow-wedge {
+      right: calc(var(--mobile-ready-side-wedge) * -1);
+      width: calc(var(--mobile-ready-side-wedge) + clamp(42px, 11vw, 92px));
+    }
+
+    .mobile-ready-overlay .ready-copy {
+      inset: 0 clamp(8px, 2vw, 18px);
+      gap: clamp(6px, 1.8vw, 18px);
+      font-size: clamp(38px, 9.4vw, 82px);
+      text-shadow:
+        -3px -3px 0 #050505,
+        3px -3px 0 #050505,
+        -3px 3px 0 #050505,
+        3px 3px 0 #050505,
+        0 7px 0 rgba(0, 0, 0, 0.42),
+        7px 10px 0 rgba(0, 0, 0, 0.5);
+      transform: translateY(12px) skewX(-8deg) scaleX(0.92);
+    }
+
+    :global(html.has-streamer-selected) .mobile-ready-overlay .ready-copy,
+    :global(html.ready-overlay-exiting) .mobile-ready-overlay .ready-copy {
+      transform: translateY(0) skewX(-8deg) scaleX(0.92);
+    }
+
+    .mobile-ready-overlay .ready-copy small {
+      font-size: clamp(18px, 4.4vw, 38px);
+    }
+
     .mobile-top-bar {
       position: fixed;
       z-index: 20;
@@ -3896,9 +3999,15 @@ const confirmationQuestions = [
     }
 
     .mobile-cta {
-      max-width: 820px;
-      margin: 16px auto 0;
-      scroll-margin-top: 86px;
+      position: fixed;
+      z-index: 46;
+      left: 50%;
+      right: auto;
+      bottom: max(10px, env(safe-area-inset-bottom));
+      width: min(820px, calc(100vw - 16px));
+      max-width: none;
+      margin: 0;
+      transform: translateX(-50%);
     }
 
     .mobile-cta-panel {
@@ -4095,6 +4204,24 @@ const confirmationQuestions = [
         padding-left: 5px;
       }
 
+      :global(html.has-streamer-selected) .mobile-layout {
+        padding-bottom: calc(300px + max(8px, env(safe-area-inset-bottom)));
+      }
+
+      .mobile-ready-overlay .ready-panel {
+        top: clamp(142px, 26svh, 220px);
+        width: calc(100vw + 128px);
+      }
+
+      .mobile-ready-overlay .ready-copy {
+        gap: 5px;
+        font-size: clamp(38px, 10.8vw, 47px);
+      }
+
+      .mobile-ready-overlay .ready-copy small {
+        font-size: clamp(18px, 5vw, 23px);
+      }
+
       .mobile-roster {
         gap: 0;
         padding: 4px;
@@ -4109,6 +4236,11 @@ const confirmationQuestions = [
 
       .mobile-cta-panel {
         min-height: 268px;
+      }
+
+      .mobile-cta {
+        bottom: max(6px, env(safe-area-inset-bottom));
+        width: calc(100vw - 10px);
       }
 
       .mobile-cta-card {
