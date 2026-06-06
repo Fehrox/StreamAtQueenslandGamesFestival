@@ -1,5 +1,5 @@
 ---
-import { featuredStreamer, streamers } from "@data/streamers";
+import { streamers } from "@data/streamers";
 
 const rosterColumns = 13;
 const confirmationQuestions = [
@@ -78,7 +78,7 @@ const confirmationQuestions = [
           {
             streamers.map((streamer, index) => (
               <article
-                class={`tile tile-${streamer.status}${streamer.status === "featured" ? " tile-selected" : ""}`}
+                class={`tile tile-${streamer.status}`}
                 style={`--tile-index: ${index}`}
                 data-streamer-card
                 aria-label={`${streamer.name} streamer slot`}
@@ -90,7 +90,7 @@ const confirmationQuestions = [
                 data-streamer-key={streamer.twitchHandle}
                 data-streamer-image={streamer.image ?? ""}
                 data-streamer-fallback-image={streamer.fallbackImage ?? ""}
-                aria-pressed={streamer.status === "featured" ? "true" : "false"}
+                aria-pressed="false"
               >
                 <div class="portrait" aria-hidden="true">
                   {
@@ -158,21 +158,9 @@ const confirmationQuestions = [
               <div class="panel-slash"></div>
             </div>
             <div class="panel-portrait" aria-hidden="true" data-desktop-selected-portrait>
-              {
-                featuredStreamer.image ? (
-                  <img
-                    src={featuredStreamer.image}
-                    alt=""
-                    data-fallback-src={featuredStreamer.fallbackImage ?? undefined}
-                  />
-                ) : (
-                  <>
-                    <span class="big-avatar-head"></span>
-                    <span class="big-avatar-body"></span>
-                    <span class="big-avatar-arm"></span>
-                  </>
-                )
-              }
+              <span class="big-avatar-head"></span>
+              <span class="big-avatar-body"></span>
+              <span class="big-avatar-arm"></span>
             </div>
             <div class="player-red-card">
               <div class="watermark">QGF</div>
@@ -313,21 +301,9 @@ const confirmationQuestions = [
         <section class="mobile-cta" data-mobile-cta hidden aria-live="polite">
           <div class="mobile-cta-panel">
             <div class="mobile-cta-portrait" aria-hidden="true" data-mobile-selected-portrait>
-              {
-                featuredStreamer.image ? (
-                  <img
-                    src={featuredStreamer.image}
-                    alt=""
-                    data-fallback-src={featuredStreamer.fallbackImage ?? undefined}
-                  />
-                ) : (
-                  <>
-                    <span class="mobile-big-avatar-head"></span>
-                    <span class="mobile-big-avatar-body"></span>
-                    <span class="mobile-big-avatar-arm"></span>
-                  </>
-                )
-              }
+              <span class="mobile-big-avatar-head"></span>
+              <span class="mobile-big-avatar-body"></span>
+              <span class="mobile-big-avatar-arm"></span>
             </div>
             <div class="mobile-cta-card">
               <div class="mobile-watermark">QGF</div>
