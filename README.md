@@ -29,8 +29,11 @@ either a repository variable or a `github-pages` environment variable named
 also works, but the Twitch client ID is public in the built site.
 
 The deploy workflow passes that value into `npm run build` and fails before
-building if it is missing. The Twitch app must register the deployed page URL,
-and any local dev URL used for testing, as OAuth redirect URLs.
+building if it is missing. The Twitch app must register this exact redirect URL:
+
+```txt
+https://streamatqueenslandgamesfestival.com/
+```
 
 Per-streamer Twitch names are read from `twitchHandle` in `src/data/streamers.ts`.
 No Twitch client secret is used or stored by this static page.
