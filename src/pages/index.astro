@@ -1346,8 +1346,8 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         document.documentElement.classList.contains("has-streamer-selected");
 
       const eventStartTime = new Date("2026-06-26T00:00:00+10:00").getTime();
-      const secondsPerDay = 24 * 60 * 60;
-      const secondsPerWeek = 7 * secondsPerDay;
+      const millisecondsPerDay = 24 * 60 * 60 * 1000;
+      const daysPerWeek = 7;
 
       const formatCountdownPart = (value: number, unit: string) =>
         `${value.toLocaleString("en-AU")} ${unit}${value === 1 ? "" : "s"}`;
@@ -1357,22 +1357,22 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
           return;
         }
 
-        const remainingSeconds = Math.max(0, Math.floor((eventStartTime - Date.now()) / 1000));
+        const remainingMilliseconds = Math.max(0, eventStartTime - Date.now());
 
-        if (remainingSeconds === 0) {
+        if (remainingMilliseconds === 0) {
           eventCountdown.textContent = "Event is underway";
           return;
         }
 
-        const weeks = Math.floor(remainingSeconds / secondsPerWeek);
-        const days = Math.floor((remainingSeconds % secondsPerWeek) / secondsPerDay);
-        const seconds = remainingSeconds % secondsPerDay;
+        const remainingDays = Math.floor(remainingMilliseconds / millisecondsPerDay);
+        const weeks = Math.floor(remainingDays / daysPerWeek);
+        const days = remainingDays % daysPerWeek;
 
-        eventCountdown.textContent = `${formatCountdownPart(weeks, "week")} / ${formatCountdownPart(days, "day")} / ${formatCountdownPart(seconds, "second")}`;
+        eventCountdown.textContent = `In ${formatCountdownPart(weeks, "week")} / ${formatCountdownPart(days, "day")}`;
       };
 
       updateEventCountdown();
-      window.setInterval(updateEventCountdown, 1000);
+      window.setInterval(updateEventCountdown, 60 * 1000);
 
       const confirmationDialogs = [
         eventInfoModal,
