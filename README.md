@@ -14,6 +14,12 @@ npm run build
 The site is configured for root GitHub Pages or custom-domain hosting with
 `base: "/"`.
 
+## Content creator roster updates
+
+Use `CONTENT_CREATOR_PROTOCOL.md` when adding a new content creator. It covers
+the roster data, images, Twitch handles, generated routes, and Discord/social
+embed checks.
+
 ## Twitch verification
 
 For local development, copy `.env.example` to `.env.local` and set:
