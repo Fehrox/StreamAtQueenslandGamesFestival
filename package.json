@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
+    "check": "astro check",
     "build": "astro build",
     "preview": "astro preview",
     "serve:dist": "node scripts/serve-dist.cjs"

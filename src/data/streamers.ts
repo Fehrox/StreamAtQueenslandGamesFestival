@@ -330,7 +330,7 @@ const resolveStreamerAssets = (
 };
 
 const cleanUrlSegment = (value: string) =>
-  value.trim().replace(/^@+/, "").replace(/[\\/]+/g, "-");
+  value.trim().replace(/^@+/, "").replace(/[\\/\s]+/g, "-");
 
 export const getStreamerUrlSlug = (value: string) =>
   cleanUrlSegment(value)
@@ -377,4 +377,3 @@ export const streamers: StreamerProfile[] = names.map((name, index) => ({
   ...resolveStreamerAssets(streamerAssets[name]),
 }));
 
-export const featuredStreamer = streamers[featuredIndex];
