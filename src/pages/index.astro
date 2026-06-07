@@ -7040,25 +7040,26 @@ const getCreatorProfileLink = (
       left: 0;
       top: 0;
       bottom: 0;
-      width: 50%;
+      width: 64%;
       height: auto;
       overflow: hidden;
     }
 
-    .mobile-cta-portrait img {
+    :global(.mobile-cta-portrait img) {
       position: absolute;
       left: 0;
-      top: 0;
+      right: auto;
+      top: auto;
       bottom: 0;
-      width: 100%;
+      width: auto;
       height: 100%;
       display: block;
-      object-fit: cover;
-      object-position: left top;
+      object-fit: contain;
+      object-position: left bottom;
       border: 0;
-      background: #101416;
+      background: transparent;
       box-shadow: none;
-      transform: none;
+      transform: translateX(-11%);
     }
 
     .mobile-big-avatar-head {
@@ -7109,9 +7110,7 @@ const getCreatorProfileLink = (
       min-height: 304px;
       margin: 22px 14px 14px auto;
       padding: 62px 12px 14px;
-      background:
-        linear-gradient(140deg, transparent 0 30%, rgba(255, 255, 255, 0.16) 31% 42%, transparent 43%),
-        linear-gradient(#ff3031, #f21814);
+      background: transparent;
     }
 
     .mobile-cta-card .profile-cutout-icon {
@@ -7126,22 +7125,22 @@ const getCreatorProfileLink = (
       margin: 0;
       color: #fff;
       font-family: "Arial Black", Impact, sans-serif;
-      font-size: clamp(27px, 8vw, 48px);
+      font-size: clamp(20px, 6vw, 36px);
       line-height: 0.95;
       text-align: right;
       text-transform: uppercase;
       text-wrap: balance;
       text-shadow:
-        -3px -3px 0 #060606,
-        3px -3px 0 #060606,
-        -3px 3px 0 #060606,
-        3px 3px 0 #060606,
-        0 7px 0 rgba(0, 0, 0, 0.4);
+        -2px -2px 0 #060606,
+        2px -2px 0 #060606,
+        -2px 2px 0 #060606,
+        2px 2px 0 #060606,
+        0 5px 0 rgba(0, 0, 0, 0.4);
     }
 
     .mobile-player-info {
-      display: grid;
-      grid-template-columns: 1fr 72px;
+      display: none;
+      grid-template-columns: 1fr;
       gap: 6px;
       margin-top: 12px;
     }
@@ -7160,6 +7159,7 @@ const getCreatorProfileLink = (
     }
 
     .mobile-player-info strong {
+      display: none;
       color: #fff;
       background: rgba(255, 232, 232, 0.5);
       text-shadow:
@@ -7172,8 +7172,8 @@ const getCreatorProfileLink = (
     .mobile-invite-context {
       display: grid;
       justify-items: end;
-      gap: 5px;
-      margin-top: 10px;
+      gap: 4px;
+      margin-top: 8px;
       text-align: right;
     }
 
@@ -7181,30 +7181,30 @@ const getCreatorProfileLink = (
       margin: 0;
       color: #fff;
       font-family: "Arial Black", Impact, sans-serif;
-      font-size: clamp(17px, 4.8vw, 24px);
+      font-size: clamp(13px, 3.6vw, 18px);
       line-height: 1;
       text-transform: uppercase;
       text-shadow:
-        -2px -2px 0 #060606,
-        2px -2px 0 #060606,
-        -2px 2px 0 #060606,
-        2px 2px 0 #060606,
-        0 4px 0 rgba(0, 0, 0, 0.38);
+        -1.5px -1.5px 0 #060606,
+        1.5px -1.5px 0 #060606,
+        -1.5px 1.5px 0 #060606,
+        1.5px 1.5px 0 #060606,
+        0 3px 0 rgba(0, 0, 0, 0.38);
     }
 
     .mobile-invite-context span,
     .mobile-invite-context a {
       max-width: 100%;
-      min-height: 30px;
+      min-height: 23px;
       display: inline-grid;
       align-items: center;
       justify-items: center;
-      padding: 4px 7px;
-      border: 3px solid #171719;
+      padding: 3px 5px;
+      border: 2px solid #171719;
       background: rgba(255, 255, 255, 0.9);
       color: #111315;
       font-family: "Arial Black", Impact, sans-serif;
-      font-size: clamp(12px, 3.6vw, 17px);
+      font-size: clamp(9px, 2.7vw, 13px);
       line-height: 1.05;
       text-transform: uppercase;
     }
@@ -7322,7 +7322,7 @@ const getCreatorProfileLink = (
 
       .mobile-invite-context span,
       .mobile-invite-context a {
-        font-size: clamp(11px, 3.5vw, 15px);
+        font-size: clamp(8px, 2.65vw, 11px);
       }
     }
   }
