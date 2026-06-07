@@ -52,6 +52,16 @@ const profileIconCutouts = [
   "/profile-icons/gamepad.png",
   "/profile-icons/joystick.png",
   "/profile-icons/hexagon.png",
+  "/profile-icons/kangaroo-gamepad.png",
+  "/profile-icons/southern-cross.png",
+  "/profile-icons/wattle.png",
+  "/profile-icons/pixel-opal.png",
+  "/profile-icons/flat-white-controller.png",
+  "/profile-icons/arcade-cabinet.png",
+  "/profile-icons/gumleaf-brush.png",
+  "/profile-icons/stream-mic.png",
+  "/profile-icons/stream-chat-crt.png",
+  "/profile-icons/lan-plug.png",
 ];
 
 const getStableIconIndex = (key: string) => {
@@ -85,14 +95,36 @@ const streamerVerificationProfileJson = JSON.stringify(streamerVerificationProfi
   "\\u003c",
 );
 
-const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
+type CreatorProfilePlatform = "twitch" | "youtube";
+
+const twitchProfileUrlPattern = /^https:\/\/(www\.)?twitch\.tv\/[^/?#]+/i;
+const youtubeProfileUrlPattern =
+  /^https:\/\/(www\.)?youtube\.com\/(@[^/?#]+|c\/[^/?#]+|channel\/[^/?#]+|user\/[^/?#]+)/i;
+
+const getCreatorProfileLink = (
+  twitchHandle = "",
+  profileUrl = "",
+): { platform: CreatorProfilePlatform | ""; url: string } => {
   const normalizedHandle = twitchHandle.trim().replace(/^@+/, "");
 
   if (normalizedHandle) {
-    return `https://www.twitch.tv/${encodeURIComponent(normalizedHandle)}`;
+    return {
+      platform: "twitch",
+      url: `https://www.twitch.tv/${encodeURIComponent(normalizedHandle)}`,
+    };
   }
 
-  return /^https:\/\/(www\.)?twitch\.tv\/[^/?#]+/i.test(profileUrl) ? profileUrl : "";
+  const normalizedProfileUrl = profileUrl.trim();
+
+  if (twitchProfileUrlPattern.test(normalizedProfileUrl)) {
+    return { platform: "twitch", url: normalizedProfileUrl };
+  }
+
+  if (youtubeProfileUrlPattern.test(normalizedProfileUrl)) {
+    return { platform: "youtube", url: normalizedProfileUrl };
+  }
+
+  return { platform: "", url: "" };
 };
 ---
 
@@ -184,10 +216,14 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
                 }
                 data-streamer-image={streamer.image ?? ""}
                 data-streamer-fallback-image={streamer.fallbackImage ?? ""}
-                data-streamer-twitch-url={getTwitchProfileUrl(
+                data-streamer-profile-link-url={getCreatorProfileLink(
                   streamer.twitchHandle,
                   streamer.profileUrl,
-                )}
+                ).url}
+                data-streamer-profile-link-platform={getCreatorProfileLink(
+                  streamer.twitchHandle,
+                  streamer.profileUrl,
+                ).platform}
                 data-streamer-profile-icon={getStreamerProfileIcon(streamer)}
                 aria-pressed="false"
               >
@@ -270,17 +306,18 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
               <h2 data-selected-name></h2>
               <div class="player-info">
                 <a
-                  class="twitch-profile-link"
-                  data-selected-twitch-link
+                  class="creator-profile-link"
+                  data-selected-profile-link
                   target="_blank"
                   rel="noopener noreferrer"
-                  title="Open Twitch profile"
-                  aria-label="Open selected streamer on Twitch"
+                  title="Open creator profile"
+                  aria-label="Open selected creator profile"
                   aria-disabled="true"
-                  data-twitch-link-disabled
+                  data-profile-link-disabled
                   tabindex="-1"
                 >
                   <img
+                    data-selected-profile-link-icon
                     src="/icons/TwitchGlitchWhite.svg"
                     alt=""
                     aria-hidden="true"
@@ -293,7 +330,13 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
                 <span class="signal-bars" aria-hidden="true">
                   <i></i><i></i><i></i><i></i>
                 </span>
-                <span class="controller-icon" aria-hidden="true"></span>
+                <img
+                  class="controller-icon"
+                  src="/icons/PlayerControllerIcon.png"
+                  alt=""
+                  aria-hidden="true"
+                  draggable="false"
+                />
                 <strong>P1</strong>
               </div>
             </div>
@@ -383,10 +426,14 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
                 }
                 data-streamer-image={streamer.image ?? ""}
                 data-streamer-fallback-image={streamer.fallbackImage ?? ""}
-                data-streamer-twitch-url={getTwitchProfileUrl(
+                data-streamer-profile-link-url={getCreatorProfileLink(
                   streamer.twitchHandle,
                   streamer.profileUrl,
-                )}
+                ).url}
+                data-streamer-profile-link-platform={getCreatorProfileLink(
+                  streamer.twitchHandle,
+                  streamer.profileUrl,
+                ).platform}
                 data-streamer-profile-icon={getStreamerProfileIcon(streamer)}
                 aria-pressed="false"
               >
@@ -1006,8 +1053,11 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
       const mobileCta = document.querySelector("[data-mobile-cta]");
       const selectedName = document.querySelector("[data-selected-name]");
       const selectedPortrait = document.querySelector("[data-desktop-selected-portrait]");
-      const selectedTwitchProfileLink = document.querySelector<HTMLAnchorElement>(
-        "[data-selected-twitch-link]",
+      const selectedProfileLink = document.querySelector<HTMLAnchorElement>(
+        "[data-selected-profile-link]",
+      );
+      const selectedProfileLinkIcon = document.querySelector<HTMLImageElement>(
+        "[data-selected-profile-link-icon]",
       );
       const mobileSelectedName = document.querySelector("[data-mobile-selected-name]");
       const mobileSelectedPortrait = document.querySelector("[data-mobile-selected-portrait]");
@@ -1637,35 +1687,61 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         }
       };
 
-      const setSelectedStreamerTwitchLink = (streamerName = "", twitchUrl = "") => {
-        if (!(selectedTwitchProfileLink instanceof HTMLAnchorElement)) {
+      const profilePlatformDetails = {
+        twitch: {
+          icon: "/icons/TwitchGlitchWhite.svg",
+          label: "Twitch",
+        },
+        youtube: {
+          icon: "/icons/YouTubeWhite.svg",
+          label: "YouTube",
+        },
+      } as const;
+
+      type ProfilePlatform = keyof typeof profilePlatformDetails;
+
+      const isProfilePlatform = (value: string): value is ProfilePlatform =>
+        Object.prototype.hasOwnProperty.call(profilePlatformDetails, value);
+
+      const setSelectedStreamerProfileLink = (
+        streamerName = "",
+        profileUrl = "",
+        profilePlatform = "",
+      ) => {
+        if (!(selectedProfileLink instanceof HTMLAnchorElement)) {
           return;
         }
 
-        const hasTwitchUrl = twitchUrl.length > 0;
-        selectedTwitchProfileLink.toggleAttribute(
-          "data-twitch-link-disabled",
-          !hasTwitchUrl,
+        const platform = isProfilePlatform(profilePlatform) ? profilePlatform : "";
+        const hasProfileLink = profileUrl.length > 0 && platform.length > 0;
+        selectedProfileLink.toggleAttribute(
+          "data-profile-link-disabled",
+          !hasProfileLink,
         );
-        selectedTwitchProfileLink.setAttribute("aria-disabled", String(!hasTwitchUrl));
-        selectedTwitchProfileLink.tabIndex = hasTwitchUrl ? 0 : -1;
+        selectedProfileLink.setAttribute("aria-disabled", String(!hasProfileLink));
+        selectedProfileLink.tabIndex = hasProfileLink ? 0 : -1;
 
-        if (!hasTwitchUrl) {
-          selectedTwitchProfileLink.removeAttribute("href");
-          selectedTwitchProfileLink.setAttribute(
-            "aria-label",
-            "Open selected streamer on Twitch",
-          );
-          selectedTwitchProfileLink.title = "Open Twitch profile";
+        if (!hasProfileLink) {
+          selectedProfileLink.removeAttribute("href");
+          selectedProfileLink.removeAttribute("data-profile-platform");
+          selectedProfileLink.setAttribute("aria-label", "Open selected creator profile");
+          selectedProfileLink.title = "Open creator profile";
           return;
         }
 
-        selectedTwitchProfileLink.href = twitchUrl;
-        selectedTwitchProfileLink.setAttribute(
+        const details = profilePlatformDetails[platform as ProfilePlatform];
+
+        selectedProfileLink.href = profileUrl;
+        selectedProfileLink.setAttribute("data-profile-platform", platform);
+        selectedProfileLink.setAttribute(
           "aria-label",
-          `Open ${streamerName}'s Twitch page`,
+          `Open ${streamerName}'s ${details.label} page`,
         );
-        selectedTwitchProfileLink.title = `Open ${streamerName}'s Twitch page`;
+        selectedProfileLink.title = `Open ${streamerName}'s ${details.label} page`;
+
+        if (selectedProfileLinkIcon instanceof HTMLImageElement) {
+          selectedProfileLinkIcon.src = details.icon;
+        }
       };
 
       const setSelectedStreamerProfileIcon = (profileIcon: string) => {
@@ -1977,7 +2053,7 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
 
           if (!hasSelection()) {
             setSelectedStreamerName("");
-            setSelectedStreamerTwitchLink();
+            setSelectedStreamerProfileLink();
             setSelectedStreamerProfileIcon("");
             setSelectedStreamerPortrait("");
           }
@@ -1993,11 +2069,17 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
         const streamerImage = card.getAttribute("data-streamer-image") || "";
         const streamerFallbackImage = card.getAttribute("data-streamer-fallback-image") || "";
-        const streamerTwitchUrl = card.getAttribute("data-streamer-twitch-url") || "";
+        const streamerProfileUrl = card.getAttribute("data-streamer-profile-link-url") || "";
+        const streamerProfilePlatform =
+          card.getAttribute("data-streamer-profile-link-platform") || "";
         const streamerProfileIcon = card.getAttribute("data-streamer-profile-icon") || "";
         document.documentElement.classList.add("has-streamer-hover-preview");
         setSelectedStreamerName(streamerName);
-        setSelectedStreamerTwitchLink(streamerName, streamerTwitchUrl);
+        setSelectedStreamerProfileLink(
+          streamerName,
+          streamerProfileUrl,
+          streamerProfilePlatform,
+        );
         setSelectedStreamerProfileIcon(streamerProfileIcon);
         setSelectedStreamerPortrait(streamerImage, streamerFallbackImage);
       };
@@ -2122,7 +2204,7 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         });
 
         setSelectedStreamerName("");
-        setSelectedStreamerTwitchLink();
+        setSelectedStreamerProfileLink();
         setSelectedStreamerProfileIcon("");
         setTwitchConfirmButtonVisibility();
         setSelectedStreamerPortrait("");
@@ -2139,7 +2221,9 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
         const streamerImage = card.getAttribute("data-streamer-image") || "";
         const streamerFallbackImage = card.getAttribute("data-streamer-fallback-image") || "";
-        const streamerTwitchUrl = card.getAttribute("data-streamer-twitch-url") || "";
+        const streamerProfileUrl = card.getAttribute("data-streamer-profile-link-url") || "";
+        const streamerProfilePlatform =
+          card.getAttribute("data-streamer-profile-link-platform") || "";
         const streamerProfileIcon = card.getAttribute("data-streamer-profile-icon") || "";
 
         showReadyOverlay();
@@ -2165,7 +2249,11 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
         });
 
         setSelectedStreamerName(streamerName);
-        setSelectedStreamerTwitchLink(streamerName, streamerTwitchUrl);
+        setSelectedStreamerProfileLink(
+          streamerName,
+          streamerProfileUrl,
+          streamerProfilePlatform,
+        );
         setSelectedStreamerProfileIcon(streamerProfileIcon);
         setTwitchConfirmButtonVisibility(streamerName);
         syncConfirmStreamerSelect();
@@ -5045,6 +5133,7 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
   }
 
   .player-red-card {
+    --player-red-card-cut: 74px;
     position: absolute;
     z-index: 3;
     right: 20px;
@@ -5057,6 +5146,12 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
       linear-gradient(#ff3031, #f21814);
     color: #fff;
     box-shadow: -20px 0 0 rgba(150, 0, 0, 0.1);
+    clip-path: polygon(
+      var(--player-red-card-cut) 0,
+      100% 0,
+      100% 100%,
+      0 100%
+    );
   }
 
   .profile-cutout-icon {
@@ -5084,12 +5179,12 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
     opacity: 0.16;
   }
 
-  .twitch-profile-link[data-twitch-link-disabled] {
+  .creator-profile-link[data-profile-link-disabled] {
     visibility: hidden;
     pointer-events: none;
   }
 
-  .twitch-profile-link {
+  .creator-profile-link {
     min-width: 0;
     width: 61px;
     height: 61px;
@@ -5120,23 +5215,36 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
       transform 110ms ease;
   }
 
-  .twitch-profile-link:hover {
+  .creator-profile-link[data-profile-platform="youtube"] {
+    background: #ff0033;
+    box-shadow:
+      0 6px 0 #9b0013,
+      0 11px 18px rgba(14, 14, 16, 0.28);
+  }
+
+  .creator-profile-link:hover {
     transform: translateY(-2px);
   }
 
-  .twitch-profile-link:active {
+  .creator-profile-link:active {
     box-shadow:
       0 3px 0 #5c16c5,
       0 7px 14px rgba(14, 14, 16, 0.24);
     transform: translateY(3px);
   }
 
-  .twitch-profile-link:focus-visible {
+  .creator-profile-link[data-profile-platform="youtube"]:active {
+    box-shadow:
+      0 3px 0 #9b0013,
+      0 7px 14px rgba(14, 14, 16, 0.24);
+  }
+
+  .creator-profile-link:focus-visible {
     outline: 4px solid #fff;
     outline-offset: 3px;
   }
 
-  .twitch-profile-link img {
+  .creator-profile-link img {
     width: 34px;
     height: 34px;
     display: block;
@@ -5195,26 +5303,50 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
 
   .controller-strip {
     position: absolute;
-    left: 44px;
-    right: 62px;
-    bottom: 6px;
-    height: 72px;
+    right: 22px;
+    bottom: 9px;
+    width: 326px;
+    height: 74px;
     display: grid;
-    grid-template-columns: 118px 1fr 150px;
+    grid-template-columns: 106px minmax(0, 1fr);
     align-items: center;
-    padding: 0 18px;
-    border: 4px solid #151515;
-    border-bottom: 0;
-    background: linear-gradient(145deg, #ff2620, #ff0f09);
-    clip-path: polygon(9% 0, 91% 0, 100% 100%, 0 100%);
+    column-gap: 18px;
+    overflow: hidden;
+    padding: 0 20px 0 22px;
+    background: #070708;
+    box-shadow:
+      0 5px 0 rgba(0, 0, 0, 0.36),
+      0 13px 22px rgba(0, 0, 0, 0.2);
+    clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%, 0 33%);
+    isolation: isolate;
+  }
+
+  .controller-strip::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: 4px;
+    background:
+      linear-gradient(108deg, rgba(255, 255, 255, 0.16) 0 12%, transparent 12.5% 100%),
+      repeating-linear-gradient(108deg, rgba(110, 0, 0, 0.28) 0 10px, transparent 10px 29px),
+      linear-gradient(180deg, #ff251f 0%, #f10b0c 58%, #c90009 100%);
+    clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%, 0 33%);
+  }
+
+  .controller-strip::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    inset: 4px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 38%),
+      linear-gradient(100deg, transparent 0 66%, rgba(0, 0, 0, 0.16) 66% 67%, transparent 67%);
+    clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%, 0 33%);
+    pointer-events: none;
   }
 
   .signal-bars {
-    align-self: start;
-    margin-top: 10px;
-    display: flex;
-    gap: 3px;
-    justify-content: center;
+    display: none;
   }
 
   .signal-bars i {
@@ -5226,23 +5358,28 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
   }
 
   .controller-icon {
-    justify-self: center;
-    width: 58px;
-    height: 37px;
-    border-radius: 18px 18px 14px 14px;
-    background:
-      radial-gradient(circle at 25% 45%, #e71824 0 4px, transparent 5px),
-      radial-gradient(circle at 68% 35%, #e71824 0 4px, transparent 5px),
-      radial-gradient(circle at 78% 56%, #e71824 0 4px, transparent 5px),
-      #fff;
-    box-shadow: 0 0 0 4px #f5c9c9;
+    position: relative;
+    z-index: 2;
+    justify-self: start;
+    width: 87px;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    filter:
+      drop-shadow(0 2px 0 rgba(92, 0, 0, 0.35))
+      drop-shadow(0 0 2px rgba(255, 255, 255, 0.22));
+    transform: translateY(1px);
+    user-select: none;
   }
 
   .controller-strip strong {
-    justify-self: end;
+    position: relative;
+    z-index: 2;
+    justify-self: center;
     font-family: "Arial Black", Impact, sans-serif;
-    font-size: 54px;
-    line-height: 1;
+    font-size: 58px;
+    line-height: 0.9;
+    letter-spacing: 0;
     text-shadow:
       -4px -4px 0 #000,
       4px -4px 0 #000,
