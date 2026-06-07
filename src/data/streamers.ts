@@ -164,7 +164,11 @@ const streamerAssets: Partial<Record<string, StreamerAssets>> = {
   Overstrand: { image: "/streamers/overstand.png", twitchHandle: "overstrand" },
   Jess: { image: "/streamers/jess.png", twitchHandle: "jesswyatt" },
   Lisa: { image: "/streamers/lisa.png", twitchHandle: "lisa" },
-  Tolga: { image: "/streamers/tolga.png", profileUrl: "https://www.instagram.com/tolgattv/" },
+  Tolga: {
+    image: "/streamers/tolga.png",
+    profileUrl: "https://www.twitch.tv/tolga",
+    twitchHandle: "tolga",
+  },
   Louna: { image: "/streamers/louna.png", twitchHandle: "lounatuna" },
   Adam: {
     image: "/streamers/adam.png",
