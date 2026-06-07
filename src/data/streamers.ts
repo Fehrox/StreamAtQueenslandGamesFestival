@@ -371,12 +371,22 @@ const getStyledImage = (image: string) => {
     return image;
   }
 
-  const styledImage = `/streamers-styled/${stem}.png`;
-  const styledImagePath = fileURLToPath(
-    new URL(`../../public${styledImage}`, import.meta.url),
-  );
+  const styledImageCandidates = [
+    `/streamers-nintendo/${stem}.png`,
+    `/streamers-styled/${stem}.png`,
+  ];
 
-  return existsSync(styledImagePath) ? styledImage : image;
+  for (const styledImage of styledImageCandidates) {
+    const styledImagePath = fileURLToPath(
+      new URL(`../../public${styledImage}`, import.meta.url),
+    );
+
+    if (existsSync(styledImagePath)) {
+      return styledImage;
+    }
+  }
+
+  return image;
 };
 
 const resolveStreamerAssets = (

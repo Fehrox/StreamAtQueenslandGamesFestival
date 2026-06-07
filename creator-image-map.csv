@@ -1,0 +1,89 @@
+slot_id,creator_name,status,asset_key,twitch_handle,profile_url,image_stem,original_profile_pic_state,original_profile_pic_path,stylized_state,stylized_path,nintendo_art_state,nintendo_art_path,active_display_image_path,active_display_image_type
+slot-01,Naysy,featured,Naysy,naysy,,naysy,present,/streamers/naysy.png,present,/streamers-styled/naysy.png,present,/streamers-nintendo/naysy.png,/streamers-nintendo/naysy.png,nintendo art
+slot-02,Cray,open,Cray,crayator,,cray,present,/streamers/cray.png,present,/streamers-styled/cray.png,present,/streamers-nintendo/cray.png,/streamers-nintendo/cray.png,nintendo art
+slot-03,Marcus,open,Marcus,prestigeclips,,marcus,present,/streamers/marcus.png,present,/streamers-styled/marcus.png,present,/streamers-nintendo/marcus.png,/streamers-nintendo/marcus.png,nintendo art
+slot-04,Bazza,open,Bazza,bazza,,baz,present,/streamers/baz.png,present,/streamers-styled/baz.png,present,/streamers-nintendo/baz.png,/streamers-nintendo/baz.png,nintendo art
+slot-05,Brodie,open,Brodie,brodie,https://www.twitch.tv/brodie,broadie,present,/streamers/broadie.png,present,/streamers-styled/broadie.png,present,/streamers-nintendo/broadie.png,/streamers-nintendo/broadie.png,nintendo art
+slot-06,Wolfie,open,Wolfie,maskedwolf,https://www.twitch.tv/maskedwolf,wolfie,present,/streamers/wolfie.png,present,/streamers-styled/wolfie.png,present,/streamers-nintendo/wolfie.png,/streamers-nintendo/wolfie.png,nintendo art
+slot-07,Lexi,open,Lexi,lexigraham,,lexi,present,/streamers/lexi.png,present,/streamers-styled/lexi.png,present,/streamers-nintendo/lexi.png,/streamers-nintendo/lexi.png,nintendo art
+slot-08,Ash,open,Ash,trash_ashx,https://www.twitch.tv/trash_ashx,ash,present,/streamers/ash.png,present,/streamers-styled/ash.png,present,/streamers-nintendo/ash.png,/streamers-nintendo/ash.png,nintendo art
+slot-09,Nic,open,Nic,nichameleon,,nic,present,/streamers/nic.png,present,/streamers-styled/nic.png,present,/streamers-nintendo/nic.png,/streamers-nintendo/nic.png,nintendo art
+slot-10,Amber,open,Amber,paladinamber,https://www.twitch.tv/paladinamber,amber,present,/streamers/amber.png,present,/streamers-styled/amber.png,present,/streamers-nintendo/amber.png,/streamers-nintendo/amber.png,nintendo art
+slot-11,Kiki,open,Kiki,kiki,,kiki,present,/streamers/kiki.png,present,/streamers-styled/kiki.png,present,/streamers-nintendo/kiki.png,/streamers-nintendo/kiki.png,nintendo art
+slot-12,Lazarbeam,open,Lazarbeam,lazarbeam,,lannen,present,/streamers/lannen.png,present,/streamers-styled/lannen.png,present,/streamers-nintendo/lannen.png,/streamers-nintendo/lannen.png,nintendo art
+slot-13,Swagger,open,Swagger,swaggersouls,,swagger,present,/streamers/swagger.png,present,/streamers-styled/swagger.png,present,/streamers-nintendo/swagger.png,/streamers-nintendo/swagger.png,nintendo art
+slot-14,Nalopia,open,Nalopia,nalopia,https://www.twitch.tv/nalopia,nal,present,/streamers/nal.png,present,/streamers-styled/nal.png,present,/streamers-nintendo/nal.png,/streamers-nintendo/nal.png,nintendo art
+slot-15,Bajo,open,Bajo,bajo,,bajo,present,/streamers/bajo.png,present,/streamers-styled/bajo.png,present,/streamers-nintendo/bajo.png,/streamers-nintendo/bajo.png,nintendo art
+slot-16,Luke,open,Luke,,https://www.youtube.com/@lukemuscat,luke,present,/streamers/luke.png,present,/streamers-styled/luke.png,present,/streamers-nintendo/luke.png,/streamers-nintendo/luke.png,nintendo art
+slot-17,eltk,open,eltk,eltk,,eltk,present,/streamers/eltk.png,present,/streamers-styled/eltk.png,present,/streamers-nintendo/eltk.png,/streamers-nintendo/eltk.png,nintendo art
+slot-18,Aliythia,open,Aliythia,aliythia,,aliythia,present,/streamers/aliythia.png,present,/streamers-styled/aliythia.png,present,/streamers-nintendo/aliythia.png,/streamers-nintendo/aliythia.png,nintendo art
+slot-19,Boa,open,Boa,boaroo,,boa,present,/streamers/boa.png,present,/streamers-styled/boa.png,present,/streamers-nintendo/boa.png,/streamers-nintendo/boa.png,nintendo art
+slot-20,Krystll,open,Krystll,krysttl,,krystll,present,/streamers/krystll.png,present,/streamers-styled/krystll.png,present,/streamers-nintendo/krystll.png,/streamers-nintendo/krystll.png,nintendo art
+slot-21,t10nat,open,t10nat,t10nat,,t10nat,present,/streamers/t10nat.png,present,/streamers-styled/t10nat.png,present,/streamers-nintendo/t10nat.png,/streamers-nintendo/t10nat.png,nintendo art
+slot-22,Arii,open,Arii,arii,,arii,present,/streamers/arii.png,present,/streamers-styled/arii.png,present,/streamers-nintendo/arii.png,/streamers-nintendo/arii.png,nintendo art
+slot-23,Jxsn,open,Jxsn,jxsn,https://www.twitch.tv/jxsn,jackson,present,/streamers/jackson.png,present,/streamers-styled/jackson.png,present,/streamers-nintendo/jackson.png,/streamers-nintendo/jackson.png,nintendo art
+slot-24,Winter,open,Winter,winter1k,,winter,present,/streamers/winter.png,present,/streamers-styled/winter.png,present,/streamers-nintendo/winter.png,/streamers-nintendo/winter.png,nintendo art
+slot-25,Randy,open,Randy,randy,,randy,present,/streamers/randy.png,present,/streamers-styled/randy.png,present,/streamers-nintendo/randy.png,/streamers-nintendo/randy.png,nintendo art
+slot-26,Jacque,open,Jacque,jacque,,jacque,present,/streamers/jacque.png,present,/streamers-styled/jacque.png,present,/streamers-nintendo/jacque.png,/streamers-nintendo/jacque.png,nintendo art
+slot-27,Pestily,open,Pestily,pestily,,paul,present,/streamers/paul.png,present,/streamers-styled/paul.png,present,/streamers-nintendo/paul.png,/streamers-nintendo/paul.png,nintendo art
+slot-28,Oasis,open,Oasis,oasisonoverwatch,,oasis,present,/streamers/oasis.jpeg,present,/streamers-styled/oasis.png,present,/streamers-nintendo/oasis.png,/streamers-nintendo/oasis.png,nintendo art
+slot-29,Overstrand,open,Overstrand,overstrand,,overstand,present,/streamers/overstand.png,present,/streamers-styled/overstand.png,present,/streamers-nintendo/overstand.png,/streamers-nintendo/overstand.png,nintendo art
+slot-30,Jess,open,Jess,jesswyatt,,jess,present,/streamers/jess.png,present,/streamers-styled/jess.png,present,/streamers-nintendo/jess.png,/streamers-nintendo/jess.png,nintendo art
+slot-31,Lisa,open,Lisa,lisa,,lisa,present,/streamers/lisa.png,present,/streamers-styled/lisa.png,present,/streamers-nintendo/lisa.png,/streamers-nintendo/lisa.png,nintendo art
+slot-32,Tolga,open,Tolga,,https://www.instagram.com/tolgattv/,tolga,present,/streamers/tolga.png,present,/streamers-styled/tolga.png,present,/streamers-nintendo/tolga.png,/streamers-nintendo/tolga.png,nintendo art
+slot-33,Louna,open,Louna,lounatuna,,louna,present,/streamers/louna.png,present,/streamers-styled/louna.png,present,/streamers-nintendo/louna.png,/streamers-nintendo/louna.png,nintendo art
+slot-34,Adam,confirmed,Adam,adamcyounis,https://www.twitch.tv/adamcyounis,adam,present,/streamers/adam.png,present,/streamers-styled/adam.png,present,/streamers-nintendo/adam.png,/streamers-nintendo/adam.png,nintendo art
+slot-35,Fasffy,confirmed,Fasffy,fasffy,,fasffy,present,/streamers/fasffy.png,present,/streamers-styled/fasffy.png,present,/streamers-nintendo/fasffy.png,/streamers-nintendo/fasffy.png,nintendo art
+slot-36,Danzie,confirmed,Danzie,danzie_dee,,danzie,present,/streamers/danzie.png,present,/streamers-styled/danzie.png,present,/streamers-nintendo/danzie.png,/streamers-nintendo/danzie.png,nintendo art
+slot-37,Nick,open,Nick,nickbeckwith,https://www.twitch.tv/nickbeckwith,nickbeckwith,present,/streamers/nickbeckwith.png,present,/streamers-styled/nickbeckwith.png,present,/streamers-nintendo/nickbeckwith.png,/streamers-nintendo/nickbeckwith.png,nintendo art
+slot-38,jurdman,open,jurdman,jurdman,https://www.twitch.tv/jurdman,jurdman,present,/streamers/jurdman.png,present,/streamers-styled/jurdman.png,present,/streamers-nintendo/jurdman.png,/streamers-nintendo/jurdman.png,nintendo art
+slot-39,Pyoar,open,Pyoar,pyoar,https://www.twitch.tv/Pyoar,pyoar,present,/streamers/pyoar.png,present,/streamers-styled/pyoar.png,present,/streamers-nintendo/pyoar.png,/streamers-nintendo/pyoar.png,nintendo art
+slot-40,Townie,open,Townie,townie,https://www.twitch.tv/townie,townie,present,/streamers/townie.png,present,/streamers-styled/townie.png,present,/streamers-nintendo/townie.png,/streamers-nintendo/townie.png,nintendo art
+slot-41,dollysox,open,dollysox,dollysox,https://www.twitch.tv/dollysox,dollysox,present,/streamers/dollysox.png,present,/streamers-styled/dollysox.png,present,/streamers-nintendo/dollysox.png,/streamers-nintendo/dollysox.png,nintendo art
+slot-42,TruinTV,open,TruinTV,truintv,https://www.twitch.tv/TruinTV,truintv,present,/streamers/truintv.png,present,/streamers-styled/truintv.png,present,/streamers-nintendo/truintv.png,/streamers-nintendo/truintv.png,nintendo art
+slot-43,Sharkie,open,Sharkie,sharkie,https://www.twitch.tv/Sharkie,sharkie,present,/streamers/sharkie.png,present,/streamers-styled/sharkie.png,present,/streamers-nintendo/sharkie.png,/streamers-nintendo/sharkie.png,nintendo art
+slot-44,hexsteph,open,hexsteph,hexsteph,https://www.twitch.tv/hexsteph,hexsteph,present,/streamers/hexsteph.jpg,present,/streamers-styled/hexsteph.png,present,/streamers-nintendo/hexsteph.png,/streamers-nintendo/hexsteph.png,nintendo art
+slot-45,Back Pocket,open,Back Pocket,back_pocket,https://www.twitch.tv/back_pocket,back_pocket,present,/streamers/back_pocket.png,present,/streamers-styled/back_pocket.png,present,/streamers-nintendo/back_pocket.png,/streamers-nintendo/back_pocket.png,nintendo art
+slot-46,Eonzn,open,Eonzn,eonzn,https://www.twitch.tv/Eonzn,eonzn,present,/streamers/eonzn.png,present,/streamers-styled/eonzn.png,present,/streamers-nintendo/eonzn.png,/streamers-nintendo/eonzn.png,nintendo art
+slot-47,Jaice,open,Jaice,jaice,https://www.twitch.tv/Jaice,jaice,present,/streamers/jaice.png,present,/streamers-styled/jaice.png,present,/streamers-nintendo/jaice.png,/streamers-nintendo/jaice.png,nintendo art
+slot-48,Elf_Energy,open,Elf_Energy,elf_energy,https://www.twitch.tv/elf_energy,elf_energy,present,/streamers/elf_energy.png,present,/streamers-styled/elf_energy.png,present,/streamers-nintendo/elf_energy.png,/streamers-nintendo/elf_energy.png,nintendo art
+slot-49,Elysa,open,Elysa,elysa,https://www.twitch.tv/elysa,elysa,present,/streamers/elysa.png,present,/streamers-styled/elysa.png,present,/streamers-nintendo/elysa.png,/streamers-nintendo/elysa.png,nintendo art
+slot-50,Berticuss,open,Berticuss,berticuss,https://www.twitch.tv/berticuss,berticuss,present,/streamers/berticuss.png,present,/streamers-styled/berticuss.png,present,/streamers-nintendo/berticuss.png,/streamers-nintendo/berticuss.png,nintendo art
+slot-51,Cardboard_Cowboy,open,Cardboard_Cowboy,cardboard_cowboy,https://www.twitch.tv/cardboard_cowboy,cardboard_cowboy,present,/streamers/cardboard_cowboy.png,present,/streamers-styled/cardboard_cowboy.png,present,/streamers-nintendo/cardboard_cowboy.png,/streamers-nintendo/cardboard_cowboy.png,nintendo art
+slot-52,MCMDesigns,open,MCMDesigns,mcmdesigns,https://www.twitch.tv/mcmdesigns,mcmdesigns,present,/streamers/mcmdesigns.png,present,/streamers-styled/mcmdesigns.png,present,/streamers-nintendo/mcmdesigns.png,/streamers-nintendo/mcmdesigns.png,nintendo art
+slot-53,LordHappyCats,open,LordHappyCats,lordhappycats,https://www.twitch.tv/LordHappyCats,lordhappycats,present,/streamers/lordhappycats.png,present,/streamers-styled/lordhappycats.png,present,/streamers-nintendo/lordhappycats.png,/streamers-nintendo/lordhappycats.png,nintendo art
+slot-54,BloodyDrongo,open,BloodyDrongo,bloodydrongo,https://www.twitch.tv/BloodyDrongo,bloodydrongo,present,/streamers/bloodydrongo.png,present,/streamers-styled/bloodydrongo.png,present,/streamers-nintendo/bloodydrongo.png,/streamers-nintendo/bloodydrongo.png,nintendo art
+slot-55,Sanjioker,open,Sanjioker,sanjioker,https://www.twitch.tv/sanjioker,sanjioker,present,/streamers/sanjioker.png,present,/streamers-styled/sanjioker.png,present,/streamers-nintendo/sanjioker.png,/streamers-nintendo/sanjioker.png,nintendo art
+slot-56,GYmedia,open,GYmedia,gymedia,https://www.twitch.tv/gymedia,gymedia,present,/streamers/gymedia.png,present,/streamers-styled/gymedia.png,present,/streamers-nintendo/gymedia.png,/streamers-nintendo/gymedia.png,nintendo art
+slot-57,Kaztelle,open,Kaztelle,kaztelle,https://www.twitch.tv/kaztelle,kaztelle,present,/streamers/kaztelle.png,present,/streamers-styled/kaztelle.png,present,/streamers-nintendo/kaztelle.png,/streamers-nintendo/kaztelle.png,nintendo art
+slot-58,ZiggyDLive,open,ZiggyDLive,ziggydlive,https://www.twitch.tv/ziggydlive,ziggydlive,present,/streamers/ziggydlive.jpeg,present,/streamers-styled/ziggydlive.png,present,/streamers-nintendo/ziggydlive.png,/streamers-nintendo/ziggydlive.png,nintendo art
+slot-59,xara,open,xara,xara,https://www.twitch.tv/xara,xara,present,/streamers/xara.png,present,/streamers-styled/xara.png,present,/streamers-nintendo/xara.png,/streamers-nintendo/xara.png,nintendo art
+slot-60,mee_shell,open,mee_shell,mee_shell,https://www.twitch.tv/mee_shell,mee_shell,present,/streamers/mee_shell.png,present,/streamers-styled/mee_shell.png,present,/streamers-nintendo/mee_shell.png,/streamers-nintendo/mee_shell.png,nintendo art
+slot-61,BasedCode,open,BasedCode,basedcode,https://www.twitch.tv/basedcode,,not configured,,not configured,,not configured,,,
+slot-62,OPEN SLOT 13,open,,,,,not configured,,not configured,,not configured,,,
+slot-63,OPEN SLOT 14,open,,,,,not configured,,not configured,,not configured,,,
+slot-64,OPEN SLOT 15,open,,,,,not configured,,not configured,,not configured,,,
+slot-65,OPEN SLOT 16,open,,,,,not configured,,not configured,,not configured,,,
+slot-66,OPEN SLOT 17,open,,,,,not configured,,not configured,,not configured,,,
+slot-67,OPEN SLOT 18,open,,,,,not configured,,not configured,,not configured,,,
+slot-68,OPEN SLOT 19,open,,,,,not configured,,not configured,,not configured,,,
+slot-69,OPEN SLOT 20,open,,,,,not configured,,not configured,,not configured,,,
+slot-70,OPEN SLOT 21,open,,,,,not configured,,not configured,,not configured,,,
+slot-71,OPEN SLOT 22,open,,,,,not configured,,not configured,,not configured,,,
+slot-72,OPEN SLOT 23,open,,,,,not configured,,not configured,,not configured,,,
+slot-73,OPEN SLOT 24,open,,,,,not configured,,not configured,,not configured,,,
+slot-74,OPEN SLOT 25,open,,,,,not configured,,not configured,,not configured,,,
+slot-75,OPEN SLOT 26,open,,,,,not configured,,not configured,,not configured,,,
+slot-76,OPEN SLOT 27,open,,,,,not configured,,not configured,,not configured,,,
+slot-77,OPEN SLOT 28,open,,,,,not configured,,not configured,,not configured,,,
+slot-78,OPEN SLOT 29,open,,,,,not configured,,not configured,,not configured,,,
+slot-79,OPEN SLOT 30,open,,,,,not configured,,not configured,,not configured,,,
+slot-80,OPEN SLOT 31,open,,,,,not configured,,not configured,,not configured,,,
+slot-81,OPEN SLOT 32,open,,,,,not configured,,not configured,,not configured,,,
+slot-82,OPEN SLOT 33,open,,,,,not configured,,not configured,,not configured,,,
+slot-83,OPEN SLOT 34,open,,,,,not configured,,not configured,,not configured,,,
+slot-84,OPEN SLOT 35,open,,,,,not configured,,not configured,,not configured,,,
+slot-85,OPEN SLOT 36,open,,,,,not configured,,not configured,,not configured,,,
+slot-86,OPEN SLOT 37,open,,,,,not configured,,not configured,,not configured,,,
+slot-87,OPEN SLOT 38,open,,,,,not configured,,not configured,,not configured,,,
+slot-88,OPEN SLOT 39,open,,,,,not configured,,not configured,,not configured,,,
