@@ -126,7 +126,20 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
             >
               <span class="back-icon" aria-hidden="true"></span>
             </button>
-            <span class="book-icon" aria-hidden="true"></span>
+            <button
+              type="button"
+              class="info-action"
+              data-event-info-open
+              aria-label="Show Queensland Games Festival event information"
+            >
+              <img
+                class="event-info-icon"
+                src="/icons/EventInfoIcon.png"
+                alt=""
+                aria-hidden="true"
+                draggable="false"
+              />
+            </button>
           </div>
           <div class="title-tab">
             <span class="title-crop title-crop-left"></span>
@@ -328,7 +341,20 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
             >
               <span class="mobile-back-icon" aria-hidden="true"></span>
             </button>
-            <span class="mobile-book-icon" aria-hidden="true"></span>
+            <button
+              type="button"
+              class="mobile-info-action"
+              data-event-info-open
+              aria-label="Show Queensland Games Festival event information"
+            >
+              <img
+                class="event-info-icon"
+                src="/icons/EventInfoIcon.png"
+                alt=""
+                aria-hidden="true"
+                draggable="false"
+              />
+            </button>
           </div>
           <div class="mobile-title-tab">
             <h1>QGF Streamer Invite</h1>
@@ -439,6 +465,161 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
       data-streamer-verification-profiles
       set:html={streamerVerificationProfileJson}
     ></script>
+
+    <dialog
+      id="event-info-modal"
+      class="confirm-modal event-info-modal"
+      data-event-info-modal
+      aria-labelledby="event-info-modal-title"
+    >
+      <section class="confirm-modal-frame event-info-modal-frame">
+        <header class="confirm-modal-header event-info-modal-header">
+          <div class="confirm-modal-brand event-info-modal-brand" aria-hidden="true">
+            <img
+              src="/icons/EventInfoIcon.png"
+              alt=""
+              draggable="false"
+            />
+            <span>QGF</span>
+          </div>
+          <h2 id="event-info-modal-title">Event Info</h2>
+          <button
+            type="button"
+            class="confirm-modal-close"
+            data-event-info-close
+            aria-label="Close event information"
+          >
+            X
+          </button>
+        </header>
+
+        <div class="confirm-modal-body event-info-modal-body">
+          <section class="event-info-intro" aria-label="Streamer Summit overview">
+            <p class="event-info-kicker">Let's Play Streamer Summit</p>
+            <p class="event-info-lede">
+              Screen Queensland is inviting selected Australian streamers and content creators to
+              join a new creator event inside Queensland Games Festival 2026.
+            </p>
+            <div class="event-info-facts" aria-label="Event details">
+              <div class="event-info-fact">
+                <span>Where</span>
+                <strong>Brisbane Powerhouse, Brisbane</strong>
+              </div>
+              <div class="event-info-fact">
+                <span>When</span>
+                <strong>26-27 June 2026</strong>
+                <small
+                  class="event-info-countdown"
+                  data-event-countdown
+                  aria-label="Countdown to the first day of the event"
+                >
+                  Counting down...
+                </small>
+              </div>
+              <div class="event-info-fact">
+                <span>Games</span>
+                <strong>30+ upcoming indie games</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="event-info-section" aria-label="Creator opportunities">
+            <h3>Creator Opportunities</h3>
+            <ul class="event-info-list">
+              <li>Create content around upcoming indie games.</li>
+              <li>Meet developers, publishers, investors, creators, and platform guests.</li>
+              <li>Join creator-focused panels, live activities, and festival-floor streams.</li>
+              <li>Attend Queensland's first Twitch Connect networking event.</li>
+            </ul>
+          </section>
+
+          <section class="event-info-schedule" aria-label="Event schedule">
+            <article class="event-info-card">
+              <span>Friday 26 June</span>
+              <h3>Growing a Community on Twitch</h3>
+              <p class="event-info-time">2:00pm - 3:00pm</p>
+              <p>
+                Panelists will share practical advice, lessons learned, and creator insights about
+                building a sustainable gaming community.
+              </p>
+            </article>
+
+            <article class="event-info-card">
+              <span>Friday 26 June</span>
+              <h3>Devs vs Streamers: Super Smash Bros Showdown</h3>
+              <p class="event-info-time">4:00pm - 4:30pm</p>
+              <p>
+                Team Streamers faces Queensland game developers in a live Super Smash Bros battle
+                for bragging rights.
+              </p>
+            </article>
+
+            <article class="event-info-card">
+              <span>Saturday 27 June</span>
+              <h3>Creator Streaming Stations</h3>
+              <p>
+                One-hour creator sessions include a pre-configured OBS station, camera,
+                microphone or headset, game capture, chat display, local recording, and staff tech
+                support.
+              </p>
+            </article>
+
+            <article class="event-info-card">
+              <span>Saturday Evening</span>
+              <h3>Twitch Connect</h3>
+              <p>
+                Twitch Partners and invited creators can meet fellow streamers, developers,
+                industry professionals, and Twitch representatives.
+              </p>
+            </article>
+          </section>
+
+          <section class="event-info-eoi" aria-label="Expression of interest">
+            <h3>Expression of Interest</h3>
+            <p>
+              Interested in joining as a panelist, competitor, streamer, or attendee? Contact
+              <strong>Jed Dawson</strong> at
+              <a href="mailto:jdawson@screenqld.com.au">jdawson@screenqld.com.au</a>.
+            </p>
+            <p>Travel funding support is available for selected interstate panelists.</p>
+          </section>
+        </div>
+      </section>
+
+      <div
+        class="custom-cursor custom-cursor-modal"
+        aria-hidden="true"
+        data-custom-cursor
+        hidden
+      >
+        <div class="custom-cursor-art">
+          <img
+            class="custom-cursor-hand custom-cursor-hand-marker"
+            src="/cursors/MarkerHand.png"
+            alt=""
+            draggable="false"
+          />
+          <img
+            class="custom-cursor-hand custom-cursor-hand-pointer"
+            src="/cursors/PointerHand.png"
+            alt=""
+            draggable="false"
+          />
+          <img
+            class="custom-cursor-hand custom-cursor-hand-open"
+            src="/cursors/OpenHand.png"
+            alt=""
+            draggable="false"
+          />
+          <img
+            class="custom-cursor-p1"
+            src="/cursors/P1.png"
+            alt=""
+            draggable="false"
+          />
+        </div>
+      </div>
+    </dialog>
 
     <dialog
       class="confirm-modal"
@@ -552,9 +733,10 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
           <button
             type="button"
             class="confirm-secondary-action"
-            data-confirm-modal-close
+            data-event-info-open
+            aria-controls="event-info-modal"
           >
-            Cancel
+            More Info
           </button>
           <button
             type="submit"
@@ -980,6 +1162,13 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
       const twitchConfirmButtons = document.querySelectorAll<HTMLButtonElement>(
         "[data-twitch-confirm]",
       );
+      const eventInfoOpenButtons =
+        document.querySelectorAll<HTMLButtonElement>("[data-event-info-open]");
+      const eventInfoModal =
+        document.querySelector<HTMLDialogElement>("[data-event-info-modal]");
+      const eventInfoCloseButtons =
+        document.querySelectorAll<HTMLButtonElement>("[data-event-info-close]");
+      const eventCountdown = document.querySelector<HTMLElement>("[data-event-countdown]");
       const confirmPanel = document.querySelector<HTMLElement>("[data-confirm-panel]");
       const confirmOpenButtons = document.querySelectorAll<HTMLButtonElement>("[data-confirm-open]");
       const confirmModal = document.querySelector<HTMLDialogElement>("[data-confirm-modal]");
@@ -1156,7 +1345,37 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
       const hasSelection = () =>
         document.documentElement.classList.contains("has-streamer-selected");
 
+      const eventStartTime = new Date("2026-06-26T00:00:00+10:00").getTime();
+      const secondsPerDay = 24 * 60 * 60;
+      const secondsPerWeek = 7 * secondsPerDay;
+
+      const formatCountdownPart = (value: number, unit: string) =>
+        `${value.toLocaleString("en-AU")} ${unit}${value === 1 ? "" : "s"}`;
+
+      const updateEventCountdown = () => {
+        if (!eventCountdown) {
+          return;
+        }
+
+        const remainingSeconds = Math.max(0, Math.floor((eventStartTime - Date.now()) / 1000));
+
+        if (remainingSeconds === 0) {
+          eventCountdown.textContent = "Event is underway";
+          return;
+        }
+
+        const weeks = Math.floor(remainingSeconds / secondsPerWeek);
+        const days = Math.floor((remainingSeconds % secondsPerWeek) / secondsPerDay);
+        const seconds = remainingSeconds % secondsPerDay;
+
+        eventCountdown.textContent = `${formatCountdownPart(weeks, "week")} / ${formatCountdownPart(days, "day")} / ${formatCountdownPart(seconds, "second")}`;
+      };
+
+      updateEventCountdown();
+      window.setInterval(updateEventCountdown, 1000);
+
       const confirmationDialogs = [
+        eventInfoModal,
         confirmModal,
         verificationChoiceModal,
         verificationResultModal,
@@ -2122,6 +2341,29 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
 
         updateUrlForSelectedStreamer(card, urlMode);
       };
+
+      eventInfoOpenButtons.forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.preventDefault();
+          openDialog(eventInfoModal);
+        });
+      });
+
+      eventInfoCloseButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          closeDialog(eventInfoModal);
+        });
+      });
+
+      eventInfoModal?.addEventListener("click", (event) => {
+        if (event.target === eventInfoModal) {
+          closeDialog(eventInfoModal);
+        }
+      });
+
+      eventInfoModal?.addEventListener("close", () => {
+        syncConfirmationDialogClass();
+      });
 
       confirmPanel?.addEventListener("click", () => {
         openConfirmModal();
@@ -3338,6 +3580,10 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
       rgba(3, 7, 10, 0.76);
   }
 
+  .confirm-modal[data-confirm-modal]::backdrop {
+    background: rgba(3, 7, 10, 0.76);
+  }
+
   .confirm-modal-frame {
     position: relative;
     max-height: calc(100svh - 40px);
@@ -3731,6 +3977,185 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
     background: #fa8a00;
   }
 
+  .event-info-modal {
+    width: min(940px, calc(100vw - 40px));
+  }
+
+  .event-info-modal-frame {
+    min-height: 540px;
+  }
+
+  .event-info-modal-header {
+    grid-template-columns: 170px minmax(0, 1fr) 72px;
+  }
+
+  .event-info-modal-brand {
+    background: #e60010;
+    box-shadow:
+      inset 0 -5px 0 #a80009,
+      0 5px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  .event-info-modal-brand img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+  }
+
+  .event-info-modal-body {
+    display: grid;
+    gap: 18px;
+    color: #101416;
+    font-family: "Segoe UI", Arial, Helvetica, system-ui, sans-serif;
+  }
+
+  .event-info-intro {
+    display: grid;
+    gap: 12px;
+  }
+
+  .event-info-kicker {
+    margin: 0;
+    color: #5c16c5;
+    font-family: "Arial Black", Impact, sans-serif;
+    font-size: 22px;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .event-info-lede {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.24;
+  }
+
+  .event-info-facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .event-info-fact,
+  .event-info-card,
+  .event-info-eoi {
+    min-width: 0;
+    border: 4px solid #101416;
+    background:
+      linear-gradient(130deg, rgba(255, 255, 255, 0.9) 0 16%, transparent 16%),
+      rgba(255, 255, 255, 0.9);
+    box-shadow: 0 5px 0 rgba(16, 20, 22, 0.28);
+  }
+
+  .event-info-fact {
+    display: grid;
+    gap: 6px;
+    padding: 12px 13px;
+  }
+
+  .event-info-fact span,
+  .event-info-card span {
+    color: #e60010;
+    font-family: "Arial Black", Impact, sans-serif;
+    font-size: 15px;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .event-info-fact strong {
+    color: #101416;
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+
+  .event-info-countdown {
+    color: #5c16c5;
+    font-family: "Arial Black", Impact, sans-serif;
+    font-size: 13px;
+    line-height: 1.15;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .event-info-section {
+    display: grid;
+    gap: 10px;
+  }
+
+  .event-info-section h3,
+  .event-info-card h3,
+  .event-info-eoi h3 {
+    margin: 0;
+    color: #101416;
+    font-family: "Arial Black", Impact, sans-serif;
+    font-size: 22px;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+
+  .event-info-list {
+    display: grid;
+    gap: 7px;
+    margin: 0;
+    padding-left: 24px;
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.24;
+  }
+
+  .event-info-list li::marker {
+    color: #e60010;
+  }
+
+  .event-info-schedule {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .event-info-card {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    padding: 14px;
+  }
+
+  .event-info-card p,
+  .event-info-eoi p {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.24;
+  }
+
+  .event-info-time {
+    justify-self: start;
+    padding: 6px 9px;
+    background: #fff017;
+    color: #101416;
+    font-family: "Arial Black", Impact, sans-serif;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    text-transform: uppercase;
+  }
+
+  .event-info-eoi {
+    display: grid;
+    gap: 9px;
+    padding: 15px;
+    background:
+      linear-gradient(130deg, rgba(255, 255, 255, 0.66) 0 16%, transparent 16%),
+      #fff017;
+  }
+
+  .event-info-eoi a {
+    color: #5c16c5;
+    font-weight: 900;
+    overflow-wrap: anywhere;
+  }
+
   .attendance-confirmed-modal {
     width: min(880px, calc(100vw - 40px));
   }
@@ -4017,15 +4442,40 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
     content: none;
   }
 
-  .book-icon {
+  .info-action {
     position: absolute;
-    left: 193px;
-    top: 14px;
-    width: 42px;
-    height: 42px;
-    border-radius: 6px;
-    background: #f3a4a4;
-    box-shadow: inset 0 5px 0 rgba(255, 255, 255, 0.35);
+    left: 189px;
+    top: 9px;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .info-action:focus-visible,
+  .mobile-info-action:focus-visible {
+    outline: 4px solid #fff;
+    outline-offset: 1px;
+  }
+
+  .event-info-icon {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    opacity: 0.72;
+    pointer-events: none;
+    transition:
+      opacity 140ms ease,
+      transform 140ms ease;
+  }
+
+  .info-action:hover .event-info-icon,
+  .mobile-info-action:hover .event-info-icon {
+    opacity: 0.92;
+    transform: translateY(-1px);
   }
 
   .title-tab {
@@ -5444,6 +5894,90 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
       font-size: 19px;
     }
 
+    .event-info-modal-frame {
+      min-height: 0;
+    }
+
+    .event-info-modal-header {
+      grid-template-columns: minmax(0, 1fr) 48px;
+    }
+
+    .event-info-modal-brand img {
+      width: 28px;
+      height: 28px;
+    }
+
+    .event-info-modal-body {
+      gap: 13px;
+    }
+
+    .event-info-kicker {
+      font-size: 17px;
+    }
+
+    .event-info-lede {
+      font-size: 18px;
+      line-height: 1.26;
+    }
+
+    .event-info-facts,
+    .event-info-schedule {
+      grid-template-columns: 1fr;
+      gap: 9px;
+    }
+
+    .event-info-fact,
+    .event-info-card,
+    .event-info-eoi {
+      border-width: 3px;
+    }
+
+    .event-info-fact {
+      padding: 10px;
+    }
+
+    .event-info-fact span,
+    .event-info-card span {
+      font-size: 13px;
+    }
+
+    .event-info-fact strong {
+      font-size: 16px;
+    }
+
+    .event-info-countdown {
+      font-size: 12px;
+    }
+
+    .event-info-section h3,
+    .event-info-card h3,
+    .event-info-eoi h3 {
+      font-size: 18px;
+      line-height: 1.08;
+    }
+
+    .event-info-list {
+      gap: 6px;
+      padding-left: 20px;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .event-info-card,
+    .event-info-eoi {
+      padding: 11px;
+    }
+
+    .event-info-card p,
+    .event-info-eoi p {
+      font-size: 15px;
+      line-height: 1.28;
+    }
+
+    .event-info-time {
+      font-size: 13px !important;
+    }
+
     .attendance-confirmed-frame {
       min-height: 360px;
     }
@@ -5670,15 +6204,16 @@ const getTwitchProfileUrl = (twitchHandle = "", profileUrl = "") => {
       content: none;
     }
 
-    .mobile-book-icon {
+    .mobile-info-action {
       position: absolute;
-      left: 81px;
-      top: 15px;
-      width: 28px;
-      height: 28px;
-      border-radius: 4px;
-      background: #f3a4a4;
-      box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.35);
+      left: 77px;
+      top: 10px;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
     }
 
     .mobile-title-tab {
