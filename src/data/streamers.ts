@@ -6,6 +6,9 @@ export interface StreamerProfile {
   name: string;
   image?: string;
   fallbackImage?: string;
+  profileImage?: string;
+  styledImage?: string;
+  nintendoImage?: string;
   profileUrl?: string;
   status: "open" | "invited" | "confirmed" | "featured";
   twitchHandle?: string;
@@ -14,98 +17,104 @@ export interface StreamerProfile {
 type StreamerAssets = Pick<StreamerProfile, "image" | "profileUrl" | "twitchHandle">;
 type ResolvedStreamerAssets = Pick<
   StreamerProfile,
-  "fallbackImage" | "image" | "profileUrl" | "twitchHandle"
+  | "fallbackImage"
+  | "image"
+  | "nintendoImage"
+  | "profileImage"
+  | "profileUrl"
+  | "styledImage"
+  | "twitchHandle"
 >;
 
 const names = [
-  "Naysy",
-  "Cray",
-  "Marcus",
-  "Bazza",
-  "Brodie",
-  "Wolfie",
-  "Lexi",
-  "Ash",
-  "Nic",
-  "Amber",
-  "Kiki",
-  "Lazarbeam",
-  "Swagger",
-  "Nalopia",
-  "Bajo",
-  "Luke",
-  "eltk",
-  "Aliythia",
-  "Boa",
-  "Krystll",
-  "t10nat",
-  "Arii",
-  "Jxsn",
-  "Winter",
-  "Randy",
-  "Jacque",
+  "Fasffy",
   "Pestily",
   "Oasis",
   "Overstrand",
-  "Jess",
   "Lisa",
   "Tolga",
   "Louna",
-  "Adam",
-  "Fasffy",
-  "Danzie",
-  "Nick",
-  "jurdman",
-  "Pyoar",
-  "Townie",
-  "dollysox",
-  "TruinTV",
-  "Sharkie",
-  "hexsteph",
-  "Back Pocket",
+  "Randy",
+  "PandaTV",
+  "Ash",
   "Eonzn",
-  "Jaice",
-  "Elf_Energy",
-  "Elysa",
+  "Luke",
   "Berticuss",
-  "Cardboard_Cowboy",
-  "MCMDesigns",
-  "LordHappyCats",
+  "Elf_Energy",
+  "Kwoli",
+  "eltk",
+  "dollysox",
+  "Elysa",
+  "Sharkie",
+  "jurdman",
+  "Danzie",
+  "Jxsn",
+  "Loserfruit",
   "BloodyDrongo",
-  "Sanjioker",
+  "mee_shell",
+  "Kiki",
+  "Nic",
+  "Megaa",
+  "Nalopia",
   "GYmedia",
   "Kaztelle",
-  "ZiggyDLive",
+  "Krystll",
+  "Wolfie",
+  "Adam",
+  "Townie",
+  "Winter",
+  "Lazarbeam",
+  "hexsteph",
+  "Bubbell",
+  "Bazza",
+  "Brodie",
+  "Jess",
+  "ProfoundRice",
+  "Rhilever",
+  "Jacque",
   "xara",
-  "mee_shell",
-  "BasedCode",
+  "Marcus",
+  "Bajo",
+  "ZiggyDLive",
+  "Pyoar",
+  "Jaice",
+  "Cray",
+  "Aliythia",
+  "MCMDesigns",
+  "Back Pocket",
+  "Sanjioker",
+  "Lexi",
+  "Arii",
+  "Carla",
+  "Boa",
+  "TRASH",
+  "TruinTV",
+  "Amber",
+  "MakoFukasame",
+  "LordHappyCats",
+  "Nick",
+  "Cardboard_Cowboy",
+  "x5_PiG",
+  "Naysy",
+  "Gooobzy",
+  "t10nat",
+  "Swagger",
+  "OPEN SLOT 1",
+  "OPEN SLOT 2",
+  "OPEN SLOT 3",
+  "OPEN SLOT 4",
+  "OPEN SLOT 5",
+  "OPEN SLOT 6",
+  "OPEN SLOT 7",
+  "OPEN SLOT 8",
+  "OPEN SLOT 9",
+  "OPEN SLOT 10",
+  "OPEN SLOT 11",
+  "OPEN SLOT 12",
   "OPEN SLOT 13",
   "OPEN SLOT 14",
   "OPEN SLOT 15",
   "OPEN SLOT 16",
-  "OPEN SLOT 17",
-  "OPEN SLOT 18",
-  "OPEN SLOT 19",
-  "OPEN SLOT 20",
-  "OPEN SLOT 21",
-  "OPEN SLOT 22",
-  "OPEN SLOT 23",
-  "OPEN SLOT 24",
-  "OPEN SLOT 25",
-  "OPEN SLOT 26",
-  "OPEN SLOT 27",
-  "OPEN SLOT 28",
-  "OPEN SLOT 29",
-  "OPEN SLOT 30",
-  "OPEN SLOT 31",
-  "OPEN SLOT 32",
-  "OPEN SLOT 33",
-  "OPEN SLOT 34",
-  "OPEN SLOT 35",
-  "OPEN SLOT 36",
-  "OPEN SLOT 37",
-  "OPEN SLOT 38",
-  "OPEN SLOT 39",
 ];
 
 const streamerAssets: Partial<Record<string, StreamerAssets>> = {
@@ -297,26 +306,85 @@ const streamerAssets: Partial<Record<string, StreamerAssets>> = {
     profileUrl: "https://www.twitch.tv/mee_shell",
     twitchHandle: "mee_shell",
   },
-  BasedCode: {
-    profileUrl: "https://www.twitch.tv/basedcode",
-    twitchHandle: "basedcode",
+  Kwoli: {
+    image: "/streamers/kwoli.png",
+    profileUrl: "https://www.twitch.tv/kwoli",
+    twitchHandle: "kwoli",
+  },
+  MakoFukasame: {
+    image: "/streamers/makofukasame.png",
+    profileUrl: "https://www.twitch.tv/MakoFukasame",
+    twitchHandle: "makofukasame",
+  },
+  Bubbell: {
+    image: "/streamers/bubbell.png",
+    profileUrl: "https://www.twitch.tv/Bubbell",
+    twitchHandle: "bubbell",
+  },
+  Megaa: {
+    image: "/streamers/megaa.png",
+    profileUrl: "https://www.twitch.tv/Megaa",
+    twitchHandle: "megaa",
+  },
+  Carla: {
+    image: "/streamers/carla.png",
+    profileUrl: "https://www.twitch.tv/Carla",
+    twitchHandle: "carla",
+  },
+  PandaTV: {
+    image: "/streamers/pandatv.png",
+    profileUrl: "https://www.twitch.tv/PandaTV",
+    twitchHandle: "pandatv",
+  },
+  x5_PiG: {
+    image: "/streamers/x5_pig.png",
+    profileUrl: "https://www.twitch.tv/x5_pig",
+    twitchHandle: "x5_pig",
+  },
+  Rhilever: {
+    image: "/streamers/rhilever.png",
+    profileUrl: "https://www.twitch.tv/Rhilever",
+    twitchHandle: "rhilever",
+  },
+  Loserfruit: {
+    image: "/streamers/loserfruit.png",
+    profileUrl: "https://www.twitch.tv/Loserfruit",
+    twitchHandle: "loserfruit",
+  },
+  ProfoundRice: {
+    image: "/streamers/profoundrice.png",
+    profileUrl: "https://www.twitch.tv/profoundrice",
+    twitchHandle: "profoundrice",
+  },
+  Gooobzy: {
+    image: "/streamers/gooobzy.png",
+    profileUrl: "https://www.twitch.tv/gooobzy",
+    twitchHandle: "gooobzy",
+  },
+  TRASH: {
+    image: "/streamers/trash.png",
+    profileUrl: "https://www.twitch.tv/trash",
+    twitchHandle: "trash",
   },
 };
 
-const getStyledImage = (image: string) => {
+const getImageVariant = (
+  image: string,
+  imageDirectory: "streamers-nintendo" | "streamers-styled",
+) => {
   const fileName = image.split("/").pop();
   const stem = fileName?.replace(/\.[^.]+$/, "");
 
   if (!stem) {
-    return image;
+    return undefined;
   }
 
-  const styledImage = `/streamers-styled/${stem}.png`;
-  const styledImagePath = fileURLToPath(
-    new URL(`../../public${styledImage}`, import.meta.url),
+  const imageVariant = `/${imageDirectory}/${stem}.png`;
+  const imageVariantPath = fileURLToPath(
+    new URL(`../../public${imageVariant}`, import.meta.url),
   );
 
-  return existsSync(styledImagePath) ? styledImage : image;
+  return existsSync(imageVariantPath) ? imageVariant : undefined;
 };
 
 const resolveStreamerAssets = (
@@ -326,10 +394,16 @@ const resolveStreamerAssets = (
     return assets ?? {};
   }
 
+  const styledImage = getImageVariant(assets.image, "streamers-styled");
+  const nintendoImage = getImageVariant(assets.image, "streamers-nintendo");
+
   return {
     ...assets,
+    profileImage: assets.image,
+    styledImage,
+    nintendoImage,
     fallbackImage: assets.image,
-    image: getStyledImage(assets.image),
+    image: nintendoImage || styledImage || assets.image,
   };
 };
 
@@ -366,14 +440,14 @@ export const getStreamerUrlSegments = (streamer: StreamerProfile) => {
   );
 };
 
-const featuredIndex = 0;
+const featuredNames = new Set(["Naysy"]);
 const confirmedNames = new Set(["Adam", "Fasffy", "Danzie"]);
 
 export const streamers: StreamerProfile[] = names.map((name, index) => ({
   id: `slot-${String(index + 1).padStart(2, "0")}`,
   name,
   status:
-    index === featuredIndex
+    featuredNames.has(name)
       ? "featured"
       : confirmedNames.has(name)
         ? "confirmed"
