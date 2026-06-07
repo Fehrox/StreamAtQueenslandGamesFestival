@@ -6,6 +6,9 @@ export interface StreamerProfile {
   name: string;
   image?: string;
   fallbackImage?: string;
+  profileImage?: string;
+  styledImage?: string;
+  nintendoImage?: string;
   profileUrl?: string;
   status: "open" | "invited" | "confirmed" | "featured";
   twitchHandle?: string;
@@ -14,7 +17,13 @@ export interface StreamerProfile {
 type StreamerAssets = Pick<StreamerProfile, "image" | "profileUrl" | "twitchHandle">;
 type ResolvedStreamerAssets = Pick<
   StreamerProfile,
-  "fallbackImage" | "image" | "profileUrl" | "twitchHandle"
+  | "fallbackImage"
+  | "image"
+  | "nintendoImage"
+  | "profileImage"
+  | "profileUrl"
+  | "styledImage"
+  | "twitchHandle"
 >;
 
 const names = [
@@ -91,21 +100,21 @@ const names = [
   "ProfoundRice",
   "Gooobzy",
   "TRASH",
-  "OPEN SLOT 25",
-  "OPEN SLOT 26",
-  "OPEN SLOT 27",
-  "OPEN SLOT 28",
-  "OPEN SLOT 29",
-  "OPEN SLOT 30",
-  "OPEN SLOT 31",
-  "OPEN SLOT 32",
-  "OPEN SLOT 33",
-  "OPEN SLOT 34",
-  "OPEN SLOT 35",
-  "OPEN SLOT 36",
-  "OPEN SLOT 37",
-  "OPEN SLOT 38",
-  "OPEN SLOT 39",
+  "OPEN SLOT 1",
+  "OPEN SLOT 2",
+  "OPEN SLOT 3",
+  "OPEN SLOT 4",
+  "OPEN SLOT 5",
+  "OPEN SLOT 6",
+  "OPEN SLOT 7",
+  "OPEN SLOT 8",
+  "OPEN SLOT 9",
+  "OPEN SLOT 10",
+  "OPEN SLOT 11",
+  "OPEN SLOT 12",
+  "OPEN SLOT 13",
+  "OPEN SLOT 14",
+  "OPEN SLOT 15",
 ];
 
 const streamerAssets: Partial<Record<string, StreamerAssets>> = {
@@ -363,30 +372,23 @@ const streamerAssets: Partial<Record<string, StreamerAssets>> = {
   },
 };
 
-const getStyledImage = (image: string) => {
+const getImageVariant = (
+  image: string,
+  imageDirectory: "streamers-nintendo" | "streamers-styled",
+) => {
   const fileName = image.split("/").pop();
   const stem = fileName?.replace(/\.[^.]+$/, "");
 
   if (!stem) {
-    return image;
+    return undefined;
   }
 
-  const styledImageCandidates = [
-    `/streamers-nintendo/${stem}.png`,
-    `/streamers-styled/${stem}.png`,
-  ];
+  const imageVariant = `/${imageDirectory}/${stem}.png`;
+  const imageVariantPath = fileURLToPath(
+    new URL(`../../public${imageVariant}`, import.meta.url),
+  );
 
-  for (const styledImage of styledImageCandidates) {
-    const styledImagePath = fileURLToPath(
-      new URL(`../../public${styledImage}`, import.meta.url),
-    );
-
-    if (existsSync(styledImagePath)) {
-      return styledImage;
-    }
-  }
-
-  return image;
+  return existsSync(imageVariantPath) ? imageVariant : undefined;
 };
 
 const resolveStreamerAssets = (
@@ -396,10 +398,16 @@ const resolveStreamerAssets = (
     return assets ?? {};
   }
 
+  const styledImage = getImageVariant(assets.image, "streamers-styled");
+  const nintendoImage = getImageVariant(assets.image, "streamers-nintendo");
+
   return {
     ...assets,
+    profileImage: assets.image,
+    styledImage,
+    nintendoImage,
     fallbackImage: assets.image,
-    image: getStyledImage(assets.image),
+    image: nintendoImage || styledImage || assets.image,
   };
 };
 

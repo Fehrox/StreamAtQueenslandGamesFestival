@@ -83,12 +83,25 @@ const getStreamerProfileIcon = (streamer: (typeof streamers)[number]) => {
 };
 
 const streamerVerificationProfiles = streamers.map(
-  ({ id, name, twitchHandle, image, fallbackImage, profileUrl }) => ({
+  ({
+    id,
+    name,
+    twitchHandle,
+    image,
+    fallbackImage,
+    nintendoImage,
+    profileImage,
+    profileUrl,
+    styledImage,
+  }) => ({
     id,
     name,
     image: image ?? "",
     fallbackImage: fallbackImage ?? "",
+    nintendoImage: nintendoImage ?? "",
+    profileImage: profileImage ?? "",
     profileUrl: profileUrl ?? "",
+    styledImage: styledImage ?? "",
     twitchHandle: twitchHandle ?? "",
   }),
 );
@@ -231,6 +244,9 @@ const getCreatorProfileLink = (
                 }
                 data-streamer-image={streamer.image ?? ""}
                 data-streamer-fallback-image={streamer.fallbackImage ?? ""}
+                data-streamer-profile-image={streamer.profileImage ?? ""}
+                data-streamer-styled-image={streamer.styledImage ?? ""}
+                data-streamer-nintendo-image={streamer.nintendoImage ?? ""}
                 data-streamer-profile-link-url={getCreatorProfileLink(
                   streamer.twitchHandle,
                   streamer.profileUrl,
@@ -251,7 +267,7 @@ const getCreatorProfileLink = (
                         loading="lazy"
                         data-fallback-src={streamer.fallbackImage ?? undefined}
                         data-styled-streamer-image={
-                          streamer.fallbackImage && streamer.image !== streamer.fallbackImage
+                          streamer.profileImage && streamer.image !== streamer.profileImage
                             ? "true"
                             : undefined
                         }
@@ -474,6 +490,9 @@ const getCreatorProfileLink = (
                 }
                 data-streamer-image={streamer.image ?? ""}
                 data-streamer-fallback-image={streamer.fallbackImage ?? ""}
+                data-streamer-profile-image={streamer.profileImage ?? ""}
+                data-streamer-styled-image={streamer.styledImage ?? ""}
+                data-streamer-nintendo-image={streamer.nintendoImage ?? ""}
                 data-streamer-profile-link-url={getCreatorProfileLink(
                   streamer.twitchHandle,
                   streamer.profileUrl,
@@ -494,7 +513,7 @@ const getCreatorProfileLink = (
                         loading="lazy"
                         data-fallback-src={streamer.fallbackImage ?? undefined}
                         data-styled-streamer-image={
-                          streamer.fallbackImage && streamer.image !== streamer.fallbackImage
+                          streamer.profileImage && streamer.image !== streamer.profileImage
                             ? "true"
                             : undefined
                         }
@@ -1224,8 +1243,19 @@ const getCreatorProfileLink = (
         name: string;
         image: string;
         fallbackImage: string;
+        nintendoImage: string;
+        profileImage: string;
         profileUrl: string;
+        styledImage: string;
         twitchHandle: string;
+      };
+
+      type StreamerImageMode = "profile" | "styled" | "nintendo";
+
+      type StreamerImageTarget = {
+        image: string;
+        fallbackImage: string;
+        isGeneratedVariant: boolean;
       };
 
       type ConfirmationDetails = {
@@ -1393,6 +1423,8 @@ const getCreatorProfileLink = (
       ];
       const portraitFadeMs = 110;
       let hoverPreviewClearTimeout: number | undefined;
+      let activeStreamerImageMode: StreamerImageMode = "nintendo";
+      let hoverPreviewCard: HTMLElement | undefined;
 
       const applyImageFallback = (img: HTMLImageElement) => {
         const fallbackImage = img.getAttribute("data-fallback-src") || "";
@@ -1422,6 +1454,75 @@ const getCreatorProfileLink = (
         .forEach((img) => wireImageFallback(img));
       let pendingConfirmationDetails: ConfirmationDetails | undefined;
 
+      const getStreamerImageFromCard = (
+        card: HTMLElement,
+        imageMode: StreamerImageMode,
+      ): StreamerImageTarget => {
+        const profileImage =
+          card.getAttribute("data-streamer-profile-image") ||
+          card.getAttribute("data-streamer-fallback-image") ||
+          "";
+        const styledImage = card.getAttribute("data-streamer-styled-image") || "";
+        const nintendoImage = card.getAttribute("data-streamer-nintendo-image") || "";
+        const image =
+          imageMode === "profile"
+            ? profileImage
+            : imageMode === "styled"
+              ? styledImage || profileImage
+              : nintendoImage || styledImage || profileImage;
+
+        return {
+          image,
+          fallbackImage: profileImage,
+          isGeneratedVariant: Boolean(image && profileImage && image !== profileImage),
+        };
+      };
+
+      const setStreamerImageElement = (
+        img: HTMLImageElement,
+        { image, fallbackImage, isGeneratedVariant }: StreamerImageTarget,
+      ) => {
+        img.removeAttribute("data-fallback-active");
+
+        if (fallbackImage && fallbackImage !== image) {
+          img.setAttribute("data-fallback-src", fallbackImage);
+        } else {
+          img.removeAttribute("data-fallback-src");
+        }
+
+        if (isGeneratedVariant) {
+          img.setAttribute("data-styled-streamer-image", "true");
+        } else {
+          img.removeAttribute("data-styled-streamer-image");
+        }
+
+        if (img.getAttribute("src") !== image) {
+          img.src = image;
+        }
+      };
+
+      const updateStreamerCardImage = (
+        card: HTMLElement,
+        imageMode: StreamerImageMode,
+      ) => {
+        const streamerImageTarget = getStreamerImageFromCard(card, imageMode);
+        card.setAttribute("data-streamer-image", streamerImageTarget.image);
+        card.setAttribute(
+          "data-streamer-fallback-image",
+          streamerImageTarget.fallbackImage,
+        );
+
+        const img = card.querySelector<HTMLImageElement>(
+          ".portrait img, .mobile-portrait img",
+        );
+
+        if (!img || !streamerImageTarget.image) {
+          return;
+        }
+
+        setStreamerImageElement(img, streamerImageTarget);
+      };
+
       const parseStreamerVerificationProfiles = (): StreamerVerificationProfile[] => {
         if (!streamerVerificationProfileData?.textContent) {
           return [];
@@ -1443,7 +1544,10 @@ const getCreatorProfileLink = (
                 typeof profile.name === "string" &&
                 typeof profile.image === "string" &&
                 typeof profile.fallbackImage === "string" &&
+                typeof profile.nintendoImage === "string" &&
+                typeof profile.profileImage === "string" &&
                 typeof profile.profileUrl === "string" &&
+                typeof profile.styledImage === "string" &&
                 typeof profile.twitchHandle === "string",
             )
             .map((profile) => ({
@@ -1451,7 +1555,10 @@ const getCreatorProfileLink = (
               name: profile.name,
               image: profile.image,
               fallbackImage: profile.fallbackImage,
+              nintendoImage: profile.nintendoImage,
+              profileImage: profile.profileImage,
               profileUrl: profile.profileUrl,
+              styledImage: profile.styledImage,
               twitchHandle: profile.twitchHandle,
             }));
         } catch {
@@ -2305,6 +2412,7 @@ const getCreatorProfileLink = (
       const clearHoverPreview = () => {
         window.clearTimeout(hoverPreviewClearTimeout);
         hoverPreviewClearTimeout = window.setTimeout(() => {
+          hoverPreviewCard = undefined;
           document.documentElement.classList.remove("has-streamer-hover-preview");
 
           if (!hasSelection()) {
@@ -2323,12 +2431,12 @@ const getCreatorProfileLink = (
         }
 
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
-        const streamerImage = card.getAttribute("data-streamer-image") || "";
-        const streamerFallbackImage = card.getAttribute("data-streamer-fallback-image") || "";
+        const streamerImageTarget = getStreamerImageFromCard(card, activeStreamerImageMode);
         const streamerProfileUrl = card.getAttribute("data-streamer-profile-link-url") || "";
         const streamerProfilePlatform =
           card.getAttribute("data-streamer-profile-link-platform") || "";
         const streamerProfileIcon = card.getAttribute("data-streamer-profile-icon") || "";
+        hoverPreviewCard = card;
         document.documentElement.classList.add("has-streamer-hover-preview");
         setSelectedStreamerName(streamerName);
         setSelectedStreamerProfileLink(
@@ -2337,7 +2445,11 @@ const getCreatorProfileLink = (
           streamerProfilePlatform,
         );
         setSelectedStreamerProfileIcon(streamerProfileIcon);
-        setSelectedStreamerPortrait(streamerImage, streamerFallbackImage);
+        setSelectedStreamerPortrait(
+          streamerImageTarget.image,
+          streamerImageTarget.fallbackImage,
+          streamerImageTarget.isGeneratedVariant,
+        );
       };
 
       const resetReadyOverlayToEntrance = () => {
@@ -2385,6 +2497,7 @@ const getCreatorProfileLink = (
         target: Element | null,
         image: string,
         fallbackImage: string,
+        isGeneratedVariant = false,
       ) => {
         if (!(target instanceof HTMLElement)) {
           return;
@@ -2404,6 +2517,16 @@ const getCreatorProfileLink = (
           "";
 
         if (currentImage === image) {
+          const currentImg = target.querySelector<HTMLImageElement>("img");
+
+          if (currentImg) {
+            setStreamerImageElement(currentImg, {
+              image,
+              fallbackImage,
+              isGeneratedVariant,
+            });
+          }
+
           return;
         }
 
@@ -2412,12 +2535,9 @@ const getCreatorProfileLink = (
         const img = document.createElement("img");
         img.alt = "";
         img.decoding = "async";
-        if (fallbackImage) {
-          img.setAttribute("data-fallback-src", fallbackImage);
-          wireImageFallback(img, false);
-        }
         img.className = "portrait-crossfade-enter";
-        img.src = image;
+        setStreamerImageElement(img, { image, fallbackImage, isGeneratedVariant });
+        wireImageFallback(img, false);
         target.append(img);
 
         window.requestAnimationFrame(() => {
@@ -2438,10 +2558,21 @@ const getCreatorProfileLink = (
       const setSelectedStreamerPortrait = (
         streamerImage: string,
         streamerFallbackImage = "",
+        isGeneratedVariant = false,
       ) => {
-        setSelectedPortrait(selectedPortrait, streamerImage, streamerFallbackImage);
+        setSelectedPortrait(
+          selectedPortrait,
+          streamerImage,
+          streamerFallbackImage,
+          isGeneratedVariant,
+        );
 
-        setSelectedPortrait(mobileSelectedPortrait, streamerImage, streamerFallbackImage);
+        setSelectedPortrait(
+          mobileSelectedPortrait,
+          streamerImage,
+          streamerFallbackImage,
+          isGeneratedVariant,
+        );
       };
 
       const clearSelection = (urlMode: UrlUpdateMode = "push") => {
@@ -2475,8 +2606,7 @@ const getCreatorProfileLink = (
       const selectStreamer = (card: HTMLElement, urlMode: UrlUpdateMode = "push") => {
         const streamerId = card.getAttribute("data-streamer-id");
         const streamerName = card.getAttribute("data-streamer-name") || "Streamer";
-        const streamerImage = card.getAttribute("data-streamer-image") || "";
-        const streamerFallbackImage = card.getAttribute("data-streamer-fallback-image") || "";
+        const streamerImageTarget = getStreamerImageFromCard(card, activeStreamerImageMode);
         const streamerProfileUrl = card.getAttribute("data-streamer-profile-link-url") || "";
         const streamerProfilePlatform =
           card.getAttribute("data-streamer-profile-link-platform") || "";
@@ -2513,13 +2643,55 @@ const getCreatorProfileLink = (
         setSelectedStreamerProfileIcon(streamerProfileIcon);
         setTwitchConfirmButtonVisibility(streamerName);
         syncConfirmStreamerSelect();
-        setSelectedStreamerPortrait(streamerImage, streamerFallbackImage);
+        setSelectedStreamerPortrait(
+          streamerImageTarget.image,
+          streamerImageTarget.fallbackImage,
+          streamerImageTarget.isGeneratedVariant,
+        );
 
         if (mobileCta instanceof HTMLElement && card.classList.contains("mobile-tile")) {
           mobileCta.hidden = false;
         }
 
         updateUrlForSelectedStreamer(card, urlMode);
+      };
+
+      const getStreamerCardById = (streamerId = "") =>
+        Array.from(streamerCards).find(
+          (card) => card.getAttribute("data-streamer-id") === streamerId,
+        );
+
+      const syncActiveStreamerPortrait = () => {
+        const selectedStreamerCard = selectedStreamerId
+          ? getStreamerCardById(selectedStreamerId)
+          : undefined;
+
+        if (selectedStreamerCard) {
+          const streamerImageTarget = getStreamerImageFromCard(
+            selectedStreamerCard,
+            activeStreamerImageMode,
+          );
+          setSelectedStreamerPortrait(
+            streamerImageTarget.image,
+            streamerImageTarget.fallbackImage,
+            streamerImageTarget.isGeneratedVariant,
+          );
+          return;
+        }
+
+        if (
+          hoverPreviewCard &&
+          document.documentElement.classList.contains("has-streamer-hover-preview")
+        ) {
+          previewStreamer(hoverPreviewCard);
+        }
+      };
+
+      const setStreamerImageMode = (imageMode: StreamerImageMode) => {
+        activeStreamerImageMode = imageMode;
+        document.documentElement.setAttribute("data-streamer-image-mode", imageMode);
+        streamerCards.forEach((card) => updateStreamerCardImage(card, imageMode));
+        syncActiveStreamerPortrait();
       };
 
       eventInfoOpenButtons.forEach((button) => {
@@ -2747,6 +2919,9 @@ const getCreatorProfileLink = (
 
         card.addEventListener("mouseleave", () => {
           setCursorOverStreamerCard(false);
+          if (hoverPreviewCard === card) {
+            hoverPreviewCard = undefined;
+          }
           clearHoverPreview();
         });
 
@@ -2781,6 +2956,24 @@ const getCreatorProfileLink = (
 
         event.preventDefault();
         clearSelection();
+      });
+
+      window.addEventListener("keydown", (event) => {
+        const imageMode =
+          event.key === "F1"
+            ? "profile"
+            : event.key === "F2"
+              ? "styled"
+              : event.key === "F3"
+                ? "nintendo"
+                : undefined;
+
+        if (!imageMode) {
+          return;
+        }
+
+        event.preventDefault();
+        setStreamerImageMode(imageMode);
       });
 
       window.addEventListener("keydown", (event) => {
