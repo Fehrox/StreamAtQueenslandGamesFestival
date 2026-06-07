@@ -3,6 +3,7 @@ dist/
 .astro/
 .env
 .env.local
+.env.*.local
 qgf-render*.png
 qgf-mobile-cdp*.png
 dev-server.*.log
