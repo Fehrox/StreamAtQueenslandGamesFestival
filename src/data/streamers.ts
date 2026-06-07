@@ -79,8 +79,8 @@ const names = [
   "xara",
   "mee_shell",
   "BasedCode",
-  "OPEN SLOT 13",
-  "OPEN SLOT 14",
+  "Kwoli",
+  "MakoFukasame",
   "OPEN SLOT 15",
   "OPEN SLOT 16",
   "OPEN SLOT 17",
@@ -300,6 +300,16 @@ const streamerAssets: Partial<Record<string, StreamerAssets>> = {
   BasedCode: {
     profileUrl: "https://www.twitch.tv/basedcode",
     twitchHandle: "basedcode",
+  },
+  Kwoli: {
+    image: "/streamers/kwoli.png",
+    profileUrl: "https://www.twitch.tv/kwoli",
+    twitchHandle: "kwoli",
+  },
+  MakoFukasame: {
+    image: "/streamers/makofukasame.png",
+    profileUrl: "https://www.twitch.tv/MakoFukasame",
+    twitchHandle: "makofukasame",
   },
 };
 
