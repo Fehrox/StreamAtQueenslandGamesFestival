@@ -99,6 +99,8 @@ const names = [
   "Gooobzy",
   "t10nat",
   "Swagger",
+  "MrLiveProducer",
+  "Shayehayes",
   "OPEN SLOT 1",
   "OPEN SLOT 2",
   "OPEN SLOT 3",
@@ -113,8 +115,6 @@ const names = [
   "OPEN SLOT 12",
   "OPEN SLOT 13",
   "OPEN SLOT 14",
-  "OPEN SLOT 15",
-  "OPEN SLOT 16",
 ];
 
 const streamerAssets: Partial<Record<string, StreamerAssets>> = {
@@ -366,6 +366,14 @@ const streamerAssets: Partial<Record<string, StreamerAssets>> = {
     profileUrl: "https://www.twitch.tv/trash",
     twitchHandle: "trash",
   },
+  MrLiveProducer: {
+    profileUrl: "https://www.tiktok.com/@mrliveproducer",
+    twitchHandle: "mrliveproducer",
+  },
+  Shayehayes: {
+    profileUrl: "https://www.twitch.tv/shayehayes",
+    twitchHandle: "shayehayes",
+  },
 };
 
 const getImageVariant = (
@@ -442,6 +450,7 @@ export const getStreamerUrlSegments = (streamer: StreamerProfile) => {
 
 const featuredNames = new Set(["Naysy"]);
 const confirmedNames = new Set(["Adam", "Fasffy", "Danzie"]);
+const invitedNames = new Set(["MrLiveProducer", "Shayehayes"]);
 
 export const streamers: StreamerProfile[] = names.map((name, index) => ({
   id: `slot-${String(index + 1).padStart(2, "0")}`,
@@ -451,7 +460,9 @@ export const streamers: StreamerProfile[] = names.map((name, index) => ({
       ? "featured"
       : confirmedNames.has(name)
         ? "confirmed"
-        : "open",
+        : invitedNames.has(name)
+          ? "invited"
+          : "open",
   ...resolveStreamerAssets(streamerAssets[name]),
 }));
 
