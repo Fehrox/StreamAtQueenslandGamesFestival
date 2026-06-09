@@ -367,10 +367,12 @@ const streamerAssets: Partial<Record<string, StreamerAssets>> = {
     twitchHandle: "trash",
   },
   MrLiveProducer: {
+    image: "/streamers/mrliveproducer.png",
     profileUrl: "https://www.tiktok.com/@mrliveproducer",
     twitchHandle: "mrliveproducer",
   },
   Shayehayes: {
+    image: "/streamers/shayehayes.png",
     profileUrl: "https://www.twitch.tv/shayehayes",
     twitchHandle: "shayehayes",
   },

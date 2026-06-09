@@ -13,16 +13,20 @@ const pageTitle = selectedStreamer
   : "Queensland Games Festival Streamer Invite";
 const pageDescription = selectedStreamer
   ? `Queensland Games Festival streamer invite for ${selectedStreamer.name}.`
-  : "Queensland Games Festival streamer invite screen.";
+  : "Join the Queensland Games Festival creator invite for indie game streams, Twitch Connect, and creator sessions.";
 const pageUrl = new URL(
   selectedStreamer ? `/${getStreamerUrlSlug(selectedStreamer.name)}/` : "/",
   siteUrl,
 ).toString();
-const socialImagePath = selectedStreamer?.fallbackImage || selectedStreamer?.image || "";
+const genericSocialImagePath = "/social/qgf-streamer-invite-og.png";
+const socialImagePath =
+  selectedStreamer?.fallbackImage || selectedStreamer?.image || genericSocialImagePath;
+const usesGenericSocialImage = socialImagePath === genericSocialImagePath;
 const socialImageUrl = socialImagePath ? new URL(socialImagePath, siteUrl).toString() : "";
-const socialImageAlt = selectedStreamer
-  ? `${selectedStreamer.name} profile picture`
-  : "Queensland Games Festival streamer invite";
+const socialImageAlt =
+  selectedStreamer && !usesGenericSocialImage
+    ? `${selectedStreamer.name} profile picture`
+    : "Illustrated Queensland Games Festival streamer invite preview";
 const brisbanePowerhouseMapUrl =
   "https://www.google.com/maps/search/?api=1&query=Brisbane%20Powerhouse%2C%20Brisbane%20QLD";
 const confirmationQuestions = [
@@ -164,6 +168,13 @@ const getCreatorProfileLink = (
           <meta property="og:image" content={socialImageUrl} />
           <meta property="og:image:secure_url" content={socialImageUrl} />
           <meta property="og:image:alt" content={socialImageAlt} />
+          {usesGenericSocialImage && (
+            <>
+              <meta property="og:image:type" content="image/png" />
+              <meta property="og:image:width" content="1200" />
+              <meta property="og:image:height" content="630" />
+            </>
+          )}
         </>
       )
     }
