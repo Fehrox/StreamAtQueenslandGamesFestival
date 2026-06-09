@@ -5132,14 +5132,17 @@ const getCreatorProfileLink = (
     left: 4px;
     right: 4px;
     bottom: 0;
+    display: block;
+    overflow: hidden;
     margin: 0;
     color: #fff;
     font-family: "Arial Black", Impact, sans-serif;
     font-size: clamp(13px, 18px, 18px);
     line-height: 0.9;
     text-align: center;
+    text-overflow: ellipsis;
     text-transform: uppercase;
-    text-wrap: balance;
+    white-space: nowrap;
     text-shadow:
       -2px -2px 0 #111,
       2px -2px 0 #111,
@@ -6997,13 +7000,16 @@ const getCreatorProfileLink = (
       left: 3px;
       right: 3px;
       bottom: 3px;
+      display: block;
+      overflow: hidden;
       color: #fff;
       font-family: "Arial Black", Impact, sans-serif;
       font-size: clamp(10px, 3.2vw, 18px);
       line-height: 0.9;
       text-align: center;
+      text-overflow: ellipsis;
       text-transform: uppercase;
-      text-wrap: balance;
+      white-space: nowrap;
       text-shadow:
         -2px -2px 0 #111,
         2px -2px 0 #111,
