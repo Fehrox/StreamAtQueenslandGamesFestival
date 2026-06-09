@@ -413,7 +413,7 @@ const resolveStreamerAssets = (
     styledImage,
     nintendoImage,
     fallbackImage: assets.image,
-    image: nintendoImage || styledImage || assets.image,
+    image: styledImage || nintendoImage || assets.image,
   };
 };
 
